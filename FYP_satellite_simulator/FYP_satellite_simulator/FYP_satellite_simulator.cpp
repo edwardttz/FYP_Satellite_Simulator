@@ -125,6 +125,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_CREATE:
+		{
+			CreateWindow(TEXT("static"), TEXT("INPUT DATA"),
+				WS_VISIBLE | WS_CHILD,
+				10, 10, 300, 20,
+				hWnd, (HMENU)1, NULL, NULL
+			);
+			CreateWindow(TEXT("static"), TEXT("Two-line Element"),
+				WS_VISIBLE | WS_CHILD,
+				10, 35, 300, 20,
+				hWnd, (HMENU)1, NULL, NULL
+			);
+			CreateWindow(TEXT("edit"), TEXT("1 "),
+				WS_VISIBLE | WS_CHILD | WS_BORDER,
+				10, 60, 300, 20,
+				hWnd, (HMENU)1, NULL, NULL
+			);
+			CreateWindow(TEXT("edit"), TEXT("2 "),
+				WS_VISIBLE | WS_CHILD | WS_BORDER,
+				10, 85, 300, 20,
+				hWnd, (HMENU)1, NULL, NULL
+			);
+			CreateWindow(TEXT("button"), TEXT(""),
+				WS_VISIBLE | WS_CHILD,
+				315, 85, 80, 20,
+				hWnd, (HMENU)1, NULL, NULL);
+			break;
+		}
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
