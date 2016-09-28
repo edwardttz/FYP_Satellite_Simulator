@@ -6,12 +6,22 @@ using namespace std;
 
 int main(void) {
 
-double tX=0.2, tY=0.2, tZ=0.2; //Torque values
-double iX=0.002, iY=0.002, iZ=0.002; // MOI values in kg/m2
+double tX=0.02, tY=0.02, tZ=0.02; //Torque values
+double iX=0.25, iY=0.15, iZ=0.35; // MOI values in kg/m2
 double h = 0.1; //100ms step
 double aX=0.0 , aY=0.0, aZ=0.0; 
 double wX=0.0169,wY=0.0169,wZ=0.0169; //angular velocity values in rad/s
 double wX_next=0.0, wY_next=0.0, wZ_next=0.0; //To calculate next w values
+string wX_values = "wX.txt", wY_values = "wY.txt", wZ_values = "wZ.txt"; //Filenames for w
+string aX_values = "aX.txt", aY_values = "aY.txt", aZ_values = "aZ.txt"; //Filenames for acc
+
+//Clear all files 
+clearFile(wX_values);
+clearFile(wY_values);
+clearFile(wZ_values);
+clearFile(aX_values);
+clearFile(aY_values);
+clearFile(aZ_values);
 
 /*
 For user input :
@@ -45,10 +55,15 @@ for (int i=1; i<=100; i++) {
 	aX = (tX/iX) - cX*wY*wZ; 
 	aY = (tY/iY) - cY*wX*wZ;
 	aZ = (tZ/iZ) - cZ*wX*wY;
-	//Print wX values for current iteration
-	cout << wX << endl;      
-	//printValues(i,aX,aY,aZ,wX,wY,wZ);
 	
+	//Store into files
+	storeInFile(aX,aX_values);
+	storeInFile(aY,aY_values);
+	storeInFile(aZ,aZ_values);
+	storeInFile(wX,wX_values);
+	storeInFile(wY,wY_values);
+	storeInFile(wZ,wZ_values);
+
 	//Find next w values
 	wX_next = rungeKutta(tX,iX,wX,wY,wZ,h,cX);
 	wY_next = rungeKutta(tY,iY,wY,wX,wZ,h,cY);

@@ -1,5 +1,6 @@
 #include "RungeKutta.h"
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -17,4 +18,17 @@ void printValues (double i, double a_X,double a_Y, double a_Z, double w_X,double
 	cout << "**** Iteration " << i << " ****" << endl;
 	cout << "Angular Velocity: X=" << w_X << " Y=" << w_Y << " Z=" << w_Z << endl;
 	cout << "Angular Acceleration: X=" << a_X << " Y=" << a_Y << " Z=" << a_Z << endl << endl;
+}
+
+void storeInFile(double value, string fileName) {
+	ofstream myFile;
+	myFile.open(fileName, ios::app);
+	myFile << value << endl;
+	myFile.close();
+}
+
+void clearFile(string fileName) {
+	ofstream myFile;
+	myFile.open(fileName, ios::trunc);
+	myFile.close();
 }
