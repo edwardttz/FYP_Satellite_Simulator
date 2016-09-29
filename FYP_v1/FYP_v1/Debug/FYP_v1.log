@@ -1,14 +1,3 @@
-﻿Build started 29-09-2016 01:46:38.
-     1>Project "C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\FYP_v1\FYP_v1.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Main.cpp
-         Main.cpp
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.exe" /INCREMENTAL /NOLOGO WS2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.lib" /MACHINE:X86 Debug\Main.obj
-         Debug\RungeKutta.obj
-         FYP_v1.vcxproj -> C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.exe
-     1>Done Building Project "C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\FYP_v1\FYP_v1.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:02.97
+﻿  RungeKutta.cpp
+  FYP_v1.vcxproj -> F:\GitHub\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.exe
+  FYP_v1.vcxproj -> F:\GitHub\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.pdb (Full PDB)

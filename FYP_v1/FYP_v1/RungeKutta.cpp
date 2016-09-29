@@ -4,13 +4,13 @@
 
 using namespace std;
 
-double rungeKutta (double t, double I, double w, double w1, double w2, double h, double c) {
+double rungeKutta (double torque, double I, double w_initial, double w1, double w2, double h, double c) {
 	double k1,k2,k3,k4,w_next;
-	k1 = (t/I) - c*w1*w2;
-	k2 = (t/I) - c*(w1*w2+(k1/2));
-	k3 = (t/I) - c*(w1*w2+(k2/2));
-	k4 = (t/I) - c*(w1*w2 + k3); 
-	w_next = w + (h/6)*(k1+2*k2+2*k3+k4);
+	k1 = (torque/I) - c * w1 * w2;
+	k2 = (torque/I) - c * (w1 * w2 + ((h/2) * k1) );
+	k3 = (torque/I) - c * (w1 * w2 + ((h/2) * k2) );
+	k4 = (torque/I) - c * (w1 * w2 + h * k3); 
+	w_next = w_initial + (h/6) * (k1 + 2 * k2 + 2 * k3 + k4);
 	return w_next;
 }
 
