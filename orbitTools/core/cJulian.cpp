@@ -32,14 +32,14 @@ namespace OrbitTools
 {
 //////////////////////////////////////////////////////////////////////////////
 // Create a Julian date object from a time_t object. time_t objects store the
-// number of seconds since midnight UTC January 1, 1970.
+// number of seconds since midnight UTC January 1, 2000.
 cJulian::cJulian(time_t time)
 {
    struct tm stm;
    
    gmtime_s(&stm, &time);
 
-   int    year = stm.tm_year + 1900;
+   int    year = stm.tm_year + 2000;
    double day  = stm.tm_yday + 1 +
                  (stm.tm_hour + 
                   ((stm.tm_min + 
