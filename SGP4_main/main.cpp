@@ -29,8 +29,9 @@ int main(int /* argc */, char* /* argv[] */)
 {
    // Test SGP4 TLE data
    string str1 = "SGP4 Test";
-   string str2 = "1 25544U 98067A   16270.20968569  .00003031  00000-0  53388-4 0  9999";
-   string str3 = "2 25544  51.6452 274.0859 0006285   7.4866  93.6781 15.53934258 20700";
+   string str2 = "1 25544U 98067A   16274.13098880  .00005780  00000-0  94956-4 0  9994";
+   string str3 = "2 25544  51.6434 254.5439 0006578  21.2685  71.2382 15.53986571 21317";
+   char buffer[80];
 
    // Create a TLE object using the data above
    cTle tleSGP4(str1, str2, str3);
@@ -38,6 +39,8 @@ int main(int /* argc */, char* /* argv[] */)
    // Create a satellite object from the TLE object
    cSatellite satSGP4(tleSGP4);
 
+   //strftime(buffer, 80, "Now it's %I:%M%p.", satSGP4.Orbit().Epoch().ToTime());
+   //printf("%16.8f\n", satSGP4.Orbit().Epoch());
    // Print the position and velocity information of the satellite
    PrintPosVel(satSGP4);
 
@@ -67,7 +70,7 @@ void PrintPosVel(const cSatellite& sat)
 
    // Calculate the position and velocity of the satellite for various times.
    // mpe = "minutes past epoch"
-   for (int mpe = 0; mpe <= (360 * 4); mpe += 60)
+   for (int mpe = 0; mpe <= (120); mpe += 1)
    {
       // Get the position of the satellite at time "mpe"
       cEciTime eci = sat.PositionEci(mpe);

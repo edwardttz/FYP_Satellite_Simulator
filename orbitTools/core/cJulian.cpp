@@ -222,7 +222,7 @@ time_t cJulian::ToTime() const
    struct tm tGMT;
    memset(&tGMT, 0, sizeof(tGMT));
 
-   tGMT.tm_year = nYear - 1900;  // 2001 is 101
+   tGMT.tm_year = nYear - 2000;  // 2001 is 1
    tGMT.tm_mon  = nMonth - 1;    // January is 0
    tGMT.tm_mday = nDOM;          // First day is 1
    tGMT.tm_hour = secs / SEC_PER_HR;

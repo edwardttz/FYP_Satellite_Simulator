@@ -26,15 +26,8 @@ cOrbit::cOrbit(const cTle &tle) :
    int    epochYear = (int)m_tle.GetField(cTle::FLD_EPOCHYEAR);
    double epochDay  =      m_tle.GetField(cTle::FLD_EPOCHDAY );
 
-   if (epochYear < 57)
-   {
-      epochYear += 2000;
-   }
-   else
-   {
-      epochYear += 1900;
-   }
-
+   epochYear += 2000;
+   
    m_jdEpoch = cJulian(epochYear, epochDay);
 
    m_secPeriod = -1.0;
