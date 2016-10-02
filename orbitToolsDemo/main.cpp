@@ -29,8 +29,8 @@ int main(int /* argc */, char* /* argv[] */)
 {
    // Test SGP4 TLE data
    string str1 = "SGP4 Test";
-   string str2 = "1 25544U 98067A   16274.13098880  .00005780  00000-0  94956-4 0  9994";
-   string str3 = "2 25544  51.6434 254.5439 0006578  21.2685  71.2382 15.53986571 21317";
+   string str2 = "1 25544U 98067A   16276.51267453  .00005824  00000-0  95509-4 0  9996";
+   string str3 = "2 25544  51.6438 242.6726 0006624  30.4136  75.0493 15.54017269 21688";
 
    // Create a TLE object using the data above
    cTle tleSGP4(str1, str2, str3);
@@ -77,7 +77,7 @@ void PrintPosVel(const cSatellite& sat)
       // Push the coordinates object onto the end of the vector.
       vecPos.push_back(eci);
    }
-
+   
    // Open ECI position, Radius file
    myfile.open("Satellite_Pos_Rad_ECI.csv", ios::trunc);
    myfile << "T since,X,Y,Z,Radius,,," << sat.Name().c_str() << endl;
@@ -100,12 +100,11 @@ void PrintPosVel(const cSatellite& sat)
 	   }
 	   else if (i == 2)
 	   {
-		   int month = sat.Orbit().Epoch().ToTime().tm_mon + 1;
-
 		   myfile << i << ',' << vecPos[i].Position().m_x << ',' << vecPos[i].Position().m_y <<
-			   ',' << vecPos[i].Position().m_z << ',' << radius << ",,," 
+			   ',' << vecPos[i].Position().m_z << ',' << radius << ",,,"
+			   << "Singapore UTC 8:"
 			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << month << '/'
+			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
 			   << sat.Orbit().Epoch().ToTime().tm_year << ' '
 			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
 			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
