@@ -224,27 +224,47 @@ tm cJulian::ToTime() const
    memset(&tGMT, 0, sizeof(tGMT));
 
    tGMT.tm_year = nYear - 2000;  // 2001 is 1
-   tGMT.tm_mon  = nMonth - 1;    // January is 0
+   tGMT.tm_mon  = nMonth;        // January is 1
    tGMT.tm_mday = nDOM;          // First day is 1
    tGMT.tm_hour = secs / SEC_PER_HR;
    tGMT.tm_min  = (secs % SEC_PER_HR) / SEC_PER_MIN;
    tGMT.tm_sec  = (secs % SEC_PER_HR) % SEC_PER_MIN;
    tGMT.tm_isdst = 0; // No conversion desired
 
-   mktime(&tGMT);
-
-/*   if (tEpoch != -1)
+   // Singapore Local Time UTC 8
+   tGMT.tm_hour += 8;
+   if (tGMT.tm_hour >= 24)
    {
-      // Valid time_t value returned from mktime().
-      // mktime() expects a local time which means that tEpoch now needs 
-      // to be adjusted by the difference between this time zone and GMT.
-      long secDelta;
-
-      _get_timezone(&secDelta);
-
-      tEpoch -= secDelta;
+	   tGMT.tm_hour -= 24;
+	   tGMT.tm_mday += 1;
    }
-   */
+   if (nMonth == 12 && tGMT.tm_mday == 32)
+   {
+	   tGMT.tm_year += 1;
+	   tGMT.tm_mon = 1;
+	   tGMT.tm_mday = 1;
+   }
+   else if (nMonth == 1 || nMonth == 3 || nMonth == 5 || nMonth == 7 || nMonth == 8 || nMonth == 10) 
+   {
+	   if (tGMT.tm_mday == 32) 
+	   {
+		   tGMT.tm_mon += 1;
+		   tGMT.tm_mday = 1;
+	   }
+   }
+   else if (nMonth == 4 || nMonth == 6 || nMonth == 9)
+   {
+	   if (tGMT.tm_mday == 31)
+	   {
+		   tGMT.tm_mon += 1;
+		   tGMT.tm_mday = 1;
+	   }
+   }
+   else if(nMonth == 2 && nYear % 4 == 0)
+   {
+	   tGMT.tm_mon += 1;
+	   tGMT.tm_mday = 1;
+   }
    return tGMT;
 }
 }
