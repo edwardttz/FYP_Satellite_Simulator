@@ -100,11 +100,13 @@ void PrintPosVel(const cSatellite& sat)
 	   }
 	   else if (i == 2)
 	   {
+		   int month = sat.Orbit().Epoch().ToTime().tm_mon + 1;
+
 		   myfile << i << ',' << vecPos[i].Position().m_x << ',' << vecPos[i].Position().m_y <<
 			   ',' << vecPos[i].Position().m_z << ',' << radius << ",,," 
 			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << ' '
+			   << month << '/'
+			   << sat.Orbit().Epoch().ToTime().tm_year << ' '
 			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
 			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
 			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
