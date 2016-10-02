@@ -194,11 +194,12 @@ double cJulian::ToLmst(double lon) const
 // Convert to type time_t
 // Avoid using this function as it discards the fractional seconds of the
 // time component.
-time_t cJulian::ToTime() const
+tm cJulian::ToTime() const
 {
    int    nYear;
    int    nMonth;
    double dblDay;
+   time_t tEpoch;
 
    GetComponent(&nYear, &nMonth, &dblDay);
 
@@ -230,9 +231,9 @@ time_t cJulian::ToTime() const
    tGMT.tm_sec  = (secs % SEC_PER_HR) % SEC_PER_MIN;
    tGMT.tm_isdst = 0; // No conversion desired
 
-   time_t tEpoch = mktime(&tGMT);
+   mktime(&tGMT);
 
-   if (tEpoch != -1)
+/*   if (tEpoch != -1)
    {
       // Valid time_t value returned from mktime().
       // mktime() expects a local time which means that tEpoch now needs 
@@ -243,8 +244,8 @@ time_t cJulian::ToTime() const
 
       tEpoch -= secDelta;
    }
-
-   return tEpoch;
+   */
+   return tGMT;
 }
 }
 }

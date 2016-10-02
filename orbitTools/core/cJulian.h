@@ -36,7 +36,7 @@ public:
 
    double ToGmst() const;           // Greenwich Mean Sidereal Time
    double ToLmst(double lon) const; // Local Mean Sidereal Time
-   time_t ToTime() const;           // To time_t type - avoid using
+   tm ToTime() const;           // To time_t type - avoid using
 
    double FromJan0_12h_1900() const { return m_Date - EPOCH_JAN0_12H_1900; }
    double FromJan1_00h_1900() const { return m_Date - EPOCH_JAN1_00H_1900; }

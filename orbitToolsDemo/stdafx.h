@@ -7,11 +7,15 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <time.h>
+#include <ctime>
 
 #include <string>
 #include <map>
 #include <vector>
 #include <algorithm>
 #include <assert.h>
+#include <iostream>
+#include <fstream>
+#include <math.h>
 
 using namespace std;
