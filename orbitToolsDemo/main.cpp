@@ -64,6 +64,7 @@ int main(int /* argc */, char* /* argv[] */)
 void PrintPosVel(const cSatellite& sat)
 {
    vector<cEci> vecPos;
+   vector<cGeo> geoPos;
    long double radius = 0.0;
    ofstream myfile;
    myfile.precision(10);
@@ -73,9 +74,10 @@ void PrintPosVel(const cSatellite& sat)
    {
       // Get the position of the satellite at time "mpe"
       cEciTime eci = sat.PositionEci(mpe);
-    
+	  cGeoTime geo = sat.PositionEci(mpe);
       // Push the coordinates object onto the end of the vector.
       vecPos.push_back(eci);
+	  geoPos.push_back(geo);
    }
    
    // Open ECI position, Radius file
@@ -151,6 +153,44 @@ void PrintPosVel(const cSatellite& sat)
 	   {
 		   myfile << i << ',' << vecPos[i].Velocity().m_x << ',' << vecPos[i].Velocity().m_y <<
 			   ',' << vecPos[i].Velocity().m_z << ",,"  << endl;
+	   }
+   }
+   myfile.close();
+
+   // Latitude, Longtitude, Altitude
+   myfile.open("Satellite_Lat_Long_Alti.csv", ios::trunc);
+   myfile << "T since,Latitude,Longtitude,Altitude,,,," << sat.Name().c_str() << endl;
+   for (unsigned int i = 0; i < geoPos.size(); i++)
+   {
+	   if (i == 0)
+	   {
+		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
+			   ',' << geoPos[i].AltitudeKm() << ",,,,"
+			   << sat.Orbit().TleLine1().c_str() << endl;
+
+	   }
+	   else if (i == 1)
+	   {
+		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
+			   ',' << geoPos[i].AltitudeKm() << ",,,,"
+			   << sat.Orbit().TleLine2().c_str() << endl;
+	   }
+	   else if (i == 2)
+	   {
+		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
+			   ',' << geoPos[i].AltitudeKm() << ",,,,"
+			   << "Singapore UTC+8:" << ",,"
+			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
+			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
+			   << sat.Orbit().Epoch().ToTime().tm_year << ' '
+			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
+			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
+			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
+	   }
+	   else
+	   {
+		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
+			   ',' << geoPos[i].AltitudeKm() << endl;
 	   }
    }
    myfile.close();
