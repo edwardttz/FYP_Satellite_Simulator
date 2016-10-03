@@ -231,19 +231,21 @@ tm cJulian::ToTime() const
    tGMT.tm_sec  = (secs % SEC_PER_HR) % SEC_PER_MIN;
    tGMT.tm_isdst = 0; // No conversion desired
 
-   // Singapore Local Time UTC 8
+   // Singapore Local Time - UTC+8
    tGMT.tm_hour += 8;
    if (tGMT.tm_hour >= 24)
    {
 	   tGMT.tm_hour -= 24;
 	   tGMT.tm_mday += 1;
    }
+   // Last month of the year
    if (nMonth == 12 && tGMT.tm_mday == 32)
    {
 	   tGMT.tm_year += 1;
 	   tGMT.tm_mon = 1;
 	   tGMT.tm_mday = 1;
    }
+   // The following months have 31 days
    else if (nMonth == 1 || nMonth == 3 || nMonth == 5 || nMonth == 7 || nMonth == 8 || nMonth == 10) 
    {
 	   if (tGMT.tm_mday == 32) 
@@ -252,6 +254,7 @@ tm cJulian::ToTime() const
 		   tGMT.tm_mday = 1;
 	   }
    }
+   // The following months have 30 days
    else if (nMonth == 4 || nMonth == 6 || nMonth == 9 || nMonth == 11)
    {
 	   if (tGMT.tm_mday == 31)
@@ -260,7 +263,8 @@ tm cJulian::ToTime() const
 		   tGMT.tm_mday = 1;
 	   }
    }
-   else if(nMonth == 2 && (nYear-2000) % 4 == 0)
+   // Check for leap years. Leap years have 366.24 days
+   else if(nMonth == 2 && (nYear % 4 == 0 || (nYear % 100 == 0) && (nYear % 400 == 0)))
    {
 	   tGMT.tm_mon += 1;
 	   tGMT.tm_mday = 1;
