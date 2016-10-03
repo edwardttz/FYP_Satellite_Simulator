@@ -252,7 +252,7 @@ tm cJulian::ToTime() const
 		   tGMT.tm_mday = 1;
 	   }
    }
-   else if (nMonth == 4 || nMonth == 6 || nMonth == 9)
+   else if (nMonth == 4 || nMonth == 6 || nMonth == 9 || nMonth == 11)
    {
 	   if (tGMT.tm_mday == 31)
 	   {
@@ -260,12 +260,12 @@ tm cJulian::ToTime() const
 		   tGMT.tm_mday = 1;
 	   }
    }
-   else if(nMonth == 2 && nYear % 4 == 0)
+   else if(nMonth == 2 && (nYear-2000) % 4 == 0)
    {
 	   tGMT.tm_mon += 1;
 	   tGMT.tm_mday = 1;
    }
    return tGMT;
-}
-}
+   }
+  }
 }
