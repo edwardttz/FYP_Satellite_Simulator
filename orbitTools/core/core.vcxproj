@@ -139,6 +139,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cEcef.cpp" />
     <ClCompile Include="cEci.cpp" />
     <ClCompile Include="cJulian.cpp" />
     <ClCompile Include="coord.cpp" />
@@ -154,6 +155,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cEcef.h" />
     <ClInclude Include="cEci.h" />
     <ClInclude Include="cJulian.h" />
     <ClInclude Include="coord.h" />

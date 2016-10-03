@@ -15,6 +15,7 @@
 #include "cTle.h"
 #include "cJulian.h"
 #include "cEci.h"
+#include "cEcef.h"
 #include "cVector.h"
 #include "cNoradBase.h"
 
@@ -37,6 +38,9 @@ public:
    // Return satellite ECI data at given minutes past epoch.
    cEciTime PositionEci(double mpe) const;
    cEciTime GetPosition(double mpe) const; // Deprecated, use PositionEci().
+
+	// Return satellite ECEF data at given minutes past epoch.
+   cEcefTime PositionEcef(double mpe) const;
    
    double Inclination()   const { return m_Inclination;   }
    double Eccentricity()  const { return m_Eccentricity;  }

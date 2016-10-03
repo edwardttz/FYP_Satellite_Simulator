@@ -9,6 +9,7 @@
 #include <string>
 #include "cTle.h"
 #include "cEci.h"
+#include "cEcef.h"
 #include "cOrbit.h"
 
 using namespace Zeptomoby::OrbitTools;
@@ -29,6 +30,9 @@ public:
    string   Name() const;
    cEciTime PositionEci(const cJulian& time) const;
    cEciTime PositionEci(double mpe) const;
+
+   cEcefTime PositionEcef(const cJulian& time) const;
+   cEcefTime PositionEcef(double mpe) const;
 
    const cOrbit& Orbit() const { return *m_pOrbit; }      
 

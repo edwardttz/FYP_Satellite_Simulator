@@ -27,6 +27,7 @@ public:
    virtual ~cNoradSDP4();
 
    virtual cEciTime GetPosition(double tsince);
+   virtual cEcefTime GetPositionEcef(double tsince);
 
    virtual cNoradBase* Clone(const cOrbit& orbit) { return new cNoradSDP4(orbit); }
 

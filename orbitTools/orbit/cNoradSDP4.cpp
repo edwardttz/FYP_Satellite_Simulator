@@ -1,6 +1,6 @@
 //
 // cNoradSDP4.cpp
-//
+// Not using this file at all!!!
 // NORAD SDP4 implementation. See header note in cNoradBase.cpp
 // Copyright (c) 2003-2014 Michael F. Henry
 //
@@ -9,6 +9,7 @@
 #include "stdafx.h"
 
 #include "cEci.h"
+#include "cEcef.h"
 #include "cNoradSDP4.h"
 #include "cOrbit.h"
 
@@ -667,6 +668,40 @@ cEciTime cNoradSDP4::GetPosition(double tsince)
    xn = XKE / pow(a, 1.5);
 
    return FinalPosition(xinc, omgadf, e, a, xl, xnode, xn, tsince);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// This procedure is useless.
+// Ecef function with ECI model
+// tsince - Time in minutes since the TLE epoch (GMT).
+cEcefTime cNoradSDP4::GetPositionEcef(double tsince)
+{
+	// Update for secular gravity and atmospheric drag 
+	double xmdf = m_Orbit.MeanAnomaly() + m_xmdot  * tsince;
+	double omgadf = m_Orbit.ArgPerigee() + m_omgdot * tsince;
+	double xnoddf = m_Orbit.RAAN() + m_xnodot * tsince;
+	double tsq = tsince * tsince;
+	double xnode = xnoddf + m_xnodcf * tsq;
+	double tempa = 1.0 - m_c1 * tsince;
+	double tempe = m_Orbit.BStar() * m_c4 * tsince;
+	double templ = m_t2cof * tsq;
+	double xn = m_Orbit.MeanMotion();
+	double em;
+	double xinc;
+
+	DeepSecular(&xmdf, &omgadf, &xnode, &em, &xinc, &xn, tsince);
+
+	double a = pow(XKE / xn, 2.0 / 3.0) * sqr(tempa);
+	double e = em - tempe;
+	double xmam = xmdf + m_Orbit.MeanMotion() * templ;
+
+	DeepPeriodics(&e, &xinc, &omgadf, &xnode, &xmam, tsince);
+
+	double xl = xmam + omgadf + xnode;
+
+	xn = XKE / pow(a, 1.5);
+
+	return FinalPositionEcef(xinc, omgadf, e, a, xl, xnode, xn, tsince);
 }
 }
 }

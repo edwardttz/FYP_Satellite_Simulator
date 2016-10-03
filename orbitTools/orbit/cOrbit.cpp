@@ -8,6 +8,7 @@
 #include "stdafx.h"
 
 #include "cEci.h"
+#include "cEcef.h"
 #include "cOrbit.h"
 #include "cNoradSGP4.h"
 #include "cNoradSDP4.h"
@@ -200,6 +201,23 @@ cEciTime cOrbit::PositionEci(double mpe) const
    eci.ScaleVelVector(radiusAe * (MIN_PER_DAY / 86400));  // km/sec
 
    return eci;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// This procedure returns the ECEF position and velocity for the satellite
+// at the given number of minutes past the (GMT) TLE epoch. The vectors 
+// returned in the ECEF object are kilometer-based.
+cEcefTime cOrbit::PositionEcef(double mpe) const
+{
+	cEcefTime ecef = m_pNoradModel->GetPosition(mpe);
+
+	// Convert ECI vector units from AU to kilometers
+	double radiusAe = XKMPER_WGS72 / AE;
+
+	ecef.ScalePosVector(radiusAe);                          // km
+	ecef.ScaleVelVector(radiusAe * (MIN_PER_DAY / 86400));  // km/sec
+
+	return ecef;
 }
 
 //////////////////////////////////////////////////////////////////////////////

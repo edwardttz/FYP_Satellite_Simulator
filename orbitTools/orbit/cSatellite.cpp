@@ -77,5 +77,19 @@ cEciTime cSatellite::PositionEci(const cJulian& time) const
    return PositionEci(mpe);
 }
 
+// Calculates the ECEF position of the satellite at the specified number of
+// minutes past the satellite epoch time.
+cEcefTime cSatellite::PositionEcef(double mpe) const
+{
+	return m_pOrbit->PositionEcef(mpe);
+}
+
+// Calculates the ECI position of the satellite at the specified time.
+cEcefTime cSatellite::PositionEcef(const cJulian& time) const
+{
+	double mpe = time.SpanMin(m_pOrbit->Epoch());
+
+	return PositionEcef(mpe);
+}
 }
 }

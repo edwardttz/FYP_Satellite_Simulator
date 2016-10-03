@@ -13,6 +13,7 @@ using namespace std;
 
 #include "cJulian.h"
 #include "cEci.h"
+#include "cEcef.h"
 #include "coord.h"
 #include "cSite.h"
 #include "cTle.h"

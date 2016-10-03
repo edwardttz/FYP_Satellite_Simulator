@@ -18,6 +18,7 @@ namespace OrbitTools
 //////////////////////////////////////////////////////////////////////////////
 
 class cEciTime;
+class cEcefTime;
 class cOrbit;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -30,6 +31,8 @@ public:
 
    virtual cEciTime GetPosition(double tsince) = 0;
 
+   virtual cEcefTime GetPositionEcef(double tsince) = 0;
+
    virtual cNoradBase* Clone(const cOrbit&) = 0;
 
 protected:
@@ -37,6 +40,9 @@ protected:
 
    cEciTime FinalPosition(double incl, double omega, double  e, double    a, 
                           double   xl, double xnode, double xn, double tsince);
+
+   cEcefTime FinalPositionEcef(double incl, double omega, double  e, double    a,
+						  double   xl, double xnode, double xn, double tsince);
 
    const cOrbit &m_Orbit;
 
