@@ -264,10 +264,26 @@ tm cJulian::ToTime() const
 	   }
    }
    // Check for leap years. Leap years have 366.24 days
-   else if(nMonth == 2 && (nYear % 4 == 0 || (nYear % 100 == 0) && (nYear % 400 == 0)))
+   else if(nMonth == 2)
    {
-	   tGMT.tm_mon += 1;
-	   tGMT.tm_mday = 1;
+	   if (nYear % 400 == 0) 
+	   {
+		   tGMT.tm_mday += 1;
+	   }
+	   else if (nYear % 100 == 0)
+	   {
+		   tGMT.tm_mday = 1;
+		   tGMT.tm_mon += 1;
+	   }
+	   else if (nYear % 4 == 0)
+	   {
+		   tGMT.tm_mday += 1;
+	   }
+	   else 
+	   {
+		   tGMT.tm_mday = 1;
+		   tGMT.tm_mon += 1;
+	   }  
    }
    return tGMT;
    }
