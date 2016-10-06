@@ -64,10 +64,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RungeKutta.cpp" />
+    <ClCompile Include="SpacecraftDynamics.cpp" />
+    <ClCompile Include="Storage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RungeKutta.h" />
+    <ClInclude Include="SpacecraftDynamics.h" />
+    <ClInclude Include="Storage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
