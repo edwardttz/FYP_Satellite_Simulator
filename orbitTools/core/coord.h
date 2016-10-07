@@ -17,6 +17,8 @@ namespace OrbitTools
 class cEci;
 class cEcf;
 class cEciTime;
+class cEcef;
+class cEcefTime;
 
 //////////////////////////////////////////////////////////////////////
 // Geocentric coordinates.
@@ -24,6 +26,7 @@ class cGeo
 {
 public:
    cGeo(const cEci& eci, cJulian date);
+   cGeo(const cEcef& ecef, cJulian date);
    cGeo(double latRad, double lonRad, double altKm);
 
    virtual ~cGeo() {}
@@ -56,6 +59,8 @@ public:
    cGeoTime(double latRad, double lonRad, double altKm, cJulian date);
    cGeoTime(const cEci &eci, cJulian date);
    cGeoTime(const cEciTime &eci);
+   cGeoTime(const cEcef &ecef, cJulian date);
+   cGeoTime(const cEcefTime &ecef);
    virtual ~cGeoTime() {};
       
    cJulian Date() const { return m_Date; }

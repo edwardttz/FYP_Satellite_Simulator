@@ -8,6 +8,7 @@
 
 #include "coord.h"
 #include "cEci.h"
+#include "cEcef.h"
 
 namespace Zeptomoby 
 {
@@ -29,6 +30,12 @@ cGeo::cGeo(const cEci& eci, cJulian date)
 {
    Construct(eci.Position(),
              fmod((AcTan(eci.Position().m_y, eci.Position().m_x) - date.ToGmst()), TWOPI));
+}
+
+cGeo::cGeo(const cEcef& ecef, cJulian date)
+{
+	Construct(ecef.Position(),
+		fmod((AcTan(ecef.Position().m_y, ecef.Position().m_x) - date.ToGmst()), TWOPI));
 }
 
 void cGeo::Construct(const cVector &posEcf, double theta)
@@ -110,6 +117,17 @@ cGeoTime::cGeoTime(const cEciTime &eci)
 {
 }
 
+cGeoTime::cGeoTime(const cEcef &ecef, cJulian date)
+	: cGeo(ecef, date),
+	m_Date(date)
+{
+}
+
+cGeoTime::cGeoTime(const cEcefTime &ecef)
+	: cGeo(ecef, ecef.Date()),
+	m_Date(ecef.Date())
+{
+}
 //////////////////////////////////////////////////////////////////////
 // cTopo Class
 //////////////////////////////////////////////////////////////////////

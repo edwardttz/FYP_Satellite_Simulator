@@ -209,7 +209,7 @@ cEciTime cOrbit::PositionEci(double mpe) const
 // returned in the ECEF object are kilometer-based.
 cEcefTime cOrbit::PositionEcef(double mpe) const
 {
-	cEcefTime ecef = m_pNoradModel->GetPosition(mpe);
+	cEcefTime ecef = m_pNoradModel->GetPositionEcef(mpe);
 
 	// Convert ECI vector units from AU to kilometers
 	double radiusAe = XKMPER_WGS72 / AE;

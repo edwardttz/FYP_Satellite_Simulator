@@ -16,6 +16,7 @@
 //
 // Copyright (c) 2003-2010 Michael F. Henry
 //
+// ECEF at line 411
 // mfh 12/2010
 //
 #include "StdAfx.h"
@@ -403,11 +404,37 @@ cEcefTime cNoradBase::FinalPositionEcef(double incl, double  omega,
 	double vy = xmy * cosuk - sinnok * sinuk;
 	double vz = sinik * cosuk;
 
-	// Position
+/*	// ECI Position
 	double x = rk * ux;
 	double y = rk * uy;
 	double z = rk * uz;
+*/
+	// Calculate ECEF Position
 
+	double cose = ecose / e;
+	double sine = esine / e;
+	temp = cose - e;
+	temp1 = 1.0 - (cose * e * e);
+	temp2 = temp / temp1;
+	double v1 = acos(temp2);
+	temp = sqrt(1.0 - e * e) * sine;
+	temp1 = 1.0 - (cose * e);
+	temp2 = temp / temp1;
+	double v2 = asin(temp2);
+	double v = 0.0;
+	if (v2 < 0)
+	{
+		v = v1 * -1.0;
+	}
+	else
+	{
+		v = v1;
+	}
+	double phi = v + omega;
+
+	double x = 100000.0;
+	double y = 100000.0;
+	double z = rk * sinik * sin(phi);
 	cVector vecPos(x, y, z);
 
 	// Validate on altitude

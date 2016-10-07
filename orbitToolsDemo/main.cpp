@@ -75,8 +75,8 @@ void PrintPosVel(const cSatellite& sat)
    {
       // Get the position of the satellite at time "mpe"
       cEciTime eci = sat.PositionEci(mpe);
-	  cGeoTime geo = sat.PositionEci(mpe);
 	  cEcefTime ecef = sat.PositionEcef(mpe);
+	  cGeoTime geo = sat.PositionEcef(mpe);
 
       // Push the coordinates object onto the end of the vector.
       vecPos.push_back(eci);
@@ -163,7 +163,7 @@ void PrintPosVel(const cSatellite& sat)
    myfile.close();
 
    // Save Satellite Latitude, Longtitude, Altitude to file
-   myfile.open("Satellite_Lat_Long_Alti.csv", ios::trunc);
+   myfile.open("Satellite_Lat_Long_Alti_ECEF.csv", ios::trunc);
    myfile << "T since,Latitude,Longtitude,Altitude,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < geoPos.size(); i++)
    {
