@@ -50,7 +50,7 @@ cEciTime cNoradSGP4::GetPosition(double tsince)
    // delta omega term, and the delta m term are dropped.
    bool isimp = false;
 
-   if ((m_Orbit.SemiMajor() * (1.0 - m_Orbit.Eccentricity()) / AE) < (220.0 / XKMPER_WGS72 + AE))
+   if ((m_Orbit.SemiMajor() * (1.0 - m_Orbit.Eccentricity()) / AE) < (220.0 / XKMPER_WGS84 + AE))
    {
       isimp = true;
    }
@@ -124,7 +124,7 @@ cEcefTime cNoradSGP4::GetPositionEcef(double tsince)
 	// delta omega term, and the delta m term are dropped.
 	bool isimp = false;
 
-	if ((m_Orbit.SemiMajor() * (1.0 - m_Orbit.Eccentricity()) / AE) < (220.0 / XKMPER_WGS72 + AE))
+	if ((m_Orbit.SemiMajor() * (1.0 - m_Orbit.Eccentricity()) / AE) < (220.0 / XKMPER_WGS84 + AE))
 	{
 		isimp = true;
 	}

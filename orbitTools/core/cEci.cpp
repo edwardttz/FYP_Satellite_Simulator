@@ -39,11 +39,11 @@ cEci::cEci(const cGeo& geo, cJulian date)
    double theta = date.ToLmst(lon);
    double c = 1.0 / sqrt(1.0 + F * (F - 2.0) * sqr(sin(lat)));
    double s = sqr(1.0 - F) * c;
-   double achcp = (XKMPER_WGS72 * c + alt) * cos(lat);
+   double achcp = (XKMPER_WGS84 * c + alt) * cos(lat);
 
    m_Position.m_x = achcp * cos(theta);         // km
    m_Position.m_y = achcp * sin(theta);         // km
-   m_Position.m_z = (XKMPER_WGS72 * s + alt) * sin(lat);   // km
+   m_Position.m_z = (XKMPER_WGS84 * s + alt) * sin(lat);   // km
    m_Position.m_w = sqrt(sqr(m_Position.m_x) +  // range, km
                          sqr(m_Position.m_y) + 
                          sqr(m_Position.m_z));  

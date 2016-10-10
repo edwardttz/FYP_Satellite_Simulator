@@ -52,10 +52,10 @@ cNoradBase::cNoradBase(const cOrbit &orbit) :
 
    // For perigee below 156 km, the values of S and QOMS2T are altered.
    double rp      = m_Orbit.SemiMajor() * (1.0 - m_Orbit.Eccentricity());
-   double perigee = (rp - 1.0) * XKMPER_WGS72;
+   double perigee = (rp - 1.0) * XKMPER_WGS84;
 
-   double Qo = AE + 120.0 / XKMPER_WGS72;
-   double S  = AE +  78.0 / XKMPER_WGS72;
+   double Qo = AE + 120.0 / XKMPER_WGS84;
+   double S  = AE +  78.0 / XKMPER_WGS84;
 
    m_s4     = S;
    m_qoms24 = pow((Qo - S), 4); //(QO - S)^4 ER^4
@@ -72,8 +72,8 @@ cNoradBase::cNoradBase(const cOrbit &orbit) :
          m_s4 = 20.0;
       }
 
-      m_qoms24 = pow((120.0 - m_s4) * AE / XKMPER_WGS72, 4.0);
-      m_s4 = m_s4 / XKMPER_WGS72 + AE;
+      m_qoms24 = pow((120.0 - m_s4) * AE / XKMPER_WGS84, 4.0);
+      m_s4 = m_s4 / XKMPER_WGS84 + AE;
    }
 
    const double pinvsq = 1.0 / (sqr(m_Orbit.SemiMajor()) * sqr(m_betao2));
@@ -264,9 +264,9 @@ cEciTime cNoradBase::FinalPosition(double incl, double  omega,
    cVector vecPos(x, y, z);
 
    // Validate on altitude
-   double altKm = (vecPos.Magnitude() * (XKMPER_WGS72 / AE));
+   double altKm = (vecPos.Magnitude() * (XKMPER_WGS84 / AE));
 
-   if (altKm < XKMPER_WGS72)
+   if (altKm < XKMPER_WGS84)
    {
       cJulian decayTime = m_Orbit.Epoch();
 
@@ -438,9 +438,9 @@ cEcefTime cNoradBase::FinalPositionEcef(double incl, double  omega,
 	cVector vecPos(x, y, z);
 
 	// Validate on altitude
-	double altKm = (vecPos.Magnitude() * (XKMPER_WGS72 / AE));
+	double altKm = (vecPos.Magnitude() * (XKMPER_WGS84 / AE));
 
-	if (altKm < XKMPER_WGS72)
+	if (altKm < XKMPER_WGS84)
 	{
 		cJulian decayTime = m_Orbit.Epoch();
 

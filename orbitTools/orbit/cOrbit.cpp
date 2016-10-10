@@ -54,8 +54,8 @@ cOrbit::cOrbit(const cTle &tle) :
    m_rmMeanMotionRec    = rpmin / (1.0 + delta0);
    m_aeAxisSemiMajorRec = a0 / (1.0 - delta0);
    m_aeAxisSemiMinorRec = m_aeAxisSemiMajorRec * sqrt(1.0 - (e * e));
-   m_kmPerigeeRec       = XKMPER_WGS72 * (m_aeAxisSemiMajorRec * (1.0 - e) - AE);
-   m_kmApogeeRec        = XKMPER_WGS72 * (m_aeAxisSemiMajorRec * (1.0 + e) - AE);
+   m_kmPerigeeRec       = XKMPER_WGS84 * (m_aeAxisSemiMajorRec * (1.0 - e) - AE);
+   m_kmApogeeRec        = XKMPER_WGS84 * (m_aeAxisSemiMajorRec * (1.0 + e) - AE);
 
    if (TWOPI / m_rmMeanMotionRec >= 225.0)
    {
@@ -195,7 +195,7 @@ cEciTime cOrbit::PositionEci(double mpe) const
    cEciTime eci = m_pNoradModel->GetPosition(mpe);
 
    // Convert ECI vector units from AU to kilometers
-   double radiusAe = XKMPER_WGS72 / AE;
+   double radiusAe = XKMPER_WGS84 / AE;
 
    eci.ScalePosVector(radiusAe);                          // km
    eci.ScaleVelVector(radiusAe * (MIN_PER_DAY / 86400));  // km/sec
@@ -212,7 +212,7 @@ cEcefTime cOrbit::PositionEcef(double mpe) const
 	cEcefTime ecef = m_pNoradModel->GetPositionEcef(mpe);
 
 	// Convert ECI vector units from AU to kilometers
-	double radiusAe = XKMPER_WGS72 / AE;
+	double radiusAe = XKMPER_WGS84 / AE;
 
 	ecef.ScalePosVector(radiusAe);                          // km
 	ecef.ScaleVelVector(radiusAe * (MIN_PER_DAY / 86400));  // km/sec

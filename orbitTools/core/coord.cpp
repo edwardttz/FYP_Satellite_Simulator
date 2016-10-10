@@ -47,7 +47,7 @@ void cGeo::Construct(const cVector &posEcf, double theta)
       theta += TWOPI;  // "wrap" negative modulo
    }
 
-   double kmSemiMaj = XKMPER_WGS72;
+   double kmSemiMaj = XKMPER_WGS84;
 
    double r   = sqrt(sqr(posEcf.m_x) + sqr(posEcf.m_y));
    double e2  = F * (2.0 - F);
