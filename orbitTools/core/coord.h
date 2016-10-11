@@ -44,6 +44,7 @@ public:
 
 protected:
    void Construct(const cVector &posEcf, double theta);
+   void ConstructEcef(const cVector &posEcf);
 
    double m_Lat;   // Latitude,  radians (negative south)
    double m_Lon;   // Longitude, radians (negative west)

@@ -34,8 +34,66 @@ cGeo::cGeo(const cEci& eci, cJulian date)
 
 cGeo::cGeo(const cEcef& ecef, cJulian date)
 {
-	Construct(ecef.Position(),
-		fmod((AcTan(ecef.Position().m_y, ecef.Position().m_x) - date.ToGmst()), TWOPI));
+	ConstructEcef(ecef.Position());
+}
+
+//
+// By D. Rose - November, 2014
+// http://danceswithcode.net/engineeringnotes/geodetic_to_ecef/geodetic_to_ecef.html
+//
+void cGeo::ConstructEcef(const cVector &posEcf)
+{
+	double x = posEcf.m_x,
+		   y = posEcf.m_y,
+		   z = posEcf.m_z;
+	double zp = abs(z);
+	double a = XKMPER_WGS84;
+	double e2 = F * (2.0 - F);
+	double a1 = a*e2,
+		a2 = a1*a1,
+		a3 = a1*e2 / 2.0,
+		a4 = 2.5*a2,
+		a5 = a1 + a3,
+		a6 = 1 - e2;
+	double w2, w, r2, r, s2, c2, s, c, ss;
+	double g, rg, rf, u, v, m, f, p;
+	double lat;
+
+	w2 = x*x + y*y;
+	w = sqrt(w2);
+	r2 = w2 + z*z;
+	r = sqrt(r2);
+	s2 = z*z / r2;
+	c2 = w2 / r2;
+	u = a2 / r;
+	v = a3 - a4 / r;
+	if (c2 > 0.3) {
+		s = (zp / r)*(1.0 + c2*(a1 + u + s2*v) / r);
+		lat = asin(s);      //Lat
+		ss = s*s;
+		c = sqrt(1.0 - ss);
+	}
+	else {
+		c = (w / r)*(1.0 - s2*(a5 - u - c2*v) / r);
+		lat = acos(c);      //Lat
+		ss = 1.0 - c*c;
+		s = sqrt(ss);
+	}
+	g = 1.0 - e2*ss;
+	rg = a/sqrt(g);
+	rf = a6*rg;
+	u = w - rg*c;
+	v = zp - rf*s;
+	f = c*u + s*v;
+	m = c*v - s*u;
+	p = m / (rf / g + f);
+	lat += p;
+	if (z < 0.0) {
+		lat *= -1.0;
+	}
+	m_Lat = lat;
+	m_Lon = AcTan(y,x);
+	m_Alt = f + m*p / 2.0;
 }
 
 void cGeo::Construct(const cVector &posEcf, double theta)

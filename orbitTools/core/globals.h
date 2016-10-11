@@ -15,7 +15,7 @@ const double PI           = 3.141592653589793;
 const double TWOPI        = 2.0 * PI;
 const double RADS_PER_DEG = PI / 180.0;
 
-const double GM           = 398601.2;   // Earth gravitational constant, km^3/sec^2
+const double GM           = 398600.5;   // Earth gravitational constant, km^3/sec^2
 const double GEOSYNC_ALT  = 42241.892;  // km
 const double EARTH_DIA    = 12800.0;    // km
 const double DAY_SIDERAL  = (23 * 3600) + (56 * 60) + 4.09;  // sec
