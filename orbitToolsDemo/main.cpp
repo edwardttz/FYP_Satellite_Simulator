@@ -24,13 +24,41 @@
 // Forward declaration of helper function; see below
 void PrintPosVel(const cSatellite& sat);
 
+
+// Converting ecef, Z stays the same.
+double eciToEcefX(double c, double s, double eciX, double eciY) {
+	return c * eciX + s * eciY;
+}
+
+double eciToEcefY(double c, double s, double eciX, double eciY) {
+	return c * eciY - s * eciX;
+}
+
+
+double convertEciToEcef(double gst, double eciX, double eciY) {
+	double c, s, x, y, ecefX, ecefY;
+	c = cos(gst);
+	s = sin(gst);
+	x = eciToEcefX(c, s, eciX, eciY);
+	y = eciToEcefY(c, s, eciX, eciY);
+
+	ecefX = x;
+	ecefY = y;
+
+	return ecefX, ecefY;
+}
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 int main(int /* argc */, char* /* argv[] */)
 {
    // Test SGP4 TLE data
    string str1 = "SGP4 Test";
-   string str2 = "1 25544U 98067A   16276.51267453  .00005824  00000-0  95509-4 0  9996";
-   string str3 = "2 25544  51.6438 242.6726 0006624  30.4136  75.0493 15.54017269 21688";
+   string str2 = "1 25544U 98067A   16287.38091704  .00009256  00000-0  14656-3 0  9993";
+   string str3 = "2 25544  51.6442 188.5032 0006981  67.5738  42.8976 15.54181201 23370";
 
    // Create a TLE object using the data above
    cTle tleSGP4(str1, str2, str3);
@@ -66,9 +94,11 @@ void PrintPosVel(const cSatellite& sat)
    vector<cEci> vecPos;
    vector<cGeo> geoPos;
    vector<cEcef> ecefPos;
+   cJulian date;
    long double radius = 0.0;
    ofstream myfile;
    myfile.precision(12);
+
    // Calculate the position and velocity of the satellite for various times.
    // mpe = "minutes past epoch"
    for (int mpe = 0; mpe <= (60 * 24); mpe += 1)
@@ -84,6 +114,9 @@ void PrintPosVel(const cSatellite& sat)
 	  ecefPos.push_back(ecef);
    }
    
+   // Test 1 line of conversion without Z coz Z wont affect.
+   convertEciToEcef(date.ToGmst(), vecPos[282].Position().m_x, vecPos[282].Position().m_y);
+
    // Save Satellite ECI position, Radius file
    myfile.open("Satellite_Pos_Rad_ECI.csv", ios::trunc);
    myfile << "T since,X,Y,Z,Radius,,," << sat.Name().c_str() << endl;

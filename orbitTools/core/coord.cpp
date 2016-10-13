@@ -43,22 +43,16 @@ cGeo::cGeo(const cEcef& ecef, cJulian date)
 //
 void cGeo::ConstructEcef(const cVector &posEcf)
 {
-	double x = posEcf.m_x,
-		   y = posEcf.m_y,
-		   z = posEcf.m_z;
-	double zp = abs(z);
+	double x = posEcf.m_x, y = posEcf.m_y, z = posEcf.m_z;
 	double a = XKMPER_WGS84;
 	double e2 = F * (2.0 - F);
-	double a1 = a*e2,
-		a2 = a1*a1,
-		a3 = a1*e2 / 2.0,
-		a4 = 2.5*a2,
-		a5 = a1 + a3,
-		a6 = 1 - e2;
-	double w2, w, r2, r, s2, c2, s, c, ss;
+	double a1 = a*e2, a2 = a1*a1, a3 = a1*e2 / 2.0,
+		   a4 = 2.5*a2, a5 = a1 + a3, a6 = 1 - e2;
+	double zp, w2, w, r2, r, s2, c2, s, c, ss;
 	double g, rg, rf, u, v, m, f, p;
 	double lat;
 
+	zp = abs(z);
 	w2 = x*x + y*y;
 	w = sqrt(w2);
 	r2 = w2 + z*z;
@@ -67,6 +61,7 @@ void cGeo::ConstructEcef(const cVector &posEcf)
 	c2 = w2 / r2;
 	u = a2 / r;
 	v = a3 - a4 / r;
+
 	if (c2 > 0.3) {
 		s = (zp / r)*(1.0 + c2*(a1 + u + s2*v) / r);
 		lat = asin(s);      //Lat
@@ -92,7 +87,7 @@ void cGeo::ConstructEcef(const cVector &posEcf)
 		lat *= -1.0;
 	}
 	m_Lat = lat;
-	m_Lon = AcTan(y,x);
+	m_Lon = AcTan(y,x);		//Lon
 	m_Alt = f + m*p / 2.0;
 }
 
