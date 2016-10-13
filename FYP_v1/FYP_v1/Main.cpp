@@ -28,7 +28,9 @@ int main(void)
 	s1.setTorque(0.02, 0.02, 0.02);
 	s1.setInitialW(0.0, 0.0, 0.0);
 	s1.setStepSize(0.005);
+	s1.setQuaternionInitialValues(0.01, 0.01, 0.01, 0.01);
 	s1.findConstants();
+	
 
 	//run RK4 150 times, 50 for positive torque, 50 in negative torque and 50 with no torque after application of previous torques
 	for (int i = 0; i < 150; i++) 
@@ -49,6 +51,7 @@ int main(void)
 		s1.findAcc();
 		s1.storeValues();
 		s1.findNextW();
+		s1.findNextQuaternion();
 	} 
 
 	system("PAUSE");

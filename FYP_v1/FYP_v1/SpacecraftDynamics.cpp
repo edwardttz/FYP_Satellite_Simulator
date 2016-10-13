@@ -1,5 +1,6 @@
 #include "SpacecraftDynamics.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -11,12 +12,20 @@ SpacecraftDynamics::SpacecraftDynamics()
 	aX_values.setFileName("aX.txt");
 	aY_values.setFileName("aY.txt");
 	aZ_values.setFileName("aZ.txt");
+	q0_values.setFileName("q0.txt");
+	qX_values.setFileName("qX.txt");
+	qY_values.setFileName("qY.txt");
+	qZ_values.setFileName("qZ.txt");
 	wX_values.clearFile();
 	wY_values.clearFile();
 	wZ_values.clearFile();
 	aX_values.clearFile();
 	aY_values.clearFile();
 	aZ_values.clearFile();
+	q0_values.clearFile();
+	qX_values.clearFile();
+	qY_values.clearFile();
+	qZ_values.clearFile();
 }
 
 double SpacecraftDynamics::rungeKutta (double torque, double MOI, double w_initial, double w1, double w2, double constant) 
@@ -27,6 +36,24 @@ double SpacecraftDynamics::rungeKutta (double torque, double MOI, double w_initi
 	k3 = (torque/MOI) - constant * (w1 + (k2/2))*(w2 + (k2/2));
 	k4 = (torque/MOI) - constant * (w1 + k3)*(w2 + k3); 
 	return w_initial + (stepSize/6) * (k1 + 2 * k2 + 2 * k3 + k4);
+}
+
+double SpacecraftDynamics::rungeKuttaQuaternions (double row1, double row2, double row3, double row4, double q_initial)
+{
+	double k1, k2, k3, k4;
+
+	k1 = 0.5 * ((row1 * getQuaternion0()) + (row2 * getQuaternionX()) + (row3 * getQuaternionY()) + (row4 * getQuaternionZ()));
+
+	k2 = 0.5 * ((row1 * (getQuaternion0() + (stepSize / 2) * k1)) + (row2 * (getQuaternionX() + (stepSize / 2) * k1)) 
+		+ (row3 * (getQuaternionY() + (stepSize / 2) * k1)) + (row4 * (getQuaternionZ() + (stepSize / 2) * k1)));
+
+	k3 = 0.5 * ((row1 * (getQuaternion0() + (stepSize / 2) * k2)) + (row2 * (getQuaternionX() + (stepSize / 2) * k2)) 
+		+ (row3 * (getQuaternionY() + (stepSize / 2) * k2)) + (row4 * (getQuaternionZ() + (stepSize / 2) * k2)));
+
+	k4 = 0.5 * ((row1 * (getQuaternion0() + (stepSize * k3))) + (row2 * (getQuaternionX() + (stepSize * k3))) 
+		+ (row3 * (getQuaternionY() + (stepSize * k3))) + (row4 * (getQuaternionZ() + (stepSize * k3))));
+
+	return q_initial + (stepSize / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
 }
 
 void SpacecraftDynamics::printValues (double iteration, double a_X,double a_Y, double a_Z, double w_X,double w_Y, double w_Z) 
@@ -94,6 +121,87 @@ void SpacecraftDynamics::storeValues()
 	aX_values.storeInFile(aX);
 	aY_values.storeInFile(aY);
 	aZ_values.storeInFile(aZ);
+	q0_values.storeInFile(q0);
+	qX_values.storeInFile(qX);
+	qY_values.storeInFile(qY);
+	qZ_values.storeInFile(qZ);
 }
 
+/**
+double SpacecraftDynamics::vectorMultiplication(vector<double> row, vector<double> column)
+{
+	double answer = 0.0;
+
+	for (int i = 0; i < column.max_size; i++)
+	{
+		answer += row[i] * row[i];
+	}
+
+	return answer;
+}
+**/
+
+/**
+vector<double> SpacecraftDynamics::assignQuaternionValue(double value, vector<double> quaternionTemp)
+{
+	quaternionTemp.push_back(value);
+
+	return quaternionTemp;
+}
+**/
+
+void SpacecraftDynamics::findNextQuaternion()
+{
+	double q0_next = rungeKuttaQuaternions(0, -getVelocityX(), -getVelocityY(), -getVelocityZ(), getQuaternion0());
+	double qX_next = rungeKuttaQuaternions(getVelocityX(), 0, getVelocityZ(), -getVelocityY(), getQuaternionX());
+	double qY_next = rungeKuttaQuaternions(getVelocityY(), -getVelocityZ(), 0, getVelocityX(), getQuaternionY());
+	double qZ_next = rungeKuttaQuaternions(getVelocityZ(), getVelocityY(), -getVelocityX(), 0, getQuaternionZ());
+	q0 = q0_next;
+	qX = qX_next;
+	qY = qY_next;
+	qZ = qZ_next;
+}
+
+void SpacecraftDynamics::setQuaternionInitialValues(double quaternion0, double quaternionX, double quaternionY, double quaternionZ)
+{
+	q0 = quaternion0;
+	qX = quaternionX;
+	qY = quaternionY;
+	qZ = quaternionZ;
+}
+
+double SpacecraftDynamics::getVelocityX()
+{
+	return wX;
+}
+
+double SpacecraftDynamics::getVelocityY()
+{
+	return wY;
+}
+
+double SpacecraftDynamics::getVelocityZ()
+{
+	return wZ;
+}
+
+double SpacecraftDynamics::getQuaternion0()
+{
+	return q0;
+}
+
+double SpacecraftDynamics::getQuaternionX()
+{
+	return qX;
+}
+
+double SpacecraftDynamics::getQuaternionY()
+{
+	return qY;
+}
+
+double SpacecraftDynamics::getQuaternionZ()
+{
+	return qZ;
+}
 
