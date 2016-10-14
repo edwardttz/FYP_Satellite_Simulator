@@ -202,9 +202,9 @@ void PrintPosVel(const cSatellite& sat)
    }
    myfile.close();
 
-   // Save Satellite ECEF position, Radius file
-   myfile.open("Satellite_Pos_Rad_ECEF.csv", ios::trunc);
-   myfile << "T since,X,Y,Z,Radius,,," << sat.Name().c_str() << endl;
+   // Save Satellite ECEF position file
+   myfile.open("Satellite_Pos_ECEF.csv", ios::trunc);
+   myfile << "T since,X,Y,Z,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < ecefPos.size(); i++)
    {
 	   radius = sqrt(powl(ecefPos[i].Position().m_x, 2) + powl(ecefPos[i].Position().m_y, 2)
@@ -212,20 +212,20 @@ void PrintPosVel(const cSatellite& sat)
 	   if (i == 0)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
-			   ',' << ecefPos[i].Position().m_z << ',' << radius << ",,,"
+			   ',' << ecefPos[i].Position().m_z << ",,,"
 			   << sat.Orbit().TleLine1().c_str() << endl;
 
 	   }
 	   else if (i == 1)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
-			   ',' << ecefPos[i].Position().m_z << ',' << radius << ",,,"
+			   ',' << ecefPos[i].Position().m_z << ",,,"
 			   << sat.Orbit().TleLine2().c_str() << endl;
 	   }
 	   else if (i == 2)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
-			   ',' << ecefPos[i].Position().m_z << ',' << radius << ",,,"
+			   ',' << ecefPos[i].Position().m_z << ",,,"
 			   << "Singapore UTC+8:" << ",,"
 			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
 			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
@@ -237,7 +237,7 @@ void PrintPosVel(const cSatellite& sat)
 	   else
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
-			   ',' << ecefPos[i].Position().m_z << ',' << radius << endl;
+			   ',' << ecefPos[i].Position().m_z << endl;
 	   }
    }
    myfile.close();
