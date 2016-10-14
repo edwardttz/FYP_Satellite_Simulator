@@ -56,7 +56,7 @@ void cGeo::ConstructEcef(const cVector &posEcf)
 		a6 = 1 - e2;
 	double zp, w2, w, r2, r, s2, c2, s, c, ss;
 	double g, rg, rf, u, v, m, f, p;
-	double lat;
+	double lat, lon;
 
 	zp = abs(z);
 	w2 = x*x + y*y;
@@ -92,8 +92,13 @@ void cGeo::ConstructEcef(const cVector &posEcf)
 	if (z < 0.0) {
 		lat *= -1.0;
 	}
+	lon = AcTan(y, x);	//Lon
+	if (lon > PI) 
+	{
+		lon -= 2*PI;
+	}
 	m_Lat = lat;
-	m_Lon = AcTan(y,x);		//Lon
+	m_Lon = lon;
 	m_Alt = f + m*p / 2.0;
 }
 

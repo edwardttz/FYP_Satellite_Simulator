@@ -166,7 +166,7 @@ void PrintPosVel(const cSatellite& sat)
 
    // Save Satellite Latitude, Longtitude, Altitude to file
    myfile.open("Satellite_Lat_Long_Alti_ECEF.csv", ios::trunc);
-   myfile << "T since,Latitude,Longtitude,Altitude,,," << sat.Name().c_str() << endl;
+   myfile << "T since,Latitude,Longitude,Altitude,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < geoPos.size(); i++)
    {
 	   if (i == 0)
