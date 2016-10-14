@@ -24,34 +24,6 @@
 // Forward declaration of helper function; see below
 void PrintPosVel(const cSatellite& sat);
 
-
-// Converting ecef, Z stays the same.
-double eciToEcefX(double c, double s, double eciX, double eciY) {
-	return c * eciX + s * eciY;
-}
-
-double eciToEcefY(double c, double s, double eciX, double eciY) {
-	return c * eciY - s * eciX;
-}
-
-
-double convertEciToEcef(double gst, double eciX, double eciY) {
-	double c, s, x, y, ecefX, ecefY;
-	c = cos(gst);
-	s = sin(gst);
-	x = eciToEcefX(c, s, eciX, eciY);
-	y = eciToEcefY(c, s, eciX, eciY);
-
-	ecefX = x;
-	ecefY = y;
-
-	return ecefX, ecefY;
-}
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////
 int main(int /* argc */, char* /* argv[] */)
 {
@@ -113,9 +85,6 @@ void PrintPosVel(const cSatellite& sat)
 	  geoPos.push_back(geo);
 	  ecefPos.push_back(ecef);
    }
-   
-   // Test 1 line of conversion without Z coz Z wont affect.
-   convertEciToEcef(date.ToGmst(), vecPos[282].Position().m_x, vecPos[282].Position().m_y);
 
    // Save Satellite ECI position, Radius file
    myfile.open("Satellite_Pos_Rad_ECI.csv", ios::trunc);

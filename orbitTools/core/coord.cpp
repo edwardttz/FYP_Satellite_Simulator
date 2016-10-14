@@ -43,11 +43,17 @@ cGeo::cGeo(const cEcef& ecef, cJulian date)
 //
 void cGeo::ConstructEcef(const cVector &posEcf)
 {
-	double x = posEcf.m_x, y = posEcf.m_y, z = posEcf.m_z;
+	double x = posEcf.m_x, 
+		y = posEcf.m_y, 
+		z = posEcf.m_z;
 	double a = XKMPER_WGS84;
 	double e2 = F * (2.0 - F);
-	double a1 = a*e2, a2 = a1*a1, a3 = a1*e2 / 2.0,
-		   a4 = 2.5*a2, a5 = a1 + a3, a6 = 1 - e2;
+	double a1 = a*e2, 
+		a2 = a1*a1, 
+		a3 = a1*e2 / 2.0,
+		a4 = 2.5*a2, 
+		a5 = a1 + a3, 
+		a6 = 1 - e2;
 	double zp, w2, w, r2, r, s2, c2, s, c, ss;
 	double g, rg, rf, u, v, m, f, p;
 	double lat;

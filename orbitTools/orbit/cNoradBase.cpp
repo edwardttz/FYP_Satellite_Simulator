@@ -289,6 +289,14 @@ cEciTime cNoradBase::FinalPosition(double incl, double  omega,
    return eci;
 }
 
+double eciToEcefX(double c, double s, double eciX, double eciY) {
+	return c * eciX + s * eciY;
+}
+
+double eciToEcefY(double c, double s, double eciX, double eciY) {
+	return c * eciY - s * eciX;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 cEcefTime cNoradBase::FinalPositionEcef(double incl, double  omega,
 									double    e, double      a,
@@ -404,39 +412,12 @@ cEcefTime cNoradBase::FinalPositionEcef(double incl, double  omega,
 	double vy = xmy * cosuk - sinnok * sinuk;
 	double vz = sinik * cosuk;
 
-/*	// ECI Position
+	// Position
 	double x = rk * ux;
 	double y = rk * uy;
 	double z = rk * uz;
-*/
-	// Calculate ECEF Position
 
-	double cose = ecose / e;
-	double sine = esine / e;
-	temp = cose - e;
-	temp1 = 1.0 - (cose * e * e);
-	temp2 = temp / temp1;
-	double v1 = acos(temp2);
-	temp = sqrt(1.0 - e * e) * sine;
-	temp1 = 1.0 - (cose * e);
-	temp2 = temp / temp1;
-	double v2 = asin(temp2);
-	double v = 0.0;
-	if (v2 < 0)
-	{
-		v = v1 * -1.0;
-	}
-	else
-	{
-		v = v1;
-	}
-	double phi = v + omega;
-
-	double x = 100000.0;
-	double y = 100000.0;
-	double z = rk * sinik * sin(phi);
-	cVector vecPos(x, y, z);
-
+/*
 	// Validate on altitude
 	double altKm = (vecPos.Magnitude() * (XKMPER_WGS84 / AE));
 
@@ -447,16 +428,26 @@ cEcefTime cNoradBase::FinalPositionEcef(double incl, double  omega,
 		decayTime.AddMin(tsince);
 		throw cDecayException(decayTime, m_Orbit.SatName(true));
 	}
-
+*/
 	// Velocity
 	double xdot = rdotk * ux + rfdotk * vx;
 	double ydot = rdotk * uy + rfdotk * vy;
 	double zdot = rdotk * uz + rfdotk * vz;
 
-	cVector vecVel(xdot, ydot, zdot);
-
 	cJulian gmt = m_Orbit.Epoch();
 	gmt.AddMin(tsince);
+	double gst = gmt.ToGmst();
+	double c = cos(gst);
+	double s = sin(gst);
+	double ecefX = eciToEcefX(c, s, x, y);
+	double ecefY = eciToEcefY(c, s, x, y);
+
+	cVector vecPos(ecefX, ecefY, z);
+	double WE = 7.292115854788046E-5;
+	double ecefXdot = (c, s, xdot, ydot) - WE * ecefY;
+	double ecefYdot = (c, s, xdot, ydot) - WE * ecefX;
+
+	cVector vecVel(ecefXdot, ecefYdot, zdot);
 
 	cEcefTime ecef = cEcefTime(vecPos, vecVel, gmt);
 
