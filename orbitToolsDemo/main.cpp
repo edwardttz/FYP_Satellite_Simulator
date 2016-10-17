@@ -29,8 +29,8 @@ int main(int /* argc */, char* /* argv[] */)
 {
    // Test SGP4 TLE data
    string str1 = "SGP4 Test";
-   string str2 = "1 25544U 98067A   16287.38091704  .00009256  00000-0  14656-3 0  9993";
-   string str3 = "2 25544  51.6442 188.5032 0006981  67.5738  42.8976 15.54181201 23370";
+   string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
+   string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
 
    // Create a TLE object using the data above
    cTle tleSGP4(str1, str2, str3);
@@ -87,7 +87,7 @@ void PrintPosVel(const cSatellite& sat)
    }
 
    // Save Satellite ECI position, Radius file
-   myfile.open("Satellite_Pos_Rad_ECI.csv", ios::trunc);
+   myfile.open("Satellite Data/Satellite_Pos_Rad_ECI.csv", ios::trunc);
    myfile << "T since,X,Y,Z,Radius,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < vecPos.size(); i++)
    {
@@ -127,7 +127,7 @@ void PrintPosVel(const cSatellite& sat)
    myfile.close();
    
    // Save Satellite ECI Velocity file
-   myfile.open("Satellite_Velocity_ECI.csv", ios::trunc);
+   myfile.open("Satellite Data/Satellite_Velocity_ECI.csv", ios::trunc);
    myfile << "T since,Xdot,Ydot,Zdot,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < vecPos.size(); i++)
    {
@@ -165,7 +165,7 @@ void PrintPosVel(const cSatellite& sat)
    myfile.close();
 
    // Save Satellite Latitude, Longtitude, Altitude to file
-   myfile.open("Satellite_Lat_Long_Alti_ECEF.csv", ios::trunc);
+   myfile.open("Satellite Data/Satellite_Lat_Long_Alti_ECEF.csv", ios::trunc);
    myfile << "T since,Latitude,Longitude,Altitude,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < geoPos.size(); i++)
    {
@@ -203,7 +203,7 @@ void PrintPosVel(const cSatellite& sat)
    myfile.close();
 
    // Save Satellite ECEF position file
-   myfile.open("Satellite_Pos_ECEF.csv", ios::trunc);
+   myfile.open("Satellite Data/Satellite_Pos_ECEF.csv", ios::trunc);
    myfile << "T since,X,Y,Z,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < ecefPos.size(); i++)
    {
@@ -243,7 +243,7 @@ void PrintPosVel(const cSatellite& sat)
    myfile.close();
 
    // Save Satellite Velocity file
-   myfile.open("Satellite_Velocity_ECEF.csv", ios::trunc);
+   myfile.open("Satellite Data/Satellite_Velocity_ECEF.csv", ios::trunc);
    myfile << "T since,Xdot,Ydot,Zdot,,," << sat.Name().c_str() << endl;
    for (unsigned int i = 0; i < ecefPos.size(); i++)
    {

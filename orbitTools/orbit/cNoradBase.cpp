@@ -443,7 +443,6 @@ cEcefTime cNoradBase::FinalPositionEcef(double incl, double  omega,
 	double ecefY = eciToEcefY(c, s, x, y);
 
 	cVector vecPos(ecefX, ecefY, z);
-	double WE = 7.292115854788046E-5;
 	double ecefXdot = (c, s, xdot, ydot) - WE * ecefY;
 	double ecefYdot = (c, s, xdot, ydot) - WE * ecefX;
 

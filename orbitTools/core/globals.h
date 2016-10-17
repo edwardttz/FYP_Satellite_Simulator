@@ -42,6 +42,7 @@ const double OMEGA_E      = 1.00273790934; // earth rotation per sideral day
 const double XKE          = sqrt(3600.0 * GE /           //sqrt(ge) ER^3/min^2
                                 (XKMPER_WGS84 * XKMPER_WGS84 * XKMPER_WGS84)); 
 const double QOMS2T       = pow((QO - S), 4);            //(QO - S)^4 ER^4
+const double WE				  = 7.292115854788046E-5; //Angular velocity of Earth
 
 // Utility functions
 double sqr   (const double x);
