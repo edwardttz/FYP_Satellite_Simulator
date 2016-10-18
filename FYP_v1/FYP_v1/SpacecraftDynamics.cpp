@@ -32,9 +32,9 @@ double SpacecraftDynamics::rungeKutta (double torque, double MOI, double w_initi
 {
 	double k1,k2,k3,k4;
 	k1 = (torque/MOI) - constant * w1 * w2;
-	k2 = (torque/MOI) - constant * (w1 + (k1/2))*(w2 + (k1/2));
-	k3 = (torque/MOI) - constant * (w1 + (k2/2))*(w2 + (k2/2));
-	k4 = (torque/MOI) - constant * (w1 + k3)*(w2 + k3); 
+	k2 = (torque/MOI) - constant * (w1 + ((k1*stepSize)/2))*(w2 + ((k1*stepSize)/2));
+	k3 = (torque/MOI) - constant * (w1 + ((k2*stepSize)/2))*(w2 + ((k2*stepSize)/2));
+	k4 = (torque/MOI) - constant * (w1 + (k3*stepSize))*(w2 + (k3*stepSize)); 
 	return w_initial + (stepSize/6) * (k1 + 2 * k2 + 2 * k3 + k4);
 }
 

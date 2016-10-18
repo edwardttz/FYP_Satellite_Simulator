@@ -33,7 +33,7 @@ int main(void)
 	
 
 	//run RK4 150 times, 50 for positive torque, 50 in negative torque and 50 with no torque after application of previous torques
-	for (int i = 0; i < 150; i++) 
+	for (int i = 0; i < 200; i++) 
 	{
 		//Switch torque values after 50 iterations
 		if(i == 49) 
