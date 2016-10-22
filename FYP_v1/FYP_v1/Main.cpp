@@ -28,7 +28,7 @@ int main(void)
 	s1.setTorque(0.02, 0.02, 0.02);
 	s1.setInitialW(0.0, 0.0, 0.0);
 	s1.setStepSize(0.005);
-	s1.setQuaternionInitialValues(0.01, 0.01, 0.01, 0.01);
+	s1.setQuaternionInitialValues(0.0, 0.0, 0.0, 1.0);
 	s1.findConstants();
 	
 
