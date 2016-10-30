@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 #include "Storage.h"
 using namespace std;
 
@@ -18,6 +19,8 @@ private:
 	double spaceTorqueX, spaceTorqueY, spaceTorqueZ;
 	double reactionTorqueX, reactionTorqueY, reactionTorqueZ;
 	double q0, qX, qY, qZ;
+	double vector0, vectorX, vectorY, vectorZ;
+	double q0Inverse, qXInverse, qYInverse, qZInverse;
 	vector<double> quaternion;
 	Storage wX_values;
 	Storage wY_values;
@@ -29,6 +32,10 @@ private:
 	Storage qX_values;
 	Storage qY_values;
 	Storage qZ_values;
+	Storage vector0_values;
+	Storage vectorX_values;
+	Storage vectorY_values;
+	Storage vectorZ_values;
 
 public:
 	SpacecraftDynamics();
@@ -47,6 +54,8 @@ public:
 	//vector<double> assignQuaternionValue(double, vector<double>);
 	void findNextQuaternion();
 	void setQuaternionInitialValues(double, double, double, double);
+	void setQuaternionInverseInitialValues(double, double, double, double);
+	void setVectorInitialValues(double, double, double, double);
 	double getVelocityX();
 	double getVelocityY();
 	double getVelocityZ();
@@ -54,7 +63,25 @@ public:
 	double getQuaternionX();
 	double getQuaternionY();
 	double getQuaternionZ();
-
+	double getQ0Inverse();
+	double getQXInverse();
+	double getQYInverse();
+	double getQZInverse();
+	double getVector0();
+	double getVectorX();
+	double getVectorY();
+	double getVectorZ();
+	double findVector0();
+	double findVectorX();
+	double findVectorY();
+	double findVectorZ();
+	double quaternion0Mulitplication(double, double, double, double, double, double, double, double);
+	double quaternionXMulitplication(double, double, double, double, double, double, double, double);
+	double quaternionYMulitplication(double, double, double, double, double, double, double, double);
+	double quaternionZMulitplication(double, double, double, double, double, double, double, double);
+	double inverseQuaternionVal(double);
+	double findMagnitude(double, double, double, double);
+	void findNextVector();
 };
  
 
