@@ -25,6 +25,7 @@ int main(void)
 	*/
 
 	SpacecraftDynamics s1;
+	s1.setMOIValues(64, 38.4, 89.6);
 	//positive torque initially
 	s1.setTorque(0.002, 0.002, 0.002);
 	s1.setInitialW(0.0, 0.0, 0.0);
