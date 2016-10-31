@@ -65,6 +65,11 @@ double SpacecraftDynamics::rungeKuttaQuaternions (double row1, double row2, doub
 	return q_initial + (stepSize / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
 }
 
+double SpacecraftDynamics::eulerMethodQuaternions(double row1, double row2, double row3, double row4, double q_initial)
+{
+	return q_initial + stepSize * ((row1 * getQuaternion0()) + (row2 * getQuaternionX()) + (row3 * getQuaternionY()) + (row4 * getQuaternionZ()));
+}
+
 void SpacecraftDynamics::printValues (double iteration, double a_X,double a_Y, double a_Z, double w_X,double w_Y, double w_Z) 
 {
 	cout << "**** Iteration " << iteration << " ****" << endl;
@@ -165,6 +170,13 @@ vector<double> SpacecraftDynamics::assignQuaternionValue(double value, vector<do
 
 void SpacecraftDynamics::findNextQuaternion()
 {
+	/**
+	double q0_next = eulerMethodQuaternions(0, -getVelocityX(), -getVelocityY(), -getVelocityZ(), getQuaternion0());
+	double qX_next = eulerMethodQuaternions(getVelocityX(), 0, getVelocityZ(), -getVelocityY(), getQuaternionX());
+	double qY_next = eulerMethodQuaternions(getVelocityY(), -getVelocityZ(), 0, getVelocityX(), getQuaternionY());
+	double qZ_next = eulerMethodQuaternions(getVelocityZ(), getVelocityY(), -getVelocityX(), 0, getQuaternionZ());
+	**/
+
 	double q0_next = rungeKuttaQuaternions(0, -getVelocityX(), -getVelocityY(), -getVelocityZ(), getQuaternion0());
 	double qX_next = rungeKuttaQuaternions(getVelocityX(), 0, getVelocityZ(), -getVelocityY(), getQuaternionX());
 	double qY_next = rungeKuttaQuaternions(getVelocityY(), -getVelocityZ(), 0, getVelocityX(), getQuaternionY());

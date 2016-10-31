@@ -41,6 +41,7 @@ public:
 	SpacecraftDynamics();
 	double rungeKutta (double, double, double, double, double, double);
 	double rungeKuttaQuaternions (double, double, double, double, double);
+	double eulerMethodQuaternions(double, double, double, double, double);
 	void printValues (double, double, double, double, double, double, double); 
 	void setStepSize(double);
 	void setInitialW(double, double, double);
