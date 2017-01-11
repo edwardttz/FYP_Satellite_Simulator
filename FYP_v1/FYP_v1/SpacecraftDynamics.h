@@ -60,10 +60,29 @@ public:
 	double getVelocityX();
 	double getVelocityY();
 	double getVelocityZ();
+	double getAccX();
+	double getAccY();
+	double getAccZ();
 	double getQuaternion0();
 	double getQuaternionX();
 	double getQuaternionY();
 	double getQuaternionZ();
+<<<<<<< HEAD
+	double getTorqueX();
+	double getTorqueY();
+	double getTorqueZ();
+	double getMOIx();
+	double getMOIy();
+	double getMOIz();
+	double getconstantX();
+	double getconstantY();
+	double getconstantZ();
+	double tempRKwX();
+	void getNextw();
+	void getNextAcc();
+	double tempRKwY();
+	double tempRKwZ();
+=======
 	double getQ0Inverse();
 	double getQXInverse();
 	double getQYInverse();
@@ -83,6 +102,7 @@ public:
 	double inverseQuaternionVal(double);
 	double findMagnitude(double, double, double, double);
 	void findNextVector();
+>>>>>>> origin/master
 };
  
 

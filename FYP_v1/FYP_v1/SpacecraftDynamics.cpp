@@ -47,6 +47,77 @@ double SpacecraftDynamics::rungeKutta (double torque, double MOI, double w_initi
 	return w_initial + (stepSize/6) * (k1 + 2 * k2 + 2 * k3 + k4);
 }
 
+double SpacecraftDynamics::tempRKwX()
+{
+	double k1, k2, k3, k4;
+	double tX = getTorqueX();
+	double tY = getTorqueY();
+	double tZ = getTorqueZ();
+	double iX = getMOIx();
+	double iY = getMOIy();
+	double iZ = getMOIz();
+	double accY = getAccY();
+	double accZ = getAccZ();
+	double wX = getVelocityX();
+	k1 = stepSize * ((tX / iX) - ((iZ-iY)/iX) * ((tZ - accZ*iZ)/(iY-iX)*wX) * ((tY - accY*iY) / (iX - iZ)*wX));
+	k2 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k1/2)) * ((tY - accY*iY) / (iX - iZ)*(wX + k1/2)));
+	k3 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k2/2)) * ((tY - accY*iY) / (iX - iZ)*(wX + k2/2)));
+	k4 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k3)) * ((tY - accY*iY) / (iX - iZ)*(wX + k3)));
+	return (wX + (k1 / 6) + (k2 / 3) + (k3 / 3) + (k4 / 6));
+}
+
+double SpacecraftDynamics::tempRKwY()
+{
+	double k1, k2, k3, k4;
+	double tX = getTorqueX();
+	double tY = getTorqueY();
+	double tZ = getTorqueZ();
+	double iX = getMOIx();
+	double iY = getMOIy();
+	double iZ = getMOIz();
+	double accX = getAccX();
+	double accZ = getAccZ();
+	double wY = getVelocityY();
+	k1 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*wY) * ((tX - accX*iX) / (iZ - iY)*wY));
+	k2 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k1/2)) * ((tX - accX*iX) / (iZ - iY)*(wY + k1/2)));
+	k3 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k2/2)) * ((tX - accX*iX) / (iZ - iY)*(wY + k2/2)));
+	k4 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k3)) * ((tX - accX*iX) / (iZ - iY)*(wY + k3)));
+	return (wY + (k1 / 6) + (k2 / 3) + (k3 / 3) + (k4 / 6));
+}
+
+double SpacecraftDynamics::tempRKwZ()
+{
+	double k1, k2, k3, k4;
+	double tX = getTorqueX();
+	double tY = getTorqueY();
+	double tZ = getTorqueZ();
+	double iX = getMOIx();
+	double iY = getMOIy();
+	double iZ = getMOIz();
+	double accX = getAccX();
+	double accY = getAccY();
+	double wZ = getVelocityZ();
+	k1 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*wZ) * ((tX - accX*iX) / (iZ - iY)*wZ));
+	k2 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k1/2)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k1/2)));
+	k3 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k2 / 2)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k2 / 2)));
+	k4 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k3)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k3)));
+	return (wZ + (k1 / 6) + (k2 / 3) + (k3 / 3) + (k4 / 6));
+}
+
+void SpacecraftDynamics::getNextw()
+{
+	wX = tempRKwX();
+	wY = tempRKwY();
+	wZ = tempRKwZ();
+}
+
+void SpacecraftDynamics::getNextAcc()
+{
+	aX = (torqueX / iX) - ((iZ - iY) / iX) * ((torqueZ - aZ*iZ) / (iY - iX)*wX) * ((torqueY - aY*iY) / (iX - iZ)*wX);
+	aY = (torqueY / iY) - ((iX - iZ) / iY) * ((torqueZ - aZ*iZ) / (iY - iX)*wY) * ((torqueX - aX*iX) / (iZ - iY)*wY);
+	aZ = (torqueZ / iZ) - ((iY - iX) / iZ) * ((torqueY - aY*iY) / (iX - iZ)*wZ) * ((torqueX - aX*iX) / (iZ - iY)*wZ);
+}
+
 double SpacecraftDynamics::rungeKuttaQuaternions (double row1, double row2, double row3, double row4, double q_initial)
 {
 	double k1, k2, k3, k4;
@@ -246,6 +317,68 @@ double SpacecraftDynamics::getQuaternionZ()
 	return qZ;
 }
 
+<<<<<<< HEAD
+double SpacecraftDynamics::getTorqueX()
+{
+	return torqueX;
+}
+
+double SpacecraftDynamics::getTorqueY()
+{
+	return torqueY;
+}
+
+double SpacecraftDynamics::getTorqueZ()
+{
+	return torqueZ;
+}
+
+double SpacecraftDynamics::getMOIx()
+{
+	return iX;
+}
+
+double SpacecraftDynamics::getMOIy()
+{
+	return iY;
+}
+
+double SpacecraftDynamics::getMOIz()
+{
+	return iZ;
+}
+
+double SpacecraftDynamics::getconstantX()
+{
+	return constantX;
+}
+
+double SpacecraftDynamics::getconstantY()
+{
+	return constantY;
+}
+
+double SpacecraftDynamics::getconstantZ()
+{
+	return constantZ;
+}
+
+double SpacecraftDynamics::getAccX()
+{
+	return aX;
+}
+
+double SpacecraftDynamics::getAccY()
+{
+	return aY;
+}
+
+double SpacecraftDynamics::getAccZ()
+{
+	return aZ;
+}
+
+=======
 double SpacecraftDynamics::getQ0Inverse()
 {
 	return q0Inverse;
@@ -366,3 +499,4 @@ void SpacecraftDynamics::findNextVector()
 	vectorY = vectorY_next;
 	vectorZ = vectorZ_next;
 }
+>>>>>>> origin/master
