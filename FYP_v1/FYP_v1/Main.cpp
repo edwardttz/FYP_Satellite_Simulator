@@ -34,8 +34,8 @@ int main(void)
 	//s1.setTorque(0.05, 0.05, 0.05); //UoSat12
 	s1.setTorque(0.01, 0.01, 0.01); //MOST
 	
-	//s1.setStepSize(0.01); //10ms stepsize
-	s1.setStepSize(0.05); //50ms stepsize
+	s1.setStepSize(0.01); //10ms stepsize
+	//s1.setStepSize(0.05); //50ms stepsize
 
 	s1.setInitialW(0.0, 0.0, 0.0);
 	s1.setQuaternionInitialValues(0.0, 0.0, 0.0, 1.0);
@@ -44,22 +44,24 @@ int main(void)
 	s1.findConstants();
 	
 	//change i < some number to fit iterations and stepsize
-	for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
+	for (int i = 0; i < 18000; i++) //18000 for 10ms, 3600 for 50ms
 	{
 		//switching torque off after 30s
-		if (i == 599) //2999 for 10ms, 599 for 50ms
+		if (i == 2999) //2999 for 10ms, 599 for 50ms
 		{
 			s1.setTorque(0.0, 0.0, 0.0);
 		}
 
 		//negative torque after 30s
-		if (i == 1199) //5999 for 10ms, 1199 for 50ms
+		if (i == 5999) //5999 for 10ms, 1199 for 50ms
 		{
-			s1.setTorque(-0.01, -0.01, -0.01);
+			//s1.setTorque(-0.0107, -0.0107, -0.0107); //KR 1
+			//s1.setTorque(-0.05, -0.05, -0.05); //UoSat12
+			s1.setTorque(-0.01, -0.01, -0.01); //MOST
 		}
 
 		//switching torque off after 30s
-		if (i == 1799) //8999 for 10ms, 1799 for 50ms
+		if (i == 8999) //8999 for 10ms, 1799 for 50ms
 		{
 			s1.setTorque(0.0, 0.0, 0.0);
 		}
