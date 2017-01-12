@@ -21,6 +21,7 @@ private:
 	double q0, qX, qY, qZ;
 	double vector0, vectorX, vectorY, vectorZ;
 	double q0Inverse, qXInverse, qYInverse, qZInverse;
+	double thetaX, thetaY, thetaZ;
 	vector<double> quaternion;
 	Storage wX_values;
 	Storage wY_values;
@@ -36,6 +37,9 @@ private:
 	Storage vectorX_values;
 	Storage vectorY_values;
 	Storage vectorZ_values;
+	Storage thetaX_values;
+	Storage thetaY_values;
+	Storage thetaZ_values;
 
 public:
 	SpacecraftDynamics();
@@ -67,7 +71,6 @@ public:
 	double getQuaternionX();
 	double getQuaternionY();
 	double getQuaternionZ();
-<<<<<<< HEAD
 	double getTorqueX();
 	double getTorqueY();
 	double getTorqueZ();
@@ -82,7 +85,6 @@ public:
 	void getNextAcc();
 	double tempRKwY();
 	double tempRKwZ();
-=======
 	double getQ0Inverse();
 	double getQXInverse();
 	double getQYInverse();
@@ -91,10 +93,6 @@ public:
 	double getVectorX();
 	double getVectorY();
 	double getVectorZ();
-	double findVector0();
-	double findVectorX();
-	double findVectorY();
-	double findVectorZ();
 	double quaternion0Mulitplication(double, double, double, double, double, double, double, double);
 	double quaternionXMulitplication(double, double, double, double, double, double, double, double);
 	double quaternionYMulitplication(double, double, double, double, double, double, double, double);
@@ -102,7 +100,7 @@ public:
 	double inverseQuaternionVal(double);
 	double findMagnitude(double, double, double, double);
 	void findNextVector();
->>>>>>> origin/master
+	void findThetaValues();
 };
  
 

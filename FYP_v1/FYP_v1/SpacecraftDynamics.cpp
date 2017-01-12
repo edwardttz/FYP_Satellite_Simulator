@@ -21,6 +21,9 @@ SpacecraftDynamics::SpacecraftDynamics()
 	vectorX_values.setFileName("vectorX.txt");
 	vectorY_values.setFileName("vectorY.txt");
 	vectorZ_values.setFileName("vectorZ.txt");
+	thetaX_values.setFileName("thetaX.txt");
+	thetaY_values.setFileName("thetaY.txt");
+	thetaZ_values.setFileName("thetaZ.txt");
 	wX_values.clearFile();
 	wY_values.clearFile();
 	wZ_values.clearFile();
@@ -35,6 +38,9 @@ SpacecraftDynamics::SpacecraftDynamics()
 	vectorX_values.clearFile();
 	vectorY_values.clearFile();
 	vectorZ_values.clearFile();
+	thetaX_values.clearFile();
+	thetaY_values.clearFile();
+	thetaZ_values.clearFile();
 }
 
 double SpacecraftDynamics::rungeKutta (double torque, double MOI, double w_initial, double w1, double w2, double constant) 
@@ -214,6 +220,9 @@ void SpacecraftDynamics::storeValues()
 	vectorX_values.storeInFile(vectorX);
 	vectorY_values.storeInFile(vectorY);
 	vectorZ_values.storeInFile(vectorZ);
+	thetaX_values.storeInFile(thetaX);
+	thetaY_values.storeInFile(thetaY);
+	thetaZ_values.storeInFile(thetaZ);
 }
 
 /**
@@ -317,7 +326,6 @@ double SpacecraftDynamics::getQuaternionZ()
 	return qZ;
 }
 
-<<<<<<< HEAD
 double SpacecraftDynamics::getTorqueX()
 {
 	return torqueX;
@@ -378,7 +386,6 @@ double SpacecraftDynamics::getAccZ()
 	return aZ;
 }
 
-=======
 double SpacecraftDynamics::getQ0Inverse()
 {
 	return q0Inverse;
@@ -499,4 +506,10 @@ void SpacecraftDynamics::findNextVector()
 	vectorY = vectorY_next;
 	vectorZ = vectorZ_next;
 }
->>>>>>> origin/master
+
+void SpacecraftDynamics::findThetaValues()
+{
+	thetaX = -2 * asin(getQuaternionX());
+	thetaY = -2 * asin(getQuaternionY());
+	thetaZ = -2 * asin(getQuaternionZ());
+}
