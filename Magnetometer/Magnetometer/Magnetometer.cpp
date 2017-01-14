@@ -12,8 +12,10 @@ int main() {
 	return value;
 }
 
-// Using ECEF Latitude, Longitude and Altitude values
-// Time is yet to be figured out
+// 
+// Input: ECEF Latitude, Longitude and Altitude values, julianDate
+// Output: Horizontal Intensity(H), Total Intensity(F), Declination(D), Inclination(I), North Component(Bx), East Component(By), Vertical Component(Bz)
+//
 int calculateMagField(double lat, double lon, double h, double t) {
 	try {
 		MagneticModel mag("wmm2015", "../GeographicLib/magnetic");
