@@ -7,14 +7,15 @@ int calculateMagField(double lat, double lon, double h, double t);
 double calculateDecimalYear(double julianDate);
 
 int main() {
-	double lat = -6.603195445, lon = 36.175534, alt = 408.2844148, jDate = 2457767.511806;
+	double lat = 11.72833442, lon = -88.76596036, alt = 403.7934671, jDate = 2457767.511806;
 	int value = calculateMagField(lat, lon, alt, jDate);
 	return value;
 }
 
 // 
 // Input: ECEF Latitude, Longitude and Altitude values, julianDate
-// Output: Horizontal Intensity(H), Total Intensity(F), Declination(D), Inclination(I), North Component(Bx), East Component(By), Vertical Component(Bz)
+// Output: Horizontal Intensity(H), Total Intensity(F), Declination(D),
+// Inclination(I), East Component(Bx), North Component(By), Vertical Component(Bz)
 //
 int calculateMagField(double lat, double lon, double h, double t) {
 	try {
@@ -24,6 +25,9 @@ int calculateMagField(double lat, double lon, double h, double t) {
 		mag(t, lat, lon, h * 1000, Bx, By, Bz);
 		double H, F, D, I;
 		MagneticModel::FieldComponents(Bx, By, Bz, H, F, D, I);
+		Bx = fabs(Bx);
+		By = fabs(By);
+		Bz = fabs(Bz);
 		cout << H << " " << F << " " << D << " " << I << "\n";
 	}
 	catch (const exception& e) {
