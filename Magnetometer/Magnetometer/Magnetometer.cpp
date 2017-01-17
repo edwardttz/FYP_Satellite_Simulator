@@ -3,13 +3,23 @@
 
 #include "stdafx.h"
 
-int calculateMagField(double lat, double lon, double h, double t);
+double * calculateMagField(double lat, double lon, double h, double t);
 double calculateDecimalYear(double julianDate);
 
 int main() {
+	//Input ECEF lat, long, alt, julian Date
 	double lat = 11.72833442, lon = -88.76596036, alt = 403.7934671, jDate = 2457767.511806;
-	int value = calculateMagField(lat, lon, alt, jDate);
-	return value;
+	// magFieldValues = [Bx, By, Bz, H, F, D, I]
+	double *magFieldValues;
+	magFieldValues = calculateMagField(lat, lon, alt, jDate);
+/*
+ *	How each value is being called from pointer array
+ */
+	for(int i = 0; i <=6; i++) {
+		cout << *(magFieldValues + i) << endl;
+	}
+
+	return 0;
 }
 
 // 
@@ -17,24 +27,25 @@ int main() {
 // Output: Horizontal Intensity(H), Total Intensity(F), Declination(D),
 // Inclination(I), East Component(Bx), North Component(By), Vertical Component(Bz)
 //
-int calculateMagField(double lat, double lon, double h, double t) {
-	try {
-		MagneticModel mag("wmm2015", "../GeographicLib/magnetic");
-		double Bx, By, Bz;
-		t = calculateDecimalYear(t);
-		mag(t, lat, lon, h * 1000, Bx, By, Bz);
-		double H, F, D, I;
-		MagneticModel::FieldComponents(Bx, By, Bz, H, F, D, I);
-		Bx = fabs(Bx);
-		By = fabs(By);
-		Bz = fabs(Bz);
-		cout << H << " " << F << " " << D << " " << I << "\n";
-	}
-	catch (const exception& e) {
-		cerr << "Caught exception: " << e.what() << "\n";
-		return 1;
-	}
-	return 0;
+double * calculateMagField(double lat, double lon, double h, double t) {
+	
+	MagneticModel mag("wmm2015", "../GeographicLib/magnetic");
+	static double magFieldValues[7];
+	double Bx, By, Bz, H, F, D, I;
+	t = calculateDecimalYear(t);
+	mag(t, lat, lon, h * 1000, Bx, By, Bz);
+	MagneticModel::FieldComponents(Bx, By, Bz, H, F, D, I);
+	Bx = fabs(Bx);
+	By = fabs(By);
+	Bz = fabs(Bz);
+	magFieldValues[0] = Bx;
+	magFieldValues[1] = By;
+	magFieldValues[2] = Bz;
+	magFieldValues[3] = H;
+	magFieldValues[4] = F;
+	magFieldValues[5] = D;
+	magFieldValues[6] = I;
+	return magFieldValues;
 }
 double calculateDecimalYear(double julianDate) {
 	int daysAYear = 365, leapDay, nYear;
