@@ -22,73 +22,71 @@
 #include "orbitLib.h"
 
 // Forward declaration of helper function; see below
-void PrintPosVel(const cSatellite& sat);
+void Execute_Sgp4(const cSatellite& sat, int timeLength,
+	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos);
+
+void PrintPosVel(string tle[], cJulian date,
+	const vector<cEci>& vecPos, const vector<cGeo>& geoPos, const vector<cEcef>& ecefPos);
 
 //////////////////////////////////////////////////////////////////////////////
 int main(int /* argc */, char* /* argv[] */)
 {
+	// Input
    // Test SGP4 TLE data
    string str1 = "SGP4 Test";
    string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
    string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
+   string tle[3] = {str1, str2, str3};
 
-   // Create a TLE object using the data above
-   cTle tleSGP4(str1, str2, str3);
-
-  // Create a satellite object from the TLE object
-   cSatellite satSGP4(tleSGP4);
-   
-   // Print the position and velocity information of the satellite
-   PrintPosVel(satSGP4);
-
-   //cJulian date
-   // Now create a site object. Site objects represent a location on the 
-   // surface of the earth. Here we arbitrarily select a point on the
-   // equator.
-   //cSite siteEquator(0.0, -100.0, 0); // 0.00 N, 100.00 W, 0 km altitude
-
-   // Now get the "look angle" from the site to the satellite. 
-   // Note that the ECI object "eciSDP4" contains a time associated
-   // with the coordinates it contains; this is the time at which
-   // the look angle is valid.
-   //cTopo topoLook = siteEquator.GetLookAngle(eciSDP4);
-
-   // Print out the results.
-   //printf("AZ: %.3f  EL: %.3f\n", 
-   //       topoLook.AzimuthDeg(),
-   //       topoLook.ElevationDeg());
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Helper function to output position and velocity information
-void PrintPosVel(const cSatellite& sat)
-{
+   // Start of Initialization
    vector<cEci> vecPos;
    vector<cGeo> geoPos;
    vector<cEcef> ecefPos;
-   cJulian date;
+
+   // Create a TLE object using the data above
+   cTle tleSGP4(tle[0], tle[1], tle[2]);
+
+	// Create a satellite object from the TLE object
+   cSatellite satSGP4(tleSGP4);
+   // End of Initialization
+
+   // Locate position and velocity information of the satellite
+   // Time in minutes
+   // mpe = "minutes past epoch"
+   for (int mpe = 0; mpe <= (60 * 24); mpe += 1) {
+	   Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
+   }
+
+   // Print the position and velocity information of the satellite
+   PrintPosVel(tle, satSGP4.Orbit().Epoch(), vecPos, geoPos, ecefPos);
+}
+void Execute_Sgp4(const cSatellite& sat, int mpe, 
+	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos) {
+
+	// Calculate the position and velocity of the satellite for various times.
+	
+	// Get the position of the satellite at time "mpe"
+	cEciTime eci = sat.PositionEci(mpe);
+	cEcefTime ecef = sat.PositionEcef(mpe);
+	cGeoTime geo = sat.PositionEcef(mpe);
+
+	// Push the coordinates object onto the end of the vector.
+	vecPos.push_back(eci);
+	geoPos.push_back(geo);
+	ecefPos.push_back(ecef);
+}
+/////////////////////////////////////////////////////////////////////////////
+// Helper function to output position and velocity information
+void PrintPosVel(string tle[], cJulian date,
+		const vector<cEci>& vecPos, const vector<cGeo>& geoPos, const vector<cEcef>& ecefPos)
+{
    long double radius = 0.0;
    ofstream myfile;
    myfile.precision(12);
-
-   // Calculate the position and velocity of the satellite for various times.
-   // mpe = "minutes past epoch"
-   for (int mpe = 0; mpe <= (60 * 24); mpe += 1)
-   {
-      // Get the position of the satellite at time "mpe"
-      cEciTime eci = sat.PositionEci(mpe);
-	  cEcefTime ecef = sat.PositionEcef(mpe);
-	  cGeoTime geo = sat.PositionEcef(mpe);
-
-      // Push the coordinates object onto the end of the vector.
-      vecPos.push_back(eci);
-	  geoPos.push_back(geo);
-	  ecefPos.push_back(ecef);
-   }
-
+  
    // Save Satellite ECI position, Radius file
    myfile.open("Satellite Data/Satellite_Pos_Rad_ECI.csv", ios::trunc);
-   myfile << "T since,X,Y,Z,Radius,,," << sat.Name().c_str() << endl;
+   myfile << "T since,X,Y,Z,Radius,,," << tle[0] << endl;
    for (unsigned int i = 0; i < vecPos.size(); i++)
    {
 	   radius = sqrt(powl(vecPos[i].Position().m_x, 2) + powl(vecPos[i].Position().m_y, 2)
@@ -97,26 +95,26 @@ void PrintPosVel(const cSatellite& sat)
 	   {
 		   myfile << i << ',' << vecPos[i].Position().m_x << ',' << vecPos[i].Position().m_y << 
 			   ',' << vecPos[i].Position().m_z << ',' << radius << ",,," 
-			   << sat.Orbit().TleLine1().c_str() << endl;
+			   << tle[1] << endl;
 			   
 	   }
 	   else if (i == 1) 
 	   {
 		   myfile << i << ',' << vecPos[i].Position().m_x << ',' << vecPos[i].Position().m_y <<
 			   ',' << vecPos[i].Position().m_z << ',' << radius << ",,," 
-			   << sat.Orbit().TleLine2().c_str() << endl;
+			   << tle[2] << endl;
 	   }
 	   else if (i == 2)
 	   {
 		   myfile << i << ',' << vecPos[i].Position().m_x << ',' << vecPos[i].Position().m_y <<
 			   ',' << vecPos[i].Position().m_z << ',' << radius << ",,,"
 			   << "Singapore UTC+8:" << ",,"
-			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_year << ' '
-			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
+			   << date.ToTime().tm_mday << '/'
+			   << date.ToTime().tm_mon << '/'
+			   << date.ToTime().tm_year << ' '
+			   << date.ToTime().tm_hour << ':'
+			   << date.ToTime().tm_min << ':'
+			   << date.ToTime().tm_sec << endl;
 	   }
 	   else 
 	   {
@@ -128,33 +126,33 @@ void PrintPosVel(const cSatellite& sat)
    
    // Save Satellite ECI Velocity file
    myfile.open("Satellite Data/Satellite_Velocity_ECI.csv", ios::trunc);
-   myfile << "T since,Xdot,Ydot,Zdot,,," << sat.Name().c_str() << endl;
+   myfile << "T since,Xdot,Ydot,Zdot,,," << tle[0] << endl;
    for (unsigned int i = 0; i < vecPos.size(); i++)
    {
 	   if (i == 0)
 	   {
 		   myfile << i << ',' << vecPos[i].Velocity().m_x << ',' << vecPos[i].Velocity().m_y <<
 			   ',' << vecPos[i].Velocity().m_z << ",,," 
-			   << sat.Orbit().TleLine1().c_str() << endl;
+			   << tle[1] << endl;
 
 	   }
 	   else if (i == 1)
 	   {
 		   myfile << i << ',' << vecPos[i].Velocity().m_x << ',' << vecPos[i].Velocity().m_y <<
 			   ',' << vecPos[i].Velocity().m_z << ",,," 
-			   << sat.Orbit().TleLine2().c_str() << endl;
+			   << tle[2] << endl;
 	   }
 	   else if (i == 2)
 	   {
 		   myfile << i << ',' << vecPos[i].Position().m_x << ',' << vecPos[i].Position().m_y <<
 			   ',' << vecPos[i].Position().m_z << ",,,"
 			   << "Singapore UTC+8:" << ",,"
-			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << ' '
-			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
+			   << date.ToTime().tm_mday << '/'
+			   << date.ToTime().tm_mon << '/'
+			   << date.ToTime().tm_year << ' '
+			   << date.ToTime().tm_hour << ':'
+			   << date.ToTime().tm_min << ':'
+			   << date.ToTime().tm_sec << endl;
 	   }
 	   else
 	   {
@@ -166,33 +164,33 @@ void PrintPosVel(const cSatellite& sat)
 
    // Save Satellite Latitude, Longtitude, Altitude to file
    myfile.open("Satellite Data/Satellite_Lat_Long_Alti_ECEF.csv", ios::trunc);
-   myfile << "T since,Latitude,Longitude,Altitude,,," << sat.Name().c_str() << endl;
+   myfile << "T since,Latitude,Longitude,Altitude,,," << tle[0] << endl;
    for (unsigned int i = 0; i < geoPos.size(); i++)
    {
 	   if (i == 0)
 	   {
 		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
 			   ',' << geoPos[i].AltitudeKm() << ",,,"
-			   << sat.Orbit().TleLine1().c_str() << endl;
+			   << tle[1] << endl;
 
 	   }
 	   else if (i == 1)
 	   {
 		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
 			   ',' << geoPos[i].AltitudeKm() << ",,,"
-			   << sat.Orbit().TleLine2().c_str() << endl;
+			   << tle[2] << endl;
 	   }
 	   else if (i == 2)
 	   {
 		   myfile << i << ',' << geoPos[i].LatitudeDeg() << ',' << geoPos[i].LongitudeDeg() <<
 			   ',' << geoPos[i].AltitudeKm() << ",,,"
 			   << "Singapore UTC+8:" << ",,"
-			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_year << ' '
-			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
+			   << date.ToTime().tm_mday << '/'
+			   << date.ToTime().tm_mon << '/'
+			   << date.ToTime().tm_year << ' '
+			   << date.ToTime().tm_hour << ':'
+			   << date.ToTime().tm_min << ':'
+			   << date.ToTime().tm_sec << endl;
 	   }
 	   else
 	   {
@@ -204,7 +202,7 @@ void PrintPosVel(const cSatellite& sat)
 
    // Save Satellite ECEF position file
    myfile.open("Satellite Data/Satellite_Pos_ECEF.csv", ios::trunc);
-   myfile << "T since,X,Y,Z,,," << sat.Name().c_str() << endl;
+   myfile << "T since,X,Y,Z,,," << tle[0] << endl;
    for (unsigned int i = 0; i < ecefPos.size(); i++)
    {
 	   radius = sqrt(powl(ecefPos[i].Position().m_x, 2) + powl(ecefPos[i].Position().m_y, 2)
@@ -213,26 +211,26 @@ void PrintPosVel(const cSatellite& sat)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
 			   ',' << ecefPos[i].Position().m_z << ",,,"
-			   << sat.Orbit().TleLine1().c_str() << endl;
+			   << tle[1] << endl;
 
 	   }
 	   else if (i == 1)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
 			   ',' << ecefPos[i].Position().m_z << ",,,"
-			   << sat.Orbit().TleLine2().c_str() << endl;
+			   << tle[2] << endl;
 	   }
 	   else if (i == 2)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
 			   ',' << ecefPos[i].Position().m_z << ",,,"
 			   << "Singapore UTC+8:" << ",,"
-			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_year << ' '
-			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
+			   << date.ToTime().tm_mday << '/'
+			   << date.ToTime().tm_mon << '/'
+			   << date.ToTime().tm_year << ' '
+			   << date.ToTime().tm_hour << ':'
+			   << date.ToTime().tm_min << ':'
+			   << date.ToTime().tm_sec << endl;
 	   }
 	   else
 	   {
@@ -244,33 +242,33 @@ void PrintPosVel(const cSatellite& sat)
 
    // Save Satellite Velocity file
    myfile.open("Satellite Data/Satellite_Velocity_ECEF.csv", ios::trunc);
-   myfile << "T since,Xdot,Ydot,Zdot,,," << sat.Name().c_str() << endl;
+   myfile << "T since,Xdot,Ydot,Zdot,,," << tle[0] << endl;
    for (unsigned int i = 0; i < ecefPos.size(); i++)
    {
 	   if (i == 0)
 	   {
 		   myfile << i << ',' << ecefPos[i].Velocity().m_x << ',' << ecefPos[i].Velocity().m_y <<
 			   ',' << ecefPos[i].Velocity().m_z << ",,,"
-			   << sat.Orbit().TleLine1().c_str() << endl;
+			   << tle[1] << endl;
 
 	   }
 	   else if (i == 1)
 	   {
 		   myfile << i << ',' << ecefPos[i].Velocity().m_x << ',' << ecefPos[i].Velocity().m_y <<
 			   ',' << ecefPos[i].Velocity().m_z << ",,,"
-			   << sat.Orbit().TleLine2().c_str() << endl;
+			   << tle[2] << endl;
 	   }
 	   else if (i == 2)
 	   {
 		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
 			   ',' << ecefPos[i].Position().m_z << ",,,"
 			   << "Singapore UTC+8:" << ",,"
-			   << sat.Orbit().Epoch().ToTime().tm_mday << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << '/'
-			   << sat.Orbit().Epoch().ToTime().tm_mon << ' '
-			   << sat.Orbit().Epoch().ToTime().tm_hour << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_min << ':'
-			   << sat.Orbit().Epoch().ToTime().tm_sec << endl;
+			   << date.ToTime().tm_mday << '/'
+			   << date.ToTime().tm_mon << '/'
+			   << date.ToTime().tm_year << ' '
+			   << date.ToTime().tm_hour << ':'
+			   << date.ToTime().tm_min << ':'
+			   << date.ToTime().tm_sec << endl;
 	   }
 	   else
 	   {
