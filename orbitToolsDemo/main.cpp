@@ -12,6 +12,8 @@
 
 #include <stdio.h>
 
+#include <time.h>
+
 // "coreLib.h" includes basic types from the core library,
 // such as cSite, cJulian, etc. The header file also contains a
 // "using namespace" statement for Zeptomoby::OrbitTools.
@@ -31,6 +33,7 @@ void PrintPosVel(string tle[], cJulian date,
 //////////////////////////////////////////////////////////////////////////////
 int main(int /* argc */, char* /* argv[] */)
 {
+	clock_t tStart = clock();
 	// Input
    // Test SGP4 TLE data
    string str1 = "SGP4 Test";
@@ -59,6 +62,10 @@ int main(int /* argc */, char* /* argv[] */)
 
    // Print the position and velocity information of the satellite
    PrintPosVel(tle, satSGP4.Orbit().Epoch(), vecPos, geoPos, ecefPos);
+
+   printf("Time taken: %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
+   system("PAUSE");
 }
 void Execute_Sgp4(const cSatellite& sat, int mpe, 
 	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos) {
