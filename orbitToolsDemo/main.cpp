@@ -56,7 +56,7 @@ int main(int /* argc */, char* /* argv[] */)
    // Locate position and velocity information of the satellite
    // Time in minutes
    // mpe = "minutes past epoch"
-   for (int mpe = 0; mpe <= (60 * 24); mpe += 1) {
+   for (double mpe = 0; mpe <= 1.0; mpe += 1.0/60.0) {
 	   Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
    }
 
@@ -267,8 +267,8 @@ void PrintPosVel(string tle[], cJulian date,
 	   }
 	   else if (i == 2)
 	   {
-		   myfile << i << ',' << ecefPos[i].Position().m_x << ',' << ecefPos[i].Position().m_y <<
-			   ',' << ecefPos[i].Position().m_z << ",,,"
+		   myfile << i << ',' << ecefPos[i].Velocity().m_x << ',' << ecefPos[i].Velocity().m_y <<
+			   ',' << ecefPos[i].Velocity().m_z << ",,,"
 			   << "Singapore UTC+8:" << ",,"
 			   << date.ToTime().tm_mday << '/'
 			   << date.ToTime().tm_mon << '/'
