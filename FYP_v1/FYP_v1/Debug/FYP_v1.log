@@ -1,4 +1,10 @@
-﻿  Gyroscope Noise Model.cpp
+﻿  Storage.cpp
+c:\users\vatsala\desktop\year4 sem1\fyp\fyp_satellite_simulator\fyp_v1\fyp_v1\storage.cpp(21): warning C4018: '<': signed/unsigned mismatch
+  SpacecraftDynamics.cpp
+  Main.cpp
+  Gyroscope Noise Model.cpp
 c:\users\vatsala\desktop\year4 sem1\fyp\fyp_satellite_simulator\fyp_v1\fyp_v1\gyroscope noise model.cpp(125): warning C4244: '=': conversion from 'double' to 'long', possible loss of data
 c:\users\vatsala\desktop\year4 sem1\fyp\fyp_satellite_simulator\fyp_v1\fyp_v1\gyroscope noise model.cpp(131): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  LINK : C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.exe not found or not built by the last incremental link; performing full link
   FYP_v1.vcxproj -> C:\Users\vatsala\Desktop\Year4 Sem1\FYP\FYP_Satellite_Simulator\FYP_v1\Debug\FYP_v1.exe

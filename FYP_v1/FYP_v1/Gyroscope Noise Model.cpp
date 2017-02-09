@@ -154,7 +154,7 @@ void GyroNoiseModel::calculateAllanDeviation(int m) {
 }
 
 void GyroNoiseModel::findAllanDeviation() {
-	generateRawValues(-0.4, 0.4);
+	generateRawValues(-0.3, 0.3);
 	calculateThetaValues();
 	int initialM = 10;
 	for (int i = initialM; i < 1000; i=i+initialM) {
