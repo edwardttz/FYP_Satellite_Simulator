@@ -63,11 +63,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Gyroscope Noise Model.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SpacecraftDynamics.cpp" />
     <ClCompile Include="Storage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Gyroscope Noise Model.h" />
     <ClInclude Include="SpacecraftDynamics.h" />
     <ClInclude Include="Storage.h" />
   </ItemGroup>

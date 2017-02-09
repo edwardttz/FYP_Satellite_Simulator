@@ -24,12 +24,18 @@
     <ClCompile Include="SpacecraftDynamics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Gyroscope Noise Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Storage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SpacecraftDynamics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gyroscope Noise Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
