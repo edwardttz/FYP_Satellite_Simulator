@@ -7,18 +7,21 @@ double * calculateMagField(double lat, double lon, double h, double t);
 double calculateDecimalYear(double julianDate);
 
 int main() {
-	//Input ECEF lat, long, alt, julian Date
+	//Input
+	//ECEF lat, long, alt, julian Date
 	double lat = 11.72833442, lon = -88.76596036, alt = 403.7934671, jDate = 2457767.511806;
+
+	// Output
 	// magFieldValues = [Bx, By, Bz, H, F, D, I]
 	double *magFieldValues;
 	magFieldValues = calculateMagField(lat, lon, alt, jDate);
 /*
  *	How each value is being called from pointer array
+ *	Print
  */
 	for(int i = 0; i <=6; i++) {
 		cout << *(magFieldValues + i) << endl;
 	}
-
 	return 0;
 }
 
@@ -38,11 +41,11 @@ double * calculateMagField(double lat, double lon, double h, double t) {
 	Bx = fabs(Bx);
 	By = fabs(By);
 	Bz = fabs(Bz);
-	magFieldValues[0] = Bx;
-	magFieldValues[1] = By;
-	magFieldValues[2] = Bz;
+	magFieldValues[0] = Bx * (100.2 / 100.0);
+	magFieldValues[1] = By * (100.2 / 100.0);
+	magFieldValues[2] = Bz * (100.2 / 100.0);
 	magFieldValues[3] = H;
-	magFieldValues[4] = F;
+	magFieldValues[4] = F * (100.1 / 100.0);
 	magFieldValues[5] = D;
 	magFieldValues[6] = I;
 	return magFieldValues;
