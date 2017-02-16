@@ -2,7 +2,6 @@
 #define STORAGE_H
 
 #include <string>
-#include <vector>
 
 using namespace std;
 
@@ -13,7 +12,6 @@ private:
 public:
 	void setFileName(string);
 	void storeInFile(double);
-	void storeAllInFile(vector <double>);
 	void clearFile();
 
 };

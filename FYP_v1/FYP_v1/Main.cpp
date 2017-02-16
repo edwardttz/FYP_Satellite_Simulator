@@ -2,16 +2,57 @@
 #include <string>
 #include <cmath>
 #include "SpacecraftDynamics.h"
-#include "Gyroscope Noise Model.h"
 #include "Storage.h"
+#include <time.h>
 
 using namespace std;
 
-SpacecraftDynamics s1;
-GyroNoiseModel g1;
+int main(void) 
+{
+	clock_t tStart = clock();
+	/*
+	For user input :
+	cout << "Enter tX: " << endl;
+	cin >> tX;
+	cout << "Enter tY: " << endl;
+	cin >> tY;
+	cout << "Enter tZ: " << endl;
+	cin >> tZ;
+	cout << "Enter I_xx: " << endl;
+	cin >> I_x;
+	cout << "Enter I_yy: " << endl;
+	cin >> I_y;
+	cout << "Enter I_zz: " << endl;
+	cin >> I_z;
+	*/
 
-void findSpacecraftDynamics() {
-for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
+	SpacecraftDynamics s1;
+
+	//s1.setMOIValues(3.03, 4.85, 2.98); //KR 1
+	//s1.setMOIValues(40.45, 42.09, 41.36); //UoSat12
+	s1.setMOIValues(3.4, 2.18, 1.68); //MOST
+
+	//s1.setTorque(0.0107, 0.0107, 0.0107); //KR 1
+	//s1.setTorque(0.05, 0.05, 0.05); //UoSat12
+	s1.setTorque(0.01, 0.01, 0.01); //MOST
+	
+	//s1.setStepSize(0.01); //10ms stepsize
+	s1.setStepSize(0.05); //50ms stepsize
+
+	//for single iteration
+	/*
+	s1.setInitialW(0.0, 0.0, 0.0);
+	s1.setQuaternionInitialValues(0.0, 0.0, 0.0, 1.0);
+	s1.setVectorInitialValues(0.0, 0.0, 0.0, 1.0);
+	s1.setQuaternionInverseInitialValues(0.0, 0.0, 0.0, 0.0);
+	s1.findConstants();
+	
+	printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+	*/
+
+	//change i < some number to fit iterations and stepsize
+	//for multiple iterations
+	for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
 	{
 		//switching torque off after 30s
 		if (i == 599) //2999 for 10ms, 599 for 50ms
@@ -35,44 +76,14 @@ for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
 
 		//Find acceleration, next velocity and store all values in text file
 
-		g1.findRealW();
 		s1.findAcc();
 		s1.findThetaValues();
 		s1.storeValues();
-		g1.storeValues();
 		s1.getNextw();
 		s1.findNextQuaternion();
 		s1.findNextVector();	
-		cout << i << endl;
 	} 
-}
-
-int main(void) 
-{
-	/*
-	//For user input :
-	s1.getUserInput(); //Gets torque and MOI values
-	g1.getUserInput(); //Gets full scale value
-	*/
-
-	//For MOI and max torque values: 
-	s1.setSatellite("MOST");
-	//s1.setSatellite("Kent Ridge 1");
-	//s1.setSatellite("UoSat12");
-
-	//For Gyro noise model:
-	g1.setFSValue(250); //gets min and max non linearity
+	printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 	
-	//s1.setStepSize(0.01); //10ms stepsize
-	s1.setStepSize(0.05); //50ms stepsize
-	
-	s1.setInitialW(0.0, 0.0, 0.0);
-	s1.setQuaternionInitialValues(0.0, 0.0, 0.0, 1.0);
-	s1.setVectorInitialValues(0.0, 0.0, 0.0, 1.0);
-	s1.setQuaternionInverseInitialValues(0.0, 0.0, 0.0, 0.0);
-	s1.findConstants();
-	//findSpacecraftDynamics();
-	g1.setSamplePeriod(0.02);
-	g1.findAllanDeviation();
 	system("PAUSE");
 }

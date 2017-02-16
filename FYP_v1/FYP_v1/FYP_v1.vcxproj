@@ -13,10 +13,11 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72924B99-F3F8-4A02-A768-D46E3ECD6B74}</ProjectGuid>
     <RootNamespace>FYP_v1</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -63,13 +64,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Gyroscope Noise Model.cpp" />
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="SpacecraftDynamics.cpp" />
     <ClCompile Include="Storage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Gyroscope Noise Model.h" />
     <ClInclude Include="SpacecraftDynamics.h" />
     <ClInclude Include="Storage.h" />
   </ItemGroup>

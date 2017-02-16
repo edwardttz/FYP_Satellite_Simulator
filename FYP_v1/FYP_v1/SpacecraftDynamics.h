@@ -10,27 +10,12 @@ using namespace std;
 class SpacecraftDynamics : public Storage 
 {
 private:
-	static double stepSize;
-	static double constantX;
-	static double constantY;
-	static double constantZ;
-
-	static double wX;
-	static double wY;
-	static double wZ;
-
-	static double aX;
-	static double aY;
-	static double aZ;
-
-	static double iX;
-	static double iY;
-	static double iZ;
-
-	static double torqueX;
-	static double torqueY;
-	static double torqueZ;
-
+	double stepSize;
+	double constantX, constantY, constantZ;
+	double wX, wY, wZ;
+	double aX, aY, aZ;
+	double iX, iY, iZ;
+	double torqueX, torqueY, torqueZ;
 	double spaceTorqueX, spaceTorqueY, spaceTorqueZ;
 	double reactionTorqueX, reactionTorqueY, reactionTorqueZ;
 	double q0, qX, qY, qZ;
@@ -58,8 +43,6 @@ private:
 
 public:
 	SpacecraftDynamics();
-	void getUserInput();
-	void setSatellite(string);
 	double rungeKutta (double, double, double, double, double, double);
 	double rungeKuttaQuaternions (double, double, double, double, double);
 	double eulerMethodQuaternions(double, double, double, double, double);
@@ -118,11 +101,6 @@ public:
 	double findMagnitude(double, double, double, double);
 	void findNextVector();
 	void findThetaValues();
-	double RKwX();
-	double RKwY();
-	double RKwZ();
-	void getNexttempw();
-	 
 };
  
 
