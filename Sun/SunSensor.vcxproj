@@ -64,15 +64,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="eciSun.cpp" />
+    <ClCompile Include="cVector.cpp" />
+    <ClCompile Include="EciSun.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SunSensor.cpp" />
-    <ClCompile Include="Storage.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="SunNoiseModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="eciSun.h" />
-    <ClInclude Include="SunSensor.h" />
-    <ClInclude Include="Storage.h" />
+    <ClInclude Include="cVector.h" />
+    <ClInclude Include="EciSun.h" />
+    <ClInclude Include="globals.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SunNoiseModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

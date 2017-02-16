@@ -18,24 +18,33 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Storage.cpp">
+    <ClCompile Include="SunNoiseModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SunSensor.cpp">
+    <ClCompile Include="EciSun.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="eciSun.cpp">
+    <ClCompile Include="cVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Storage.h">
+    <ClInclude Include="EciSun.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SunSensor.h">
+    <ClInclude Include="SunNoiseModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="eciSun.h">
+    <ClInclude Include="cVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
