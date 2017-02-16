@@ -4,6 +4,8 @@
 #include <string>
 #include <thread>
 #include <mutex>
+#include <windows.h>
+
 
 //headers
 #include <time.h>
@@ -16,34 +18,70 @@ mutex groundTruthMutex;
 mutex noiseModelsMutex;
 mutex transportProtocolMutex;
 
+double groundTruthBuffer[50];
+double noiseModelsBuffer[50];
+double dataToSendBuffer[50];
+
+void foo(void);
+void bar(void);
+void tango(void);
+
+int main(void)
+{
+	//thread groundTruth(foo);
+	//thread noiseModels(bar);
+	//thread transportProtocol(tango);
+
+	clock_t tStart = clock();
+
+	thread groundTruth(foo);
+	thread noiseModels(bar);
+
+	if (groundTruth.joinable())
+	{
+		groundTruth.join();
+	}
+	
+	if (noiseModels.joinable())
+	{
+		noiseModels.join();
+	}
+	
+	printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
+	system("PAUSE");
+}
+
 void foo()
 {
+	printf("foo fighters\n");
+	groundTruthMutex.lock();
 	SpacecraftDynamics s1;
 
 	//s1.setMOIValues(3.03, 4.85, 2.98); //KR 1
 	//s1.setMOIValues(40.45, 42.09, 41.36); //UoSat12
 	s1.setMOIValues(3.4, 2.18, 1.68); //MOST
 
-									  //s1.setTorque(0.0107, 0.0107, 0.0107); //KR 1
-									  //s1.setTorque(0.05, 0.05, 0.05); //UoSat12
+	//s1.setTorque(0.0107, 0.0107, 0.0107); //KR 1
+	//s1.setTorque(0.05, 0.05, 0.05); //UoSat12
 	s1.setTorque(0.01, 0.01, 0.01); //MOST
 
-									//s1.setStepSize(0.01); //10ms stepsize
+	//s1.setStepSize(0.01); //10ms stepsize
 	s1.setStepSize(0.05); //50ms stepsize
 
-						  //for single iteration
-						  /*
-						  s1.setInitialW(0.0, 0.0, 0.0);
-						  s1.setQuaternionInitialValues(0.0, 0.0, 0.0, 1.0);
-						  s1.setVectorInitialValues(0.0, 0.0, 0.0, 1.0);
-						  s1.setQuaternionInverseInitialValues(0.0, 0.0, 0.0, 0.0);
-						  s1.findConstants();
+	//for single iteration
+	/*
+	s1.setInitialW(0.0, 0.0, 0.0);
+	s1.setQuaternionInitialValues(0.0, 0.0, 0.0, 1.0);
+	s1.setVectorInitialValues(0.0, 0.0, 0.0, 1.0);
+	s1.setQuaternionInverseInitialValues(0.0, 0.0, 0.0, 0.0);
+	s1.findConstants();
 
-						  printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-						  */
+	printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+	*/
 
-						  //change i < some number to fit iterations and stepsize
-						  //for multiple iterations
+	//change i < some number to fit iterations and stepsize
+	//for multiple iterations
 	for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
 	{
 		//switching torque off after 30s
@@ -76,30 +114,21 @@ void foo()
 		s1.findNextVector();
 	}
 	printf("ground\n");
+	groundTruthMutex.unlock();
 }
 
 void bar()
 {
+	printf("bar bar black sheep\n");
+	groundTruthMutex.lock();
+	printf("in bar\n");
+	Sleep(10000);
 	printf("noise\n");
+	groundTruthMutex.unlock();
 }
 
 void tango()
 {
 	printf("tpt\n");
-}
-
-int main(void)
-{
-	
-
-	//thread groundTruth(foo);
-	//thread noiseModels(bar);
-	//thread transportProtocol(tango);
-
-	clock_t tStart = clock();
-	foo();
-	printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-
-	system("PAUSE");
 }
 
