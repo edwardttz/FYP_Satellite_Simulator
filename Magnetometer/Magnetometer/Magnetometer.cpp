@@ -1,54 +1,87 @@
 // Magnetometer.cpp : Defines the entry point for the console application.
+// All fields are in mG
 //
 
 #include "stdafx.h"
 
-double * calculateMagField(double lat, double lon, double h, double t);
-double calculateDecimalYear(double julianDate);
-
 int main() {
+	// Initialization
+	vector<double> magFieldValues;
+
+	// Output
+	// magFieldValues = [Bx, By, Bz, H, F, D, I]
+	/*
+	 * Leslie: Use this instead.
+	 * calcMagFieldMain(geoPos, date, magFieldValues)
+	 */
+
+	// For Testing purposes
 	//Input
 	//ECEF lat, long, alt, julian Date
 	double lat = 11.72833442, lon = -88.76596036, alt = 403.7934671, jDate = 2457767.511806;
 
-	// Output
-	// magFieldValues = [Bx, By, Bz, H, F, D, I]
-	double *magFieldValues;
-	magFieldValues = calculateMagField(lat, lon, alt, jDate);
-/*
- *	How each value is being called from pointer array
- *	Print
- */
-	for(int i = 0; i <=6; i++) {
-		cout << *(magFieldValues + i) << endl;
-	}
+	calculateMagField(lat, lon, alt, jDate, magFieldValues);
+
+	testNoiseFloor();
+	testQuantization();
 	return 0;
 }
-
+/*
+void calcMagFieldMain(const cGeo geoPos, const cJulian date, vector<double>& magFieldValues) {
+	double lat = geoPos.LatitudeDeg();
+	double lon = geoPos.LongitudeDeg();
+	double h = geoPos.AltitudeKm();
+	double t = date.Date();
+	calculateMagField(lat, lon, h, t, magFieldValues);
+}
+*/
 // 
 // Input: ECEF Latitude, Longitude and Altitude values, julianDate
-// Output: Horizontal Intensity(H), Total Intensity(F), Declination(D),
-// Inclination(I), East Component(Bx), North Component(By), Vertical Component(Bz)
+// Output: East Component(Bx), North Component(By), Vertical Component(Bz)
+// Horizontal Intensity(H), Total Intensity(F), Declination(D), Inclination(I)
+// Digital of Bx, By, Bz, H, F
 //
-double * calculateMagField(double lat, double lon, double h, double t) {
+void calculateMagField(const double lat, const double lon, const double h, const double t, vector<double>& magFieldValues) {
 	
 	MagneticModel mag("wmm2015", "../GeographicLib/magnetic");
-	static double magFieldValues[7];
-	double Bx, By, Bz, H, F, D, I;
-	t = calculateDecimalYear(t);
-	mag(t, lat, lon, h * 1000, Bx, By, Bz);
+	
+	double Bx, By, Bz, H, F, D, I, Bx_temp, By_temp, Bz_temp;
+	double time = calculateDecimalYear(t);
+	mag(time, lat, lon, h * 1000, Bx, By, Bz);
 	MagneticModel::FieldComponents(Bx, By, Bz, H, F, D, I);
-	Bx = fabs(Bx);
-	By = fabs(By);
-	Bz = fabs(Bz);
-	magFieldValues[0] = Bx * (100.2 / 100.0);
-	magFieldValues[1] = By * (100.2 / 100.0);
-	magFieldValues[2] = Bz * (100.2 / 100.0);
-	magFieldValues[3] = H;
-	magFieldValues[4] = F * (100.1 / 100.0);
-	magFieldValues[5] = D;
-	magFieldValues[6] = I;
-	return magFieldValues;
+	
+	// Conversion to mG (1nT = 0.01mG)
+	Bx_temp = fabs(Bx) / 100.0;
+	By_temp = fabs(By) / 100.0;
+	Bz_temp = fabs(Bz) / 100.0;
+	H /= 100.0;
+	F /= 100.0;
+
+	// Include noise due to Cross-Axis Sensitivity
+	Bx = Bx_temp + ((By_temp + Bz_temp) * 0.02);
+	By = By_temp + ((Bx_temp + Bz_temp) * 0.02);
+	Bz = Bz_temp + +((Bx_temp + By_temp) * 0.02);
+	H = sqrt(pow(Bx, 2) + pow(By, 2));
+	F = sqrt(pow(Bx, 2) + pow(By, 2) + pow(Bz, 2));
+
+	// Linearity 0.1% Full-Scale
+	F = F * (100.1 / 100); 
+
+	// Analog values
+	magFieldValues.push_back(Bx);
+	magFieldValues.push_back(By);
+	magFieldValues.push_back(Bz);
+	magFieldValues.push_back(H);
+	magFieldValues.push_back(F);
+	magFieldValues.push_back(D);
+	magFieldValues.push_back(I);
+
+	// Digital (Quantized) values
+	magFieldValues.push_back(quantizeValue(Bx));
+	magFieldValues.push_back(quantizeValue(By));
+	magFieldValues.push_back(quantizeValue(Bz));
+	magFieldValues.push_back(quantizeValue(H));
+	magFieldValues.push_back(quantizeValue(F));
 }
 double calculateDecimalYear(double julianDate) {
 	int daysAYear = 365, leapDay, nYear;
@@ -67,5 +100,6 @@ double calculateDecimalYear(double julianDate) {
 	julianDate -= leapDay;
 	julianDate -= nYear * daysAYear;
 	decYear = nYear + 2000 + julianDate / daysAYear;
+
 	return decYear;
 }

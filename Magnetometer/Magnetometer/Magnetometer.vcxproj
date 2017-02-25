@@ -151,7 +151,9 @@
     <ClInclude Include="Geocentric.hpp" />
     <ClInclude Include="MagneticCircle.hpp" />
     <ClInclude Include="MagneticModel.hpp" />
+    <ClInclude Include="Magnetometer.h" />
     <ClInclude Include="Math.hpp" />
+    <ClInclude Include="NoiseModel.h" />
     <ClInclude Include="SphericalEngine.hpp" />
     <ClInclude Include="SphericalHarmonic.hpp" />
     <ClInclude Include="stdafx.h" />
@@ -165,6 +167,7 @@
     <ClCompile Include="MagneticModel.cpp" />
     <ClCompile Include="Magnetometer.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="NoiseModel.cpp" />
     <ClCompile Include="SphericalEngine.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
