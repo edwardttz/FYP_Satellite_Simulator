@@ -9,10 +9,11 @@ int main() {
 	vector<double> magFieldValues;
 
 	// Output
-	// magFieldValues = [Bx, By, Bz, H, F, D, I]
+	// magFieldValues = [Bx, By, Bz, H, F, D, I, qBx, qBy, qBz, qH, qF]
 	/*
 	 * Leslie: Use this instead.
 	 * calcMagFieldMain(geoPos, date, magFieldValues)
+	 * Need you to help me uncomment this function below and also in .h file
 	 */
 
 	// For Testing purposes
@@ -33,8 +34,7 @@ void calcMagFieldMain(const cGeo geoPos, const cJulian date, vector<double>& mag
 	double h = geoPos.AltitudeKm();
 	double t = date.Date();
 	calculateMagField(lat, lon, h, t, magFieldValues);
-}
-*/
+}*/
 // 
 // Input: ECEF Latitude, Longitude and Altitude values, julianDate
 // Output: East Component(Bx), North Component(By), Vertical Component(Bz)
