@@ -18,9 +18,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SunNoiseModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EciSun.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,12 +27,15 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SunSensorModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EciSun.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SunNoiseModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cVector.h">
@@ -45,6 +45,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunSensorModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="testCase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

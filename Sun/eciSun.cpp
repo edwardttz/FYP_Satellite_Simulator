@@ -11,8 +11,8 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 EciSun::EciSun()
 {
-	calculateSunVec();
 }
+
 void EciSun::calculateSunVec()
 {
 	double UT1 = 0.0;
@@ -36,31 +36,33 @@ void EciSun::calculateSunVec()
 	// Obliquity of the ecliptic in degrees
 	eccentricity = 23.439291 - 0.0130042 * UT1;
 
-	sun_Position.sun_x = cos(ecliptic * PI / 180);
-	sun_Position.sun_y = cos(eccentricity * PI / 180) * sin(ecliptic * PI / 180);
-	sun_Position.sun_z = sin(eccentricity * PI / 180) * sin(ecliptic * PI / 180);
+	sun_Position.x = cos(ecliptic * PI / 180);
+	sun_Position.y = cos(eccentricity * PI / 180) * sin(ecliptic * PI / 180);
+	sun_Position.z = sin(eccentricity * PI / 180) * sin(ecliptic * PI / 180);
 
-	// Unit Sun Vector to Sun Vector
-	sun_Position.sun_x *= sunDistInKm;
-	sun_Position.sun_y *= sunDistInKm;
-	sun_Position.sun_z *= sunDistInKm;
+	// Unit vector to Sun Vector
+	sun_Position.x *= sunDistInKm;
+	sun_Position.y *= sunDistInKm;
+	sun_Position.z *= sunDistInKm;
 
-	sun_Position.sun_azi = (atan(sun_Position.sun_y / sun_Position.sun_x)) * 180 / PI;
-	sun_Position.sun_ele = (atan(sun_Position.sun_z / sqrt(powl(sun_Position.sun_x, 2) +
-		powl(sun_Position.sun_y, 2)))) * 180 / PI;
+	// Computes the azimuth and elevation of Sun
+	sun_Position.azi = (atan(sun_Position.y / sun_Position.x)) * 180 / PI;
+	sun_Position.ele = (atan(sun_Position.z / sqrt(powl(sun_Position.x, 2) +
+		powl(sun_Position.y, 2)))) * 180 / PI;
 }
-
-/** 
-//	Testing Purposes
-void EciSun::computeBodyFrame(double eci)
-{
-	sun_Position.body_frame = -eci + (sun_Position.sun_x + sun_Position.sun_y + sun_Position.sun_z);
-} **/
 
 void EciSun::computeBodyFrame(double eciX, double eciY, double eciZ)
 {
-	sun_Position.body_frame = -(eciX + eciY + eciZ) + 
-		(sun_Position.sun_x + sun_Position.sun_y + sun_Position.sun_z);
+	// Gets the satellite body frame 
+	body_Position.x = (-eciX + sun_Position.x);
+	body_Position.y = (-eciY + sun_Position.y);
+	body_Position.z = (-eciZ + sun_Position.z);
+
+	// Normalize the vectors
+	body_Position.m = body_Position.Magnitude_2D();
+	body_Position.x /= body_Position.m;
+	body_Position.y /= body_Position.m;
+	body_Position.z /= body_Position.m;
 }
 
 void EciSun::setJulianDate(double JD)

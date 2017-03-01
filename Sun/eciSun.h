@@ -12,9 +12,8 @@ class EciSun
 {
 	public:
 		EciSun();
-		
 		const cVector& SunPosition() const { return sun_Position; }
-		const cVector& EciPosition() const { return eci_Position; }
+		const cVector& BodyPosition() const { return body_Position; }
 
 		double julianDate;
 		
@@ -26,5 +25,5 @@ class EciSun
 
 	protected:
 		cVector sun_Position;
-		cVector eci_Position;
+		cVector body_Position;
 };

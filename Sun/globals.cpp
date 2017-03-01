@@ -1,0 +1,15 @@
+#include "globals.h"
+
+//////////////////////////////////////////////////////////////////////////////
+double rad2deg(const double r)
+{
+	const double DEG_PER_RAD = 180.0 / PI;
+	return r * DEG_PER_RAD;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+double deg2rad(const double d)
+{
+	const double RAD_PER_DEG = PI / 180.0;
+	return d * RAD_PER_DEG;
+}

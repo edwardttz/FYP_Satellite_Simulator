@@ -1,15 +1,19 @@
 #pragma once
 
+#include "cVector.h";
+
 using namespace std;
 
 class SunSensorModel
 {
-private:
-	/** Parameters **/
 
 public:
-	SunSensorModel();
-	SunSensorModel(const SunSensorModel &s);
+	SunSensorModel();	
+	const cVector& Plane() const { return plane; }
 
-	double x, y, z, d;
+	void setPlane(double, double, double);
+	void computeSensorVector(EciSun e);
+
+protected:
+	cVector plane;
 };

@@ -9,9 +9,9 @@ using namespace std;
 
 void cVector::Mul(double factor)
 {
-	sun_x *= factor;
-	sun_y *= factor;
-	sun_z *= factor;
+	x *= factor;
+	y *= factor;
+	z *= factor;
 }
 
 //*****************************************************************************
@@ -20,39 +20,58 @@ void cVector::Mul(double factor)
 
 void cVector::Sub(const cVector& vec)
 {
-	sun_x -= vec.sun_x;
-	sun_y -= vec.sun_y;
-	sun_z -= vec.sun_z;
+	x -= vec.x;
+	y -= vec.y;
+	z -= vec.z;
 }
 
 //*****************************************************************************
 // Calculate the angle between this vector and another
 //*****************************************************************************
 		
-double cVector::Angle(const cVector& vec) const
+double cVector::Angle_2D(const cVector& vec) const
 {
-	return acos(Dot(vec) / (Magnitude() * vec.Magnitude()));
+	return acos(Dot_2D(vec) / (Magnitude_2D() * vec.Magnitude_2D()));
+}
+
+double cVector::Angle_3D(const cVector& vec) const
+{
+	return acos(Dot_3D(vec) / (Magnitude_3D() * vec.Magnitude_3D()));
 }
 
 //*****************************************************************************
-//
+// Calculate the magnitude for 2D
 //*****************************************************************************
 
-double cVector::Magnitude() const
+double cVector::Magnitude_2D() const
 {
-	return sqrt((sun_x * sun_x) +
-				(sun_y * sun_y) +
-				(sun_z * sun_z));
+	return sqrt((x * x) + (y * y));
 }
 
 //*****************************************************************************
-// Return the dot product
+// Calculate the magnitude for 3D
 //*****************************************************************************
 
-double cVector::Dot(const cVector& vec) const
+double cVector::Magnitude_3D() const
 {
-	return (sun_x * vec.sun_x) +
-			(sun_y * vec.sun_y) +
-			(sun_z * vec.sun_z);
+	return sqrt((x * x) + (y * y) + (z*z));
+}
+
+//*****************************************************************************
+// Return the dot product of 2D
+//*****************************************************************************
+
+double cVector::Dot_2D(const cVector& vec) const
+{
+	return (x * vec.x) + (y * vec.y);
+}
+
+//*****************************************************************************
+// Return the dot product of 3D
+//*****************************************************************************
+
+double cVector::Dot_3D(const cVector& vec) const
+{
+	return (x * vec.x) + (y * vec.y) + (z * vec.z);
 }
 

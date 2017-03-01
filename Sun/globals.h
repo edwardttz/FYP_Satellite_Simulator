@@ -5,4 +5,7 @@
 const double sunDistInKm = 149597870700;
 const double PI = 3.14159265359;
 
+double rad2deg(const double);
+double deg2rad(const double);
+
 
