@@ -279,9 +279,9 @@ void GyroNoiseModel::findRealW() {
 	setRealwX(wX);
 	setRealwY(wY);
 	setRealwZ(wZ);
-	realWValues.push_back(wXreal);
+	/*realWValues.push_back(wXreal);
 	realWValues.push_back(wYreal);
-	realWValues.push_back(wZreal);
+	realWValues.push_back(wZreal);*/
 	storeRealwValues();
 }
 

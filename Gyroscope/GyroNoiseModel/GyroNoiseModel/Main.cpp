@@ -8,28 +8,19 @@
 
 using namespace std;
 
-GyroNoiseModel g1;
-static vector <double> wValues;
-
-vector <double> getwValues() {
-	return g1.getRealWValues();
-}
-
-void printwValues() {
-	vector <double> wValues = g1.getRealWValues();
-	cout << "wX=" << wValues[0] << " , wY=" << wValues[1] << " , wZ=" << wValues[2] << endl;
-}
-
 int main(void) 
 {
 	/*
 	Leslie :
-	To get the w values call the function:
-	g1.getRealWValues()
-	It will return you a vector <double> type in the form [wX, wY, wZ]. (Refer to line 14 in main.cpp)
+	Copy all of the main function into your code. It will calculate my values which are wX, wY and wZ after noise is added.
+	After it runs, to access the data you can use the GyroNoiseModel object g1 and call the following:
+		For wX value - g1.getRealwX() [Returns you double type wX]
+		For wY value - g1.getRealwY() [Returns you double type wY]
+		For wZ value - g1.getRealwZ() [Returns you double type wZ]
 	Also this program assumes you are running at 50ms. Please do tell me if it changes as I will have to update my side too.
 	*/
 
+	GyroNoiseModel g1;
 	g1.setPollingTime(0.05); //Polling time by default is 50ms
 	g1.setSamplePeriod(0.02); //sample period 1 for raw gyro values
 	g1.setFSValue(250); //Full scale of gyro by default = 250
@@ -37,7 +28,6 @@ int main(void)
 	g1.setMinNoiseDensity(-0.37);
 	g1.findRealW();
 	//g1.findAllanDeviation();
-	//printwValues();
 
 	/*
 	For testing purposes
