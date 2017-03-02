@@ -39,7 +39,7 @@ GyroNoiseModel::GyroNoiseModel() {
 	wYRealValues.clearFile();
 	wZRealValues.clearFile();
 	setAccumNoise(0.0);
-	numberOfNoiseGenerations = 5;
+	numberOfNoiseGenerations = 2;
 }
 
 double GyroNoiseModel::getPollingTime() {

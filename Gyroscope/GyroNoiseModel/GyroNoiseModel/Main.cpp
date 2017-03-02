@@ -27,10 +27,10 @@ int main(void)
 	To get the w values call the function:
 	g1.getRealWValues()
 	It will return you a vector <double> type in the form [wX, wY, wZ]. (Refer to line 14 in main.cpp)
-	Also this program assumes you are running at 100ms. Please do tell me if it changes as I will have to update my side too.
+	Also this program assumes you are running at 50ms. Please do tell me if it changes as I will have to update my side too.
 	*/
 
-	g1.setPollingTime(0.1); //Polling time by default is 100ms
+	g1.setPollingTime(0.05); //Polling time by default is 50ms
 	g1.setSamplePeriod(0.02); //sample period 1 for raw gyro values
 	g1.setFSValue(250); //Full scale of gyro by default = 250
 	g1.setMaxNoiseDensity(0.37); 
