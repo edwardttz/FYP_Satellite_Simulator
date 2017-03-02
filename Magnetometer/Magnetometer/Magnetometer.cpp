@@ -19,12 +19,16 @@ int main() {
 	// For Testing purposes
 	//Input
 	//ECEF lat, long, alt, julian Date
-	double lat = 11.72833442, lon = -88.76596036, alt = 403.7934671, jDate = 2457767.511806;
+	double lat = 40.7077778, lon = -73.90527777, alt = 403.7934671, jDate = 2457814.5;
 
 	calculateMagField(lat, lon, alt, jDate, magFieldValues);
 
-	testNoiseFloor();
-	testQuantization();
+	ofstream out("../out.txt");
+
+	for (int i = 0; i < magFieldValues.size(); i++) {
+		out << magFieldValues[i] << endl;
+	}
+	out.close();
 	return 0;
 }
 /*
@@ -49,20 +53,28 @@ void calculateMagField(const double lat, const double lon, const double h, const
 	double time = calculateDecimalYear(t);
 	mag(time, lat, lon, h * 1000, Bx, By, Bz);
 	MagneticModel::FieldComponents(Bx, By, Bz, H, F, D, I);
+	Bz = -Bz;
 	
-	// Conversion to mG (1nT = 0.01mG)
-	Bx_temp = fabs(Bx) / 100.0;
-	By_temp = fabs(By) / 100.0;
-	Bz_temp = fabs(Bz) / 100.0;
+	// Conversion to mG (100nT = 1mG)
+	Bx_temp = Bx / 100.0;
+	By_temp = By / 100.0;
+	Bz_temp = Bz / 100.0;
 	H /= 100.0;
 	F /= 100.0;
-
+	
 	// Include noise due to Cross-Axis Sensitivity
 	Bx = Bx_temp + ((By_temp + Bz_temp) * 0.02);
 	By = By_temp + ((Bx_temp + Bz_temp) * 0.02);
-	Bz = Bz_temp + +((Bx_temp + By_temp) * 0.02);
+	Bz = Bz_temp + ((Bx_temp + By_temp) * 0.02);
 	H = sqrt(pow(Bx, 2) + pow(By, 2));
 	F = sqrt(pow(Bx, 2) + pow(By, 2) + pow(Bz, 2));
+	
+	// Adding Noise floor
+	Bx += genRandNoiseFloor(4);
+	By += genRandNoiseFloor(4);
+	Bz += genRandNoiseFloor(4);
+	H += genRandNoiseFloor(4);
+	F += genRandNoiseFloor(4);
 
 	// Linearity 0.1% Full-Scale
 	F = F * (100.1 / 100); 
