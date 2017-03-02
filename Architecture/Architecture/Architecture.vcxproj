@@ -77,7 +77,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\Magnetometer\Magnetometer;$(SolutionDir)..\orbitTools\orbit;$(SolutionDir)..\orbitTools\core;$(SolutionDir)..\FYP_v1\FYP_v1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>F:\GitHub\FYP_Satellite_Simulator\Architecture\Win32\Debug\orbitTools.core.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Win32\Debug\orbitTools.orbit.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Debug\FYP_v1.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Debug\Magnetometer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)\Win32\Debug\orbitTools.core.lib;$(SolutionDir)\Win32\Debug\orbitTools.orbit.lib;$(SolutionDir)\Debug\FYP_v1.lib;$(SolutionDir)\Debug\Magnetometer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

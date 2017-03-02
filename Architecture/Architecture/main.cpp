@@ -6,6 +6,23 @@ bool groundTruthDone = false;
 bool noiseModelsDone = false;
 bool transportDone = true;
 
+// Test SGP4 TLE data
+string str1 = "SGP4 Test";
+string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
+string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
+string tle[3] = { str1, str2, str3 };
+
+// Start of Initialization
+vector<cEci> vecPos;
+vector<cGeo> geoPos;
+vector<cEcef> ecefPos;
+
+// Create a TLE object using the data above
+cTle tleSGP4(tle[0], tle[1], tle[2]);
+
+// Create a satellite object from the TLE object
+cSatellite satSGP4(tleSGP4);
+
 //forward declarations
 void calculateGroundTruth(void);
 void calculateNoiseModels(void);
@@ -20,6 +37,7 @@ void calculateMagField(const double, const double, const double, const double, v
 int main(void)
 {
 	clock_t tStart = clock();
+
 	
 	thread groundTruth(calculateGroundTruth);
 	thread noiseModels(calculateNoiseModels);
@@ -109,23 +127,6 @@ void calculateGroundTruth()
 	cout << "qZ = " << s1.getQuaternionZ() << endl;
 
 	printf("start TLE\n");
-
-	// Test SGP4 TLE data
-	string str1 = "SGP4 Test";
-	string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
-	string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
-	string tle[3] = { str1, str2, str3 };
-
-	// Start of Initialization
-	vector<cEci> vecPos;
-	vector<cGeo> geoPos;
-	vector<cEcef> ecefPos;
-
-	// Create a TLE object using the data above
-	cTle tleSGP4(tle[0], tle[1], tle[2]);
-
-	// Create a satellite object from the TLE object
-	cSatellite satSGP4(tleSGP4);
 
 	// Locate position and velocity information of the satellite
 	// Time in minutes
