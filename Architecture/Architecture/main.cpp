@@ -1,34 +1,10 @@
-//libraries
-#include <iostream>
-#include <cmath>
-#include <string>
-#include <thread>
-#include <mutex>
-#include <windows.h>
-#include <cstdlib>
-#include <condition_variable>
-#include <time.h>
-
-//headers for ground truth
-#include "SpacecraftDynamics.h"
-#include "Storage.h"
-#include "coreLib.h"
-#include "orbitLib.h"
-
-//headers for noise models
-
-using namespace std;
+#include "stdafx.h"
 
 mutex groundTruthLock;
 condition_variable groundTruthConVar;
 bool groundTruthDone = false;
 bool noiseModelsDone = false;
 bool transportDone = true;
-
-
-double groundTruthBuffer[50];
-double noiseModelsBuffer[50];
-double dataToSendBuffer[50];
 
 //forward declarations
 void calculateGroundTruth(void);
@@ -38,6 +14,8 @@ void Execute_Sgp4(const cSatellite& sat, int timeLength,
 	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos);
 void calculateMagField(const double, const double, const double, const double, vector<double>&);
 void calcMagFieldMain(const cGeo, const cJulian, vector<double>&);
+double calculateDecimalYear(double);
+void calculateMagField(const double, const double, const double, const double, vector<double>&);
 
 int main(void)
 {
@@ -131,6 +109,7 @@ void calculateGroundTruth()
 	cout << "qZ = " << s1.getQuaternionZ() << endl;
 
 	printf("start TLE\n");
+
 	// Test SGP4 TLE data
 	string str1 = "SGP4 Test";
 	string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
@@ -147,7 +126,6 @@ void calculateGroundTruth()
 
 	// Create a satellite object from the TLE object
 	cSatellite satSGP4(tleSGP4);
-	// End of Initialization
 
 	// Locate position and velocity information of the satellite
 	// Time in minutes
@@ -158,7 +136,7 @@ void calculateGroundTruth()
 		cout << "mpe = " << mpe << endl;
 		Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
 	}
-
+	cout << "test = " << vecPos[0].Position().m_x << endl;
 	groundTruthDone = true;
 	groundTruthConVar.notify_one();
 }
@@ -186,16 +164,91 @@ void calculateNoiseModels()
 	groundTruthConVar.wait(groundLock, [] {return groundTruthDone; });
 	
 	//magnetometer
+	//vector<double> magFieldValues;
+
+	//calcMagFieldMain(geoPos[geoPos.size() - 1], satSGP4.Orbit().Epoch(), magFieldValues);
 
 	//gyro
 
 	//sun
 
+
 	printf("noise\n");
+}
+
+void calcMagFieldMain(const cGeo geoPos, const cJulian date, vector<double>& magFieldValues) {
+	double lat = geoPos.LatitudeDeg();
+	double lon = geoPos.LongitudeDeg();
+	double h = geoPos.AltitudeKm();
+	double t = date.Date();
+	calculateMagField(lat, lon, h, t, magFieldValues);
+}
+
+void calculateMagField(const double lat, const double lon, const double h, const double t, vector<double>& magFieldValues) {
+
+	MagneticModel mag("wmm2015", "../GeographicLib/magnetic");
+
+	double Bx, By, Bz, H, F, D, I, Bx_temp, By_temp, Bz_temp;
+	double time = calculateDecimalYear(t);
+	mag(time, lat, lon, h * 1000, Bx, By, Bz);
+	MagneticModel::FieldComponents(Bx, By, Bz, H, F, D, I);
+
+	// Conversion to mG (1nT = 0.01mG)
+	Bx_temp = fabs(Bx) / 100.0;
+	By_temp = fabs(By) / 100.0;
+	Bz_temp = fabs(Bz) / 100.0;
+	H /= 100.0;
+	F /= 100.0;
+
+	// Include noise due to Cross-Axis Sensitivity
+	Bx = Bx_temp + ((By_temp + Bz_temp) * 0.02);
+	By = By_temp + ((Bx_temp + Bz_temp) * 0.02);
+	Bz = Bz_temp + +((Bx_temp + By_temp) * 0.02);
+	H = sqrt(pow(Bx, 2) + pow(By, 2));
+	F = sqrt(pow(Bx, 2) + pow(By, 2) + pow(Bz, 2));
+
+	// Linearity 0.1% Full-Scale
+	F = F * (100.1 / 100);
+
+	// Analog values
+	magFieldValues.push_back(Bx);
+	magFieldValues.push_back(By);
+	magFieldValues.push_back(Bz);
+	magFieldValues.push_back(H);
+	magFieldValues.push_back(F);
+	magFieldValues.push_back(D);
+	magFieldValues.push_back(I);
+
+	// Digital (Quantized) values
+	magFieldValues.push_back(quantizeValue(Bx));
+	magFieldValues.push_back(quantizeValue(By));
+	magFieldValues.push_back(quantizeValue(Bz));
+	magFieldValues.push_back(quantizeValue(H));
+	magFieldValues.push_back(quantizeValue(F));
+}
+
+double calculateDecimalYear(double julianDate) {
+	int daysAYear = 365, leapDay, nYear;
+	double refDate = 2451544.5; //Date: 2000/1/1
+	double decimalValue, decYear;
+	decimalValue = julianDate - (int)julianDate;
+	if (decimalValue < 0.5) {
+		julianDate = (int)julianDate - 1 + 0.5;
+	}
+	else {
+		julianDate = (int)julianDate + 0.5;
+	}
+	julianDate -= refDate;
+	nYear = julianDate / daysAYear;
+	leapDay = nYear / 4;
+	julianDate -= leapDay;
+	julianDate -= nYear * daysAYear;
+	decYear = nYear + 2000 + julianDate / daysAYear;
+
+	return decYear;
 }
 
 void tango()
 {
 	printf("tpt\n");
 }
-

@@ -74,10 +74,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\orbitTools\orbit;$(SolutionDir)..\orbitTools\core;$(SolutionDir)..\FYP_v1\FYP_v1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Magnetometer\Magnetometer;$(SolutionDir)..\orbitTools\orbit;$(SolutionDir)..\orbitTools\core;$(SolutionDir)..\FYP_v1\FYP_v1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>F:\GitHub\FYP_Satellite_Simulator\Architecture\Win32\Debug\orbitTools.core.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Win32\Debug\orbitTools.orbit.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Debug\FYP_v1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>F:\GitHub\FYP_Satellite_Simulator\Architecture\Win32\Debug\orbitTools.core.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Win32\Debug\orbitTools.orbit.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Debug\FYP_v1.lib;F:\GitHub\FYP_Satellite_Simulator\Architecture\Debug\Magnetometer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -115,6 +115,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
