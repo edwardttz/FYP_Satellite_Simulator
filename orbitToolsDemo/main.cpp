@@ -32,33 +32,32 @@ void PrintPosVel(string tle[], cJulian date,
 int main(int /* argc */, char* /* argv[] */)
 {
 	// Input
-   // Test SGP4 TLE data
-   string str1 = "SGP4 Test";
-   string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
-   string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
-   string tle[3] = {str1, str2, str3};
+	// Test SGP4 TLE data
+	string str1 = "SGP4 Test";
+	string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
+	string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
+	string tle[3] = {str1, str2, str3};
 
-   // Start of Initialization
-   vector<cEci> vecPos;
-   vector<cGeo> geoPos;
-   vector<cEcef> ecefPos;
+	// Start of Initialization
+	vector<cEci> vecPos;
+	vector<cGeo> geoPos;
+	vector<cEcef> ecefPos;
 
-   // Create a TLE object using the data above
-   cTle tleSGP4(tle[0], tle[1], tle[2]);
-
+	// Create a TLE object using the data above
+	cTle tleSGP4(tle[0], tle[1], tle[2]);
 	// Create a satellite object from the TLE object
-   cSatellite satSGP4(tleSGP4);
-   // End of Initialization
+	cSatellite satSGP4(tleSGP4);
+	// End of Initialization
 
-   // Locate position and velocity information of the satellite
-   // Time in minutes
-   // mpe = "minutes past epoch"
-   for (int mpe = 0; mpe <= (60 * 24); mpe += 1) {
-	   Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
-   }
+	// Locate position and velocity information of the satellite
+	// Time in minutes
+	// mpe = "minutes past epoch"
+	for (int mpe = 0; mpe <= (60 * 24); mpe += 1) {
+		Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
+	}
 
-   // Print the position and velocity information of the satellite
-   PrintPosVel(tle, satSGP4.Orbit().Epoch(), vecPos, geoPos, ecefPos);
+	// Print the position and velocity information of the satellite
+	PrintPosVel(tle, satSGP4.Orbit().Epoch(), vecPos, geoPos, ecefPos);
 }
 void Execute_Sgp4(const cSatellite& sat, int mpe, 
 	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos) {
