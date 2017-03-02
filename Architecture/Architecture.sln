@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Architecture", "Architectur
 		{72924B99-F3F8-4A02-A768-D46E3ECD6B74} = {72924B99-F3F8-4A02-A768-D46E3ECD6B74}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FYP_v1", "..\FYP_v1\FYP_v1\FYP_v1.vcxproj", "{72924B99-F3F8-4A02-A768-D46E3ECD6B74}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\orbitTools\core\core.vcxproj", "{F3067B0D-4F1E-457A-AE9C-AAB6CCD5C1A3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbit", "..\orbitTools\orbit\orbit.vcxproj", "{E7D39150-D44F-426D-B0E2-5ACFA19042DE}"
@@ -20,6 +18,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Magnetometer", "..\Magnetometer\Magnetometer\Magnetometer.vcxproj", "{55B35FFA-0164-4300-91CA-2892F85AD748}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GyroNoiseModel", "GyroNoiseModel\GyroNoiseModel\GyroNoiseModel.vcxproj", "{62651B58-4564-4226-BEB8-E77ED8E7E7DE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FYP_v1", "FYP_v1\FYP_v1\FYP_v1.vcxproj", "{72924B99-F3F8-4A02-A768-D46E3ECD6B74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,12 +37,6 @@ Global
 		{82DEBA31-315A-4ED0-85C9-67892A0D2429}.Release|x64.Build.0 = Release|x64
 		{82DEBA31-315A-4ED0-85C9-67892A0D2429}.Release|x86.ActiveCfg = Release|Win32
 		{82DEBA31-315A-4ED0-85C9-67892A0D2429}.Release|x86.Build.0 = Release|Win32
-		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Debug|x64.ActiveCfg = Debug|Win32
-		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Debug|x86.ActiveCfg = Debug|Win32
-		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Debug|x86.Build.0 = Debug|Win32
-		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Release|x64.ActiveCfg = Release|Win32
-		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Release|x86.ActiveCfg = Release|Win32
-		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Release|x86.Build.0 = Release|Win32
 		{F3067B0D-4F1E-457A-AE9C-AAB6CCD5C1A3}.Debug|x64.ActiveCfg = Debug|x64
 		{F3067B0D-4F1E-457A-AE9C-AAB6CCD5C1A3}.Debug|x64.Build.0 = Debug|x64
 		{F3067B0D-4F1E-457A-AE9C-AAB6CCD5C1A3}.Debug|x86.ActiveCfg = Debug|Win32
@@ -75,6 +69,12 @@ Global
 		{62651B58-4564-4226-BEB8-E77ED8E7E7DE}.Release|x64.Build.0 = Release|x64
 		{62651B58-4564-4226-BEB8-E77ED8E7E7DE}.Release|x86.ActiveCfg = Release|Win32
 		{62651B58-4564-4226-BEB8-E77ED8E7E7DE}.Release|x86.Build.0 = Release|Win32
+		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Debug|x64.ActiveCfg = Debug|Win32
+		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Debug|x86.ActiveCfg = Debug|Win32
+		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Debug|x86.Build.0 = Debug|Win32
+		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Release|x64.ActiveCfg = Release|Win32
+		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Release|x86.ActiveCfg = Release|Win32
+		{72924B99-F3F8-4A02-A768-D46E3ECD6B74}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
