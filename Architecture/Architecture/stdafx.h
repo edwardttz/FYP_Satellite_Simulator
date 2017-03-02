@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <math.h>
 #include <cmath>
+#include <tchar.h>
 
 //headers for ground truth
 #include "SpacecraftDynamics.h"
@@ -46,6 +47,11 @@
 #include "NoiseModel.h"
 
 #include "Gyroscope Noise Model.h"
+
+//#include "globals.h"
+//#include "EciSun.h"
+//#include "cVector.h"
+//#include "SunSensorModel.h"
 
 using namespace std;
 using namespace GeographicLib;

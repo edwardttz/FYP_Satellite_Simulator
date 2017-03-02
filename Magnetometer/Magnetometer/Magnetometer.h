@@ -1,4 +1,6 @@
 #pragma once
+
+#include "stdafx.h"
 using namespace std;
 
 //void calcMagFieldMain(const cGeo geoPos, const cJulian date, vector<double>& magFieldValues);
