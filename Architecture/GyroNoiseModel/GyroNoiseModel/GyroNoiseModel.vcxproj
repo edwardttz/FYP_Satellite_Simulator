@@ -19,13 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{82DEBA31-315A-4ED0-85C9-67892A0D2429}</ProjectGuid>
-    <RootNamespace>Architecture</RootNamespace>
+    <ProjectGuid>{62651B58-4564-4226-BEB8-E77ED8E7E7DE}</ProjectGuid>
+    <RootNamespace>GyroNoiseModel</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -74,11 +74,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\GyroNoiseModel\GyroNoiseModel;$(SolutionDir)..\Magnetometer\Magnetometer;$(SolutionDir)..\orbitTools\orbit;$(SolutionDir)..\orbitTools\core;$(SolutionDir)..\FYP_v1\FYP_v1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\FYP_v1\FYP_v1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(SolutionDir)\Win32\Debug\orbitTools.core.lib;$(SolutionDir)\Win32\Debug\orbitTools.orbit.lib;$(SolutionDir)\Debug\FYP_v1.lib;$(SolutionDir)\Debug\GyroNoiseModel.lib;$(SolutionDir)\Debug\Magnetometer.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -114,13 +111,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="sgp4Data.cpp" />
-    <ClCompile Include="stdafx.cpp" />
+    <ClInclude Include="Gyroscope Noise Model.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sgp4Data.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClCompile Include="Gyroscope Noise Model.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FYP_v1\FYP_v1\FYP_v1.vcxproj">
+      <Project>{72924b99-f3f8-4a02-a768-d46e3ecd6b74}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

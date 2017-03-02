@@ -7,6 +7,8 @@ bool noiseModelsDone = false;
 bool transportDone = true;
 
 SpacecraftDynamics s1;
+GyroNoiseModel gyroModel;
+//sgp4Data tleData;
 
 //forward declarations
 void calculateGroundTruth(void);
@@ -64,7 +66,6 @@ void calculateGroundTruth()
 	//for multiple iterations
 	for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
 	{
-		
 		//switching torque off after 30s
 		if (i == 599) //2999 for 10ms, 599 for 50ms
 		{
@@ -84,10 +85,7 @@ void calculateGroundTruth()
 		{
 			s1.setTorque(0.0, 0.0, 0.0);
 		}
-		
-
 		//Find acceleration, next velocity and store all values in text file
-
 		s1.findAcc();
 		s1.findThetaValues();
 		s1.storeValues();
@@ -108,16 +106,12 @@ void calculateGroundTruth()
 	cout << "qZ = " << s1.getQuaternionZ() << endl;
 
 	printf("start TLE\n");
+
 	// Test SGP4 TLE data
 	string str1 = "SGP4 Test";
 	string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
 	string str3 = "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954";
 	string tle[3] = { str1, str2, str3 };
-
-	// Start of Initialization
-	vector<cEci> vecPos;
-	vector<cGeo> geoPos;
-	vector<cEcef> ecefPos;
 
 	// Create a TLE object using the data above
 	cTle tleSGP4(tle[0], tle[1], tle[2]);
@@ -125,16 +119,22 @@ void calculateGroundTruth()
 	// Create a satellite object from the TLE object
 	cSatellite satSGP4(tleSGP4);
 
+	// Start of Initialization
+	vector<cEci> vecPos;
+	vector<cGeo> geoPos;
+	vector<cEcef> ecefPos;
+
 	// Locate position and velocity information of the satellite
 	// Time in minutes
 	// mpe = "minutes past epoch"
 	printf("start loop\n");
-	for (int mpe = 0; mpe <= 3.0; mpe += 1.0)
+	for (int mpe = 0; mpe <= 60 * 24; mpe += 1)
 	{
 		cout << "mpe = " << mpe << endl;
+		//Execute_Sgp4(tleData.getSatSGP4(), mpe, tleData.getVecPos(), tleData.getGeoPos(), tleData.getEcefPos());
 		Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
+		cout << "test in loop = " << vecPos[mpe].Position().m_y << endl;
 	}
-	cout << "test = " << vecPos[0].Position().m_x << endl;
 	groundTruthDone = true;
 	groundTruthConVar.notify_one();
 }
@@ -163,10 +163,22 @@ void calculateNoiseModels()
 	
 	//magnetometer
 	//vector<double> magFieldValues;
-
 	//calcMagFieldMain(geoPos[geoPos.size() - 1], satSGP4.Orbit().Epoch(), magFieldValues);
 
 	//gyro
+
+	//for (int i = 0; i < 3600; i++)
+	gyroModel.setPollingTime(0.05); //Polling time by default is 50ms
+	gyroModel.setSamplePeriod(0.02); //sample period 1 for raw gyro values
+	gyroModel.setFSValue(250); //Full scale of gyro by default = 250
+	gyroModel.setMaxNoiseDensity(0.37);
+	gyroModel.setMinNoiseDensity(-0.37);
+	gyroModel.findRealW();
+	//gyroModel.findAllanDeviation();
+
+	cout << "realwX = " << gyroModel.getRealwX() << endl;
+	cout << "realwY = " << gyroModel.getRealwY() << endl;
+	cout << "realwZ = " << gyroModel.getRealwZ() << endl;
 
 	//sun
 

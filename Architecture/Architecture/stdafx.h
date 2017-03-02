@@ -1,5 +1,6 @@
 #pragma once
 
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 //libraries
 #include <iostream>
 #include <cmath>
@@ -17,15 +18,19 @@
 #include <map>
 #include <random>
 #include <exception>
-#include "math.h"
-#include "time.h"
+#include <ctime>
+#include <tchar.h>
+#include <algorithm>
+#include <assert.h>
+#include <math.h>
+#include <cmath>
 
 //headers for ground truth
 #include "SpacecraftDynamics.h"
 #include "Storage.h"
 #include "coreLib.h"
 #include "orbitLib.h"
-
+#include "sgp4Data.h"
 
 //headers for noise models
 #include "CircularEngine.hpp"
@@ -39,6 +44,8 @@
 #include "Utility.hpp"
 #include "Magnetometer.h"
 #include "NoiseModel.h"
+
+#include "Gyroscope Noise Model.h"
 
 using namespace std;
 using namespace GeographicLib;
