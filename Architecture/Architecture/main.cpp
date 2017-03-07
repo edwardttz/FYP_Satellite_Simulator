@@ -14,7 +14,7 @@ GyroNoiseModel gyroModel;
 void calculateGroundTruth(void);
 void calculateNoiseModels(void);
 void transportData(void);
-void Execute_Sgp4(const cSatellite& sat, int timeLength,
+void Execute_Sgp4(const cSatellite& sat, double timeLength,
 	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos);
 void calculateMagField(const double, const double, const double, const double, vector<double>&);
 void calcMagFieldMain(const cGeo, const cJulian, vector<double>&);
@@ -66,7 +66,7 @@ void calculateGroundTruth()
 
 	//change i < some number to fit iterations and stepsize
 	//for multiple iterations
-	for (int i = 0; i < 3600; i++) //18000 for 10ms, 3600 for 50ms
+	for (int i = 0; i < 1; i++) //18000 for 10ms, 3600 for 50ms
 	{
 		//switching torque off after 30s
 		if (i == 599) //2999 for 10ms, 599 for 50ms
@@ -130,18 +130,21 @@ void calculateGroundTruth()
 	// Locate position and velocity information of the satellite
 	// Time in minutes
 	// mpe = "minutes past epoch"
-	printf("start loop\n");
-	for (int mpe = 0; mpe <= 60 * 24; mpe += 1)
+	
+	//printf("start loop\n");
+	/*for (int mpe = 0; mpe <= 60 * 24; mpe += 1)
 	{
-		cout << "mpe = " << mpe << endl;
-		//Execute_Sgp4(tleData.getSatSGP4(), mpe, tleData.getVecPos(), tleData.getGeoPos(), tleData.getEcefPos());
-		Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
 
-		//magnetometer
-		//calcMagFieldMain(geoPos[geoPos.size() - 1], satSGP4.Orbit().Epoch(), magFieldValues);
-
-		cout << "test in loop = " << vecPos[mpe].Position().m_y << endl;
 	}
+	*/
+	double mpe = 0.05 / 60;
+	cout << "mpe = " << mpe << endl;
+	Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
+
+	//magnetometer
+	//calcMagFieldMain(geoPos[geoPos.size() - 1], satSGP4.Orbit().Epoch(), magFieldValues);
+
+	//cout << "test in loop = " << vecPos[mpe].Position().m_y << endl;
 
 	//unlocking of mutex
 	groundTruthDone = true;
@@ -153,13 +156,13 @@ void calculateNoiseModels()
 	unique_lock<mutex> groundLock(groundTruthLock);
 	groundTruthConVar.wait(groundLock, [] {return groundTruthDone; });
 	
+	/*
 	//magnetometer
 
 	//vector<double> magFieldValues;
 	//calcMagFieldMain(geoPos[geoPos.size() - 1], satSGP4.Orbit().Epoch(), magFieldValues);
 
 	//gyro
-	//for (int i = 0; i < 3600; i++)
 	gyroModel.setPollingTime(0.05); //Polling time by default is 50ms
 	gyroModel.setSamplePeriod(0.02); //sample period 1 for raw gyro values
 	gyroModel.setFSValue(250); //Full scale of gyro by default = 250
@@ -173,7 +176,6 @@ void calculateNoiseModels()
 	cout << "realwZ = " << gyroModel.getRealwZ() << endl;
 
 	//sun
-	/*
 	// Testing parameters for sun position
 	// Wednesday, A.D. 2017 Feb 15	15:38:45.2
 	double JD = 2457800.151912;
@@ -203,7 +205,7 @@ void transportData()
 	printf("tpt\n");
 }
 
-void Execute_Sgp4(const cSatellite& sat, int mpe,
+void Execute_Sgp4(const cSatellite& sat, double mpe,
 	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos) {
 
 	cout << "mpe in exe = " << mpe << endl;
@@ -219,7 +221,7 @@ void Execute_Sgp4(const cSatellite& sat, int mpe,
 	geoPos.push_back(geo);
 	ecefPos.push_back(ecef);
 }
-
+/*
 void calcMagFieldMain(const cGeo geoPos, const cJulian date, vector<double>& magFieldValues) {
 	double lat = geoPos.LatitudeDeg();
 	double lon = geoPos.LongitudeDeg();
@@ -303,7 +305,7 @@ double calculateDecimalYear(double julianDate) {
 //////////////////////////////////////////////////////////////////////
 // Call this method when you want the position of the sun
 //////////////////////////////////////////////////////////////////////
-/*
+
 void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos,
 	vector<SunSensorModel>& getGroundTruth, double eciX, double eciY,
 	double eciZ, EciSun e, SunSensorModel s)
@@ -318,9 +320,8 @@ void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos,
 	s.setPlane(0, 1, 0);
 	s.computeSensorVector(e);
 	getGroundTruth.push_back(s);
-}*/
+}
 
-/*
 void runSunVector(cSatellite JD)
 {
 	// Testing parameters for sun position
