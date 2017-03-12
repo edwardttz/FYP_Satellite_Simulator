@@ -590,7 +590,7 @@ int main( int argc, char** argv )
     glutInit( &argc, argv );
     glutInitDisplayMode ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( winWidth, winHeight );
-    glutCreateWindow( "Assign1" );
+    glutCreateWindow( "Renderer" );
 
 
 // Register the callback functions.
