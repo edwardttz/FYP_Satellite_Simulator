@@ -12,6 +12,7 @@
 #include <map>
 #include <random>
 #include <fstream>
+#include <numeric>
 #include <vector>
 
 #include "CircularEngine.hpp"

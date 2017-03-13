@@ -21,14 +21,13 @@ int main() {
 	//ECEF lat, long, alt, julian Date
 	double lat = 40.7077778, lon = -73.90527777, alt = 403.7934671, jDate = 2457814.5;
 
-	calculateMagField(lat, lon, alt, jDate, magFieldValues);
+	//calculateMagField(lat, lon, alt, jDate, magFieldValues);
 
-	ofstream out("../out.txt");
+	testNoiseFloor();
 
 	for (int i = 0; i < magFieldValues.size(); i++) {
-		out << magFieldValues[i] << endl;
+		cout << magFieldValues[i] << endl;
 	}
-	out.close();
 	return 0;
 }
 /*
@@ -66,18 +65,17 @@ void calculateMagField(const double lat, const double lon, const double h, const
 	Bx = Bx_temp + ((By_temp + Bz_temp) * 0.02);
 	By = By_temp + ((Bx_temp + Bz_temp) * 0.02);
 	Bz = Bz_temp + ((Bx_temp + By_temp) * 0.02);
+
+	// Adding Noise floor
+	Bx += genRandNoiseFloor(4)[99];
+	By += genRandNoiseFloor(4)[99];
+	Bz += genRandNoiseFloor(4)[99];
+
 	H = sqrt(pow(Bx, 2) + pow(By, 2));
 	F = sqrt(pow(Bx, 2) + pow(By, 2) + pow(Bz, 2));
-	
-	// Adding Noise floor
-	Bx += genRandNoiseFloor(4);
-	By += genRandNoiseFloor(4);
-	Bz += genRandNoiseFloor(4);
-	H += genRandNoiseFloor(4);
-	F += genRandNoiseFloor(4);
 
 	// Linearity 0.1% Full-Scale
-	F = F * (100.1 / 100); 
+	F *= (100.1 / 100); 
 
 	// Analog values
 	magFieldValues.push_back(Bx);
