@@ -8,10 +8,16 @@ bool transportDone = true;
 
 SpacecraftDynamics s1;
 GyroNoiseModel gyroModel;
-//sgp4Data tleData;
+
+// Start of Initialization
+vector<cEci> vecPos;
+vector<cGeo> geoPos;
+vector<cEcef> ecefPos;
+vector<double> magFieldValues;
+double mpe = 0;
 
 //forward declarations
-void calculateGroundTruth(void);
+void calculateGroundTruth(int);
 void calculateNoiseModels(void);
 void transportData(void);
 void Execute_Sgp4(const cSatellite& sat, double timeLength,
@@ -27,25 +33,28 @@ int main(void)
 {
 	clock_t tStart = clock();
 
-	thread groundTruth(calculateGroundTruth);
-	thread noiseModels(calculateNoiseModels);
+	for (int count = 0; count < 1201; count++) {
+		thread groundTruth(calculateGroundTruth, count);
+		thread noiseModels(calculateNoiseModels);
 
-	if (groundTruth.joinable())
-	{
-		groundTruth.join();
+		if (groundTruth.joinable())
+		{
+			groundTruth.join();
+		}
+
+		if (noiseModels.joinable())
+		{
+			noiseModels.join();
+		}
+
+		mpe += 0.05/60;
 	}
-	
-	if (noiseModels.joinable())
-	{
-		noiseModels.join();
-	}
-	
 	printf("Time taken = %.10fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	system("PAUSE");
 }
 
-void calculateGroundTruth()
+void calculateGroundTruth(int counter)
 {
 	unique_lock<mutex> groundLock(groundTruthLock);
 	groundTruthConVar.wait(groundLock, [] {return transportDone;});
@@ -121,30 +130,19 @@ void calculateGroundTruth()
 	// Create a satellite object from the TLE object
 	cSatellite satSGP4(tleSGP4);
 
-	// Start of Initialization
-	vector<cEci> vecPos;
-	vector<cGeo> geoPos;
-	vector<cEcef> ecefPos;
-	vector<double> magFieldValues;
-
 	// Locate position and velocity information of the satellite
 	// Time in minutes
 	// mpe = "minutes past epoch"
 	
 	//printf("start loop\n");
-	/*for (int mpe = 0; mpe <= 60 * 24; mpe += 1)
-	{
+	//for (int count = 0; count <= 60 * 24; count += 1)
+	//{
+		
+	//}
 
-	}
-	*/
-	double mpe = 0.05 / 60;
 	cout << "mpe = " << mpe << endl;
 	Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
-
-	//magnetometer
-	//calcMagFieldMain(geoPos[geoPos.size() - 1], satSGP4.Orbit().Epoch(), magFieldValues);
-
-	//cout << "test in loop = " << vecPos[mpe].Position().m_y << endl;
+	cout << "test in loop = " << vecPos[counter].Position().m_y << endl;
 
 	//unlocking of mutex
 	groundTruthDone = true;
