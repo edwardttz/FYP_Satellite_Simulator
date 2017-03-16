@@ -14,22 +14,16 @@
 
 #define SCENE_RADIUS        6.0     // Mainly for setting far clipping plane distance.
 
-// The room has a square floor, which is centered at the world-space origin.
-// The z-axis is pointing up.
+// The reflective SATELLITE is a rectangle that is always parallel to the x-y plane.
+// The sides of the SATELLITE are always parallel to the x-axis or y-axis.
 
-#define ROOM_WIDTH          6.0
-#define ROOM_HEIGHT         4.0
+#define SATELLITE_X1         -0.5
+#define SATELLITE_X2         0.5
+#define SATELLITE_Y1         -0.5
+#define SATELLITE_Y2         0.5
+#define SATELLITE_Z          0.25     // This is the z coordinate of the top-most face of the table.
 
-// The reflective tabletop is a rectangle that is always parallel to the x-y plane.
-// The sides of the tabletop are always parallel to the x-axis or y-axis.
-
-#define TABLETOP_X1         -1.0
-#define TABLETOP_X2         1.0
-#define TABLETOP_Y1         -1.5
-#define TABLETOP_Y2         1.5
-#define TABLETOP_Z          1.2     // This is the z coordinate of the top-most face of the table.
-
-#define TABLE_THICKNESS     0.1
+#define TABLE_THICKNESS     0.75
 
 // The followings are for navigation and setting the view of the (actual) eye.
 
@@ -61,11 +55,6 @@ const GLfloat light1Position[] = { -2.0, 10.0, -2.0, 1.0 };
 
 
 // Texture image filenames.
-const char woodTexFile[] = "images/wood.jpg";
-const char ceilingTexFile[] = "images/ceiling.jpg";
-const char brickTexFile[] = "images/brick.jpg";
-const char checkerTexFile[] = "images/checker.png";
-const char spotsTexFile[] = "images/spots.png";
 const char earthTexFile[] = "images/earth.jpg";
 
 
@@ -94,12 +83,6 @@ double eyeDistance = EYE_INIT_DIST;
 double eyePos[3];
 
 // Texture objects.
-GLuint reflectionTexObj;
-GLuint woodTexObj;
-GLuint ceilingTexObj;
-GLuint brickTexObj;
-GLuint checkerTexObj;
-GLuint spotsTexObj;
 GLuint earthTexObj;
 
 //needed for earth texture as it is meant for sphere
@@ -113,76 +96,15 @@ bool hasTexture = true;         // Toggle texture mapping.
 
 // Forward function declarations.
 void DrawAxes( double length );
-void DrawRoom( void );
-void DrawTeapot( void );
-void DrawSphere( void );
-void DrawTable( void );
-void DrawTexturedSphere(void);
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Render the scene from the imaginary viewpoint and capture the image as 
-// a texture map.
-//
-// This texture map is then used to texture map the tabletop rectangle
-// to simulate the reflection of the scene from the tabletop.
-/////////////////////////////////////////////////////////////////////////////
-
-void MakeReflectionImage( void )
-{
-    //********************************************************
-    //*********** TASK #1: WRITE YOUR CODE BELOW *************
-    //********************************************************
-    // This function does the followings:
-    // STEP 1: Clears the correct buffers.
-    // STEP 2: Sets up the correct view volume for the imaginary viewpoint.
-    // STEP 3: Sets up the imaginary viewpoint.
-    // STEP 4: Sets up the light source positions in the world space.
-    // STEP 5: Draws the scene (may not need to draw all objects).
-    // STEP 6: Read the correct color buffer into the correct texture object.
-    //********************************************************
-
-	//clear buffer
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-	//set up view volume
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-1.5 - eyePos[1], 1.5 - eyePos[1], -1 - eyePos[0], 1 - eyePos[0], eyePos[2] - 1.2, 100);
-
-	//set up imaginary viewpoint
-	double imaginaryZ = 2 * 1.2 - eyePos[2];
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(eyePos[0], eyePos[1], imaginaryZ, eyePos[0], eyePos[1], eyePos[2], 1.0, 0.0, 0.0);
-
-	//set up lights
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
-	glEnable(GL_LIGHTING);
-
-	//draw scene
-	DrawRoom();
-	DrawTeapot();
-	DrawSphere();
-	DrawTexturedSphere();
-
-	//read colour buffers for texture objects
-	glReadBuffer(GL_BACK);
-	glBindTexture(GL_TEXTURE_2D, reflectionTexObj);
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, winWidth, winHeight, 0);
-}
-
-
+void DrawEarth(void);
+void DrawSatellite(void);
 
 
 /////////////////////////////////////////////////////////////////////////////
 // The display callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void MyDisplay( void )
+void EarthDrawing( void )
 {
     if ( hasTexture )
         glEnable( GL_TEXTURE_2D );
@@ -194,8 +116,6 @@ void MyDisplay( void )
     double xy = eyeDistance * cos( eyeLatitude * PI / 180.0 );
     eyePos[0] = xy * cos( eyeLongitude * PI / 180.0 ) + LOOKAT_X;
     eyePos[1] = xy * sin( eyeLongitude * PI / 180.0 ) + LOOKAT_Y;
-
-    MakeReflectionImage();
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -215,13 +135,46 @@ void MyDisplay( void )
     if ( drawAxes ) DrawAxes( 1 );
 
     // Draw scene.
-    //DrawRoom();
-    //DrawTeapot();
-    //DrawSphere();
-	DrawTexturedSphere();
-    //DrawTable();
+	DrawEarth();
 
     glutSwapBuffers();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// The display callback function.
+/////////////////////////////////////////////////////////////////////////////
+
+void SatelliteDrawing(void)
+{
+	glDisable(GL_TEXTURE_2D);
+
+	// Compute world-space eye position from eyeLatitude, eyeLongitude, eyeDistance, and look-at point.
+	eyePos[2] = eyeDistance * sin(eyeLatitude * PI / 180.0) + LOOKAT_Z;
+	double xy = eyeDistance * cos(eyeLatitude * PI / 180.0);
+	eyePos[0] = xy * cos(eyeLongitude * PI / 180.0) + LOOKAT_X;
+	eyePos[1] = xy * sin(eyeLongitude * PI / 180.0) + LOOKAT_Y;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (double)winWidth / winHeight, EYE_MIN_DIST, eyeDistance + SCENE_RADIUS);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(eyePos[0], eyePos[1], eyePos[2], LOOKAT_X, LOOKAT_Y, LOOKAT_Z, 0.0, 0.0, 1.0);
+
+	// Set world-space positions of the two lights.
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Position);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
+
+	// Draw axes.
+	if (drawAxes) DrawAxes(2);
+
+	// Draw scene.
+	DrawSatellite();
+
+	glutSwapBuffers();
 }
 
 
@@ -415,144 +368,6 @@ void SetUpTextureMaps( void )
 
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-
-// This texture object is for the wood texture map.
-
-    glGenTextures( 1, &woodTexObj );
-    glBindTexture( GL_TEXTURE_2D, woodTexObj );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-
-    if ( ReadImageFile( woodTexFile, &imageData, 
-                        &imageWidth, &imageHeight, &numComponents ) == 0 ) exit( 1 );
-    if ( numComponents != 3 )
-    {
-        fprintf( stderr, "Error: Texture image is not in RGB format.\n" );
-        exit( 1 );
-    }
-
-    gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, imageWidth, imageHeight,
-                       GL_RGB, GL_UNSIGNED_BYTE, imageData );
-
-    DeallocateImageData( &imageData );
-
-
-// This texture object is for the ceiling texture map.
-
-    glGenTextures( 1, &ceilingTexObj );
-    glBindTexture( GL_TEXTURE_2D, ceilingTexObj );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-
-    if ( ReadImageFile( ceilingTexFile, &imageData, 
-                        &imageWidth, &imageHeight, &numComponents ) == 0 ) exit( 1 );
-    if ( numComponents != 3 )
-    {
-        fprintf( stderr, "Error: Texture image is not in RGB format.\n" );
-        exit( 1 );
-    }
-
-    gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, imageWidth, imageHeight,
-                       GL_RGB, GL_UNSIGNED_BYTE, imageData );
-
-    DeallocateImageData( &imageData );
-
-
-// This texture object is for the brick texture map.
-
-    glGenTextures( 1, &brickTexObj );
-    glBindTexture( GL_TEXTURE_2D, brickTexObj );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-
-    if ( ReadImageFile( brickTexFile, &imageData, 
-                        &imageWidth, &imageHeight, &numComponents ) == 0 ) exit( 1 );
-    if ( numComponents != 3 )
-    {
-        fprintf( stderr, "Error: Texture image is not in RGB format.\n" );
-        exit( 1 );
-    }
-
-    gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, imageWidth, imageHeight,
-                       GL_RGB, GL_UNSIGNED_BYTE, imageData );
-
-    DeallocateImageData( &imageData );
-
-
-// This texture object is for the checkered texture map.
-
-    glGenTextures( 1, &checkerTexObj );
-    glBindTexture( GL_TEXTURE_2D, checkerTexObj );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-
-    if ( ReadImageFile( checkerTexFile, &imageData, 
-                        &imageWidth, &imageHeight, &numComponents ) == 0 ) exit( 1 );
-    if ( numComponents != 3 )
-    {
-        fprintf( stderr, "Error: Texture image is not in RGB format.\n" );
-        exit( 1 );
-    }
-
-    gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, imageWidth, imageHeight,
-                       GL_RGB, GL_UNSIGNED_BYTE, imageData );
-
-    DeallocateImageData( &imageData );
-
-
-// This texture object is for the spots texture map.
-
-    glGenTextures( 1, &spotsTexObj );
-    glBindTexture( GL_TEXTURE_2D, spotsTexObj );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-
-    if ( ReadImageFile( spotsTexFile, &imageData, 
-                        &imageWidth, &imageHeight, &numComponents ) == 0 ) exit( 1 );
-    if ( numComponents != 3 )
-    {
-        fprintf( stderr, "Error: Texture image is not in RGB format.\n" );
-        exit( 1 );
-    }
-
-    gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, imageWidth, imageHeight,
-                       GL_RGB, GL_UNSIGNED_BYTE, imageData );
-
-    DeallocateImageData( &imageData );
-
-
-// This texture object is for storing the reflection image read from the color buffer.
-
-    //********************************************************
-    //*********** TASK #1: WRITE YOUR CODE BELOW *************
-    //********************************************************
-    // Sets up the texture object reflectionTexObj for storing the reflection 
-    // texture map that is to be mapped to the tabletop.
-    // You must make sure that mipmapping is used.
-    // You must also make sure that whenever a new image is copied to the texture object,
-    // all other lower-resolution mipmap levels are automatically generated.
-    //********************************************************
-
-	glGenTextures(1, &reflectionTexObj);
-	glBindTexture(GL_TEXTURE_2D, reflectionTexObj);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-
-	DeallocateImageData( &imageData );
-
 	// This texture object is for the earth texture map (task 2)
 
 	glGenTextures(1, &earthTexObj);
@@ -590,15 +405,22 @@ int main( int argc, char** argv )
     glutInit( &argc, argv );
     glutInitDisplayMode ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( winWidth, winHeight );
-    glutCreateWindow( "Renderer" );
+    
+	// satellite window
+	glutCreateWindow("Satellite");
+	glutDisplayFunc(SatelliteDrawing);
+	glutReshapeFunc(MyReshape);
+	glutKeyboardFunc(MyKeyboard);
+	glutSpecialFunc(MySpecialKey);
+	
+	// main window
+	glutCreateWindow("Main");
+    glutDisplayFunc(EarthDrawing); 
+    glutReshapeFunc(MyReshape);
+    glutKeyboardFunc(MyKeyboard);
+    glutSpecialFunc(MySpecialKey);
 
 
-// Register the callback functions.
-
-    glutDisplayFunc( MyDisplay ); 
-    glutReshapeFunc( MyReshape );
-    glutKeyboardFunc( MyKeyboard );
-    glutSpecialFunc( MySpecialKey );
 
 
 // Initialize GLEW.
@@ -759,153 +581,7 @@ void SubdivideAndDrawQuad( int uSteps, int vSteps,
     glEnd();
 }
 
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Draw the room. 
-// The walls, ceiling and floor are all texture-mapped.
-/////////////////////////////////////////////////////////////////////////////
-
-void DrawRoom( void )
-{
-    const float ROOM_HALF_WIDTH = ROOM_WIDTH / 2.0f;
-
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-// Ceiling.
-
-    GLfloat matAmbient1[] = { 0.7, 0.7, 0.7, 1.0 };
-    GLfloat matDiffuse1[] = { 0.7, 0.7, 0.7, 1.0 };
-    GLfloat matSpecular1[] = { 0.3, 0.3, 0.3, 1.0 };
-    GLfloat matShininess1[] = { 32.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient1 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse1 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular1 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess1 );
-
-    glBindTexture( GL_TEXTURE_2D, ceilingTexObj );
-    glNormal3f( 0.0, 0.0, -1.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 24, 0.0, 0.0, ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  ROOM_WIDTH, 0.0, ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  ROOM_WIDTH, ROOM_WIDTH, -ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  0.0, ROOM_WIDTH, -ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, ROOM_HEIGHT );
-
-// Walls.
-
-    glBindTexture( GL_TEXTURE_2D, brickTexObj );
-
-    // In +y direction.
-    glNormal3f( 0.0, -1.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 16, 0.0, 0.0, -ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, 0.0, ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, ROOM_HEIGHT/2, ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  0.0, ROOM_HEIGHT/2, -ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, ROOM_HEIGHT );
-    // In -y direction.
-    glNormal3f( 0.0, 1.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 16, 0.0, 0.0, ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, 0.0, -ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, ROOM_HEIGHT/2, -ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  0.0, ROOM_HEIGHT/2, ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, ROOM_HEIGHT );
-    // In +x direction.
-    glNormal3f( -1.0, 0.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 16, 0.0, 0.0, ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, 0.0, ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, ROOM_HEIGHT/2, ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  0.0, ROOM_HEIGHT/2, ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, ROOM_HEIGHT );
-    // In -x direction.
-    glNormal3f( 1.0, 0.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 16, 0.0, 0.0, -ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, 0.0, -ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH/2, ROOM_HEIGHT/2, -ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, ROOM_HEIGHT, 
-                                  0.0, ROOM_HEIGHT/2, -ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, ROOM_HEIGHT );
-
-// Floor.
-
-    GLfloat matAmbient2[] = { 0.6, 0.6, 0.6, 1.0 };
-    GLfloat matDiffuse2[] = { 0.6, 0.6, 0.6, 1.0 };
-    GLfloat matSpecular2[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat matShininess2[] = { 128.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient2 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse2 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular2 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess2 );
-
-    glBindTexture( GL_TEXTURE_2D, checkerTexObj );
-    glNormal3f( 0.0, 0.0, 1.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 24, 0.0, 0.0, ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH, 0.0, ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, 0.0, 
-                                  ROOM_WIDTH, ROOM_WIDTH, -ROOM_HALF_WIDTH, ROOM_HALF_WIDTH, 0.0, 
-                                  0.0, ROOM_WIDTH, -ROOM_HALF_WIDTH, -ROOM_HALF_WIDTH, 0.0 );
-}
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Draw a texture-mapped teapot.
-/////////////////////////////////////////////////////////////////////////////
-
-void DrawTeapot( void )
-{
-    double size = 0.45;
-
-    GLfloat matAmbient[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat matDiffuse[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat matSpecular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat matShininess[] = { 128.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess );
-
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-    glBindTexture( GL_TEXTURE_2D, spotsTexObj );
-
-    glFrontFace( GL_CW ); // Need to do this because the built-in teapot is modelled using clockwise polygon winding.
-    glDisable( GL_CULL_FACE );  // Disable back-face culling.
-
-    glPushMatrix();
-    glTranslated( -0.3, -0.5, size * 0.75 + TABLETOP_Z );
-    glRotated( 90.0, 0.0, 0.0, 1.0 );
-    glRotated( 90.0, 1.0, 0.0, 0.0 );
-    glutSolidTeapot( size ); // This function also generates texture coordinates on the teapot.
-    glPopMatrix();
-
-    glEnable( GL_CULL_FACE );	// Enable back-face culling.
-    glFrontFace( GL_CCW );		// Go back to counter-clockwise polygon winding.
-}
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Draw a non-texture-mapped sphere.
-/////////////////////////////////////////////////////////////////////////////
-
-void DrawSphere( void )
-{
-    double radius = 0.35;
-
-    GLfloat matAmbient[] = { 0.7, 0.5, 0.2, 1.0 };
-    GLfloat matDiffuse[] = { 0.7, 0.5, 0.2, 1.0 };
-    GLfloat matSpecular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat matShininess[] = { 128.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess );
-
-    glBindTexture( GL_TEXTURE_2D, 0 );  // Texture object ID == 0 means no texture mapping.
-
-    glPushMatrix();
-    glTranslated( 0.3, 0.5, radius + TABLETOP_Z );
-    glutSolidSphere( radius, 32, 16 );
-    glPopMatrix();
-}
-
-//task 2, new texture-mapped object
-void DrawTexturedSphere(void)
+void DrawEarth(void)
 {
 	double radius = 0.35;
 
@@ -927,15 +603,9 @@ void DrawTexturedSphere(void)
 	quad = gluNewQuadric();
 	
 	glPushMatrix();
-	
-	//move sphere above table top
-	//glTranslated(0.5, -0.5, radius + TABLETOP_Z + 1);
-
 	glScaled(2, 2, 2);
-
 	//generate quadric tex coords
 	gluQuadricTexture(quad, GL_TRUE);
-	
 	//draw sphere with texture
 	gluSphere(quad, radius, 32, 16);
 
@@ -945,136 +615,61 @@ void DrawTexturedSphere(void)
 }
 
 
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Draw the table.
-/////////////////////////////////////////////////////////////////////////////
-
-void DrawTable( void )
+void DrawSatellite(void)
 {
-// Tabletop.
 
-    GLfloat matAmbient1[] = { 0.4, 0.6, 0.8, 1.0 };
-    GLfloat matDiffuse1[] = { 0.4, 0.6, 0.8, 1.0 };
-    GLfloat matSpecular1[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat matShininess1[] = { 128.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient1 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse1 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular1 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess1 );
-
-    //********************************************************
-    //*********** TASK #1: WRITE YOUR CODE BELOW *************
-    //********************************************************
-    // Must use the SubdivideAndDrawQuad() function to draw the tabletop rectangle.
-    // So that the tabletop has small enough quads to show the sharp specular highlight.
-    //
-    // Correct texture coordinates must be provided at the vertices of the tabletop rectangle,
-    // so that the reflection tecture map is correctly mapped on it.
-    //
-    // The reflection on the tabletop should not be 100% (it is not a perfect mirror), 
-    // and the underlying diffuse color and lighting on the tabletop must still be visible.
-    //********************************************************
-
-	//texture for reflection
-	glBindTexture(GL_TEXTURE_2D, reflectionTexObj);
+	GLfloat matAmbient1[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matDiffuse1[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matSpecular1[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matShininess1[] = { 128.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient1);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse1);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular1);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess1);
 
 	//in +ve z-direction (normal vector)
 	glNormal3f(0.0, 0.0, 1.0);
 
 	//draw counter-clockwise from (0, 0)
-	SubdivideAndDrawQuad(24, 24,
-		0.0, 0.0, TABLETOP_X1, TABLETOP_Y1, TABLETOP_Z,
-		0.0, 1.0, TABLETOP_X2, TABLETOP_Y1, TABLETOP_Z,
-		1.0, 1.0, TABLETOP_X2, TABLETOP_Y2, TABLETOP_Z,
-		1.0, 0.0, TABLETOP_X1, TABLETOP_Y2, TABLETOP_Z);
+	SubdivideAndDrawQuad(24, 2,
+		0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z,
+		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z,
+		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z);
 
-// Sides.
+	// Sides.
+	// In +y direction.
+	glNormal3f(0.0, 1.0, 0.0); // Normal vector.
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 1.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z,
+		0.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z);
+	// In -y direction.
+	glNormal3f(0.0, -1.0, 0.0); // Normal vector.
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z,
+		0.0, 1.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z);
+	// In +x direction.
+	glNormal3f(1.0, 0.0, 0.0); // Normal vector.
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z,
+		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z);
+	// In -x direction.
+	glNormal3f(-1.0, 0.0, 0.0); // Normal vector.
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 1.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z,
+		0.0, 1.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z);
 
-    GLfloat matAmbient2[] = { 0.2, 0.3, 0.4, 1.0 };
-    GLfloat matDiffuse2[] = { 0.2, 0.3, 0.4, 1.0 };
-    GLfloat matSpecular2[] = { 0.6, 0.8, 1.0, 1.0 };
-    GLfloat matShininess2[] = { 128.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient2 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse2 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular2 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess2 );
+	// Bottom.
 
-    glBindTexture( GL_TEXTURE_2D, 0 ); // Texture object ID == 0 means no texture mapping.
-
-    // In +y direction.
-    glNormal3f( 0.0, 1.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 2,  0.0, 0.0, TABLETOP_X2, TABLETOP_Y2, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 0.0, TABLETOP_X1, TABLETOP_Y2, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 1.0, TABLETOP_X1, TABLETOP_Y2, TABLETOP_Z, 
-                                  0.0, 1.0, TABLETOP_X2, TABLETOP_Y2, TABLETOP_Z );
-    // In -y direction.
-    glNormal3f( 0.0, -1.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 2,  0.0, 0.0, TABLETOP_X1, TABLETOP_Y1, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 0.0, TABLETOP_X2, TABLETOP_Y1, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 1.0, TABLETOP_X2, TABLETOP_Y1, TABLETOP_Z, 
-                                  0.0, 1.0, TABLETOP_X1, TABLETOP_Y1, TABLETOP_Z );
-    // In +x direction.
-    glNormal3f( 1.0, 0.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 2,  0.0, 0.0, TABLETOP_X2, TABLETOP_Y1, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 0.0, TABLETOP_X2, TABLETOP_Y2, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 1.0, TABLETOP_X2, TABLETOP_Y2, TABLETOP_Z, 
-                                  0.0, 1.0, TABLETOP_X2, TABLETOP_Y1, TABLETOP_Z );
-    // In -x direction.
-    glNormal3f( -1.0, 0.0, 0.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 2,  0.0, 0.0, TABLETOP_X1, TABLETOP_Y2, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 0.0, TABLETOP_X1, TABLETOP_Y1, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 1.0, TABLETOP_X1, TABLETOP_Y1, TABLETOP_Z, 
-                                  0.0, 1.0, TABLETOP_X1, TABLETOP_Y2, TABLETOP_Z );
-
-// Bottom.
-
-    glNormal3f( 0.0, 0.0, -1.0 ); // Normal vector.
-    SubdivideAndDrawQuad( 24, 24, 0.0, 0.0, TABLETOP_X1, TABLETOP_Y1, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 0.0, TABLETOP_X1, TABLETOP_Y2, TABLETOP_Z - TABLE_THICKNESS, 
-                                  1.0, 1.0, TABLETOP_X2, TABLETOP_Y2, TABLETOP_Z - TABLE_THICKNESS, 
-                                  0.0, 1.0, TABLETOP_X2, TABLETOP_Y1, TABLETOP_Z - TABLE_THICKNESS );
-
-// Legs.
-
-    GLfloat matAmbient3[] = { 0.4, 0.4, 0.4, 1.0 };
-    GLfloat matDiffuse3[] = { 0.4, 0.4, 0.4, 1.0 };
-    GLfloat matSpecular3[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat matShininess3[] = { 64.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient3 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse3 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular3 );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, matShininess3 );
-
-    glPushMatrix();
-    glTranslated( TABLETOP_X1 + TABLE_THICKNESS, TABLETOP_Y1 + TABLE_THICKNESS, 0.0 );
-    glScaled( TABLE_THICKNESS, TABLE_THICKNESS, TABLETOP_Z - TABLE_THICKNESS );
-    glTranslated( 0.0, 0.0, 0.5 );
-    glutSolidCube( 1.0 );
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslated( TABLETOP_X2 - TABLE_THICKNESS, TABLETOP_Y1 + TABLE_THICKNESS, 0.0 );
-    glScaled( TABLE_THICKNESS, TABLE_THICKNESS, TABLETOP_Z - TABLE_THICKNESS );
-    glTranslated( 0.0, 0.0, 0.5 );
-    glutSolidCube( 1.0 );
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslated( TABLETOP_X2 - TABLE_THICKNESS, TABLETOP_Y2 - TABLE_THICKNESS, 0.0 );
-    glScaled( TABLE_THICKNESS, TABLE_THICKNESS, TABLETOP_Z - TABLE_THICKNESS );
-    glTranslated( 0.0, 0.0, 0.5 );
-    glutSolidCube( 1.0 );
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslated( TABLETOP_X1 + TABLE_THICKNESS, TABLETOP_Y2 - TABLE_THICKNESS, 0.0 );
-    glScaled( TABLE_THICKNESS, TABLE_THICKNESS, TABLETOP_Z - TABLE_THICKNESS );
-    glTranslated( 0.0, 0.0, 0.5 );
-    glutSolidCube( 1.0 );
-    glPopMatrix();
+	glNormal3f(0.0, 0.0, -1.0); // Normal vector.
+	SubdivideAndDrawQuad(24, 24, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS);
+	
+	glPopMatrix();
 }
-
-
