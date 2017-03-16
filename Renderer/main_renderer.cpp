@@ -620,8 +620,8 @@ void DrawEarth(void)
 void DrawSatellite(void)
 {
 
-	GLfloat matAmbient1[] = { 0.0, 1.0, 1.0, 1.0 };
-	GLfloat matDiffuse1[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
+	GLfloat matDiffuse1[] = { 1.0, 0.0, 0.0, 0.0 };
 	GLfloat matSpecular1[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat matShininess1[] = { 128.0 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient1);
@@ -631,13 +631,21 @@ void DrawSatellite(void)
 
 	//in +ve z-direction (normal vector)
 	glNormal3f(0.0, 0.0, 1.0);
-
 	//draw counter-clockwise from (0, 0)
 	SubdivideAndDrawQuad(24, 2,
 		0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z,
 		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z);
+
+	GLfloat matAmbient2[] = { 0.5, 0.5, 0.5, 0.5 };
+	GLfloat matDiffuse2[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matSpecular2[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matShininess2[] = { 128.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient2);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse2);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular2);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess2);
 
 	// Sides.
 	// In +y direction.
@@ -666,7 +674,6 @@ void DrawSatellite(void)
 		0.0, 1.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z);
 
 	// Bottom.
-
 	glNormal3f(0.0, 0.0, -1.0); // Normal vector.
 	SubdivideAndDrawQuad(24, 24, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
