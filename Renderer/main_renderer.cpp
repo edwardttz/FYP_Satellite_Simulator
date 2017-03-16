@@ -21,9 +21,9 @@
 #define SATELLITE_X2         0.5
 #define SATELLITE_Y1         -0.5
 #define SATELLITE_Y2         0.5
-#define SATELLITE_Z          0.25     // This is the z coordinate of the top-most face of the table.
+#define SATELLITE_Z          0.25     // This is the z coordinate of the top-most face of the SATELLITE.
 
-#define TABLE_THICKNESS     0.75
+#define SATELLITE_THICKNESS     0.75
 
 // The followings are for navigation and setting the view of the (actual) eye.
 
@@ -169,7 +169,7 @@ void SatelliteDrawing(void)
 	glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
 
 	// Draw axes.
-	if (drawAxes) DrawAxes(2);
+	if (drawAxes) DrawAxes(1);
 
 	// Draw scene.
 	DrawSatellite();
@@ -400,25 +400,30 @@ void SetUpTextureMaps( void )
 
 int main( int argc, char** argv )
 {
-// Initialize GLUT and create window.
-
+	// Initialize GLUT and create window.
     glutInit( &argc, argv );
     glutInitDisplayMode ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( winWidth, winHeight );
-    
+
 	// satellite window
 	glutCreateWindow("Satellite");
 	glutDisplayFunc(SatelliteDrawing);
 	glutReshapeFunc(MyReshape);
 	glutKeyboardFunc(MyKeyboard);
 	glutSpecialFunc(MySpecialKey);
-	
+	// Setup the initial render context.
+	GLInit();
+	SetUpTextureMaps();
+
 	// main window
 	glutCreateWindow("Main");
     glutDisplayFunc(EarthDrawing); 
     glutReshapeFunc(MyReshape);
     glutKeyboardFunc(MyKeyboard);
     glutSpecialFunc(MySpecialKey);
+	// Setup the initial render context.
+	GLInit();
+	SetUpTextureMaps();
 
 
 
@@ -441,10 +446,7 @@ int main( int argc, char** argv )
     }
 
 
-// Setup the initial render context.
 
-    GLInit();
-    SetUpTextureMaps();
 
 
 // Display user instructions in console window.
@@ -618,7 +620,7 @@ void DrawEarth(void)
 void DrawSatellite(void)
 {
 
-	GLfloat matAmbient1[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matAmbient1[] = { 0.0, 1.0, 1.0, 1.0 };
 	GLfloat matDiffuse1[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat matSpecular1[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat matShininess1[] = { 128.0 };
@@ -640,36 +642,36 @@ void DrawSatellite(void)
 	// Sides.
 	// In +y direction.
 	glNormal3f(0.0, 1.0, 0.0); // Normal vector.
-	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
-		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z);
 	// In -y direction.
 	glNormal3f(0.0, -1.0, 0.0); // Normal vector.
-	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
-		1.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
+		1.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z);
 	// In +x direction.
 	glNormal3f(1.0, 0.0, 0.0); // Normal vector.
-	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
-		1.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
+		1.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z);
 	// In -x direction.
 	glNormal3f(-1.0, 0.0, 0.0); // Normal vector.
-	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
-		1.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
+	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z);
 
 	// Bottom.
 
 	glNormal3f(0.0, 0.0, -1.0); // Normal vector.
-	SubdivideAndDrawQuad(24, 24, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS,
-		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
-		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - TABLE_THICKNESS,
-		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - TABLE_THICKNESS);
+	SubdivideAndDrawQuad(24, 24, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
+		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
+		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
+		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS);
 	
 	glPopMatrix();
 }
