@@ -132,7 +132,7 @@ void EarthDrawing( void )
     glLightfv( GL_LIGHT1, GL_POSITION, light1Position );
 
     // Draw axes.
-    if ( drawAxes ) DrawAxes( 1 );
+    if ( drawAxes ) DrawAxes( 2 );
 
     // Draw scene.
 	DrawEarth();
@@ -585,7 +585,7 @@ void SubdivideAndDrawQuad( int uSteps, int vSteps,
 
 void DrawEarth(void)
 {
-	double radius = 0.35;
+	double radius = 1;
 
 	GLfloat matAmbient[] = { 0.8, 0.8, 0.8, 1.0 };
 	GLfloat matDiffuse[] = { 0.8, 0.8, 0.8, 1.0 };
@@ -605,7 +605,6 @@ void DrawEarth(void)
 	quad = gluNewQuadric();
 	
 	glPushMatrix();
-	glScaled(2, 2, 2);
 	//generate quadric tex coords
 	gluQuadricTexture(quad, GL_TRUE);
 	//draw sphere with texture
