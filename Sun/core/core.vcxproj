@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E7D39150-D44F-426D-B0E2-5ACFA19042DE}</ProjectGuid>
-    <RootNamespace>orbit</RootNamespace>
+    <ProjectGuid>{F3067B0D-4F1E-457A-AE9C-AAB6CCD5C1A3}</ProjectGuid>
+    <RootNamespace>core</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -72,15 +72,14 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">orbitTools.$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">orbitTools.$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">orbitTools.$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">orbitTools.$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">orbitTools.$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">orbitTools.$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -96,7 +95,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -113,7 +111,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -130,7 +127,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -143,11 +139,14 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cNoradBase.cpp" />
-    <ClCompile Include="cNoradSDP4.cpp" />
-    <ClCompile Include="cNoradSGP4.cpp" />
-    <ClCompile Include="cOrbit.cpp" />
-    <ClCompile Include="cSatellite.cpp" />
+    <ClCompile Include="cEcef.cpp" />
+    <ClCompile Include="cEci.cpp" />
+    <ClCompile Include="cJulian.cpp" />
+    <ClCompile Include="coord.cpp" />
+    <ClCompile Include="cSite.cpp" />
+    <ClCompile Include="cTLE.cpp" />
+    <ClCompile Include="cVector.cpp" />
+    <ClCompile Include="globals.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -156,12 +155,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cNoradBase.h" />
-    <ClInclude Include="cNoradSDP4.h" />
-    <ClInclude Include="cNoradSGP4.h" />
-    <ClInclude Include="cOrbit.h" />
-    <ClInclude Include="cSatellite.h" />
-    <ClInclude Include="orbitLib.h" />
+    <ClInclude Include="cEcef.h" />
+    <ClInclude Include="cEci.h" />
+    <ClInclude Include="cJulian.h" />
+    <ClInclude Include="coord.h" />
+    <ClInclude Include="coreLib.h" />
+    <ClInclude Include="cSite.h" />
+    <ClInclude Include="cTLE.h" />
+    <ClInclude Include="cVector.h" />
+    <ClInclude Include="exceptions.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

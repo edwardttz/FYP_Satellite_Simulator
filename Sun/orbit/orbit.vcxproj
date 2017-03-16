@@ -167,6 +167,12 @@
   <ItemGroup>
     <None Include="revHistory.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\core\core.vcxproj">
+      <Project>{f3067b0d-4f1e-457a-ae9c-aab6ccd5c1a3}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

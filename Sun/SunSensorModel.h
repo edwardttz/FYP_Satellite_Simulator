@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cVector.h";
+#include "sVector.h"
 
 using namespace std;
 
@@ -9,11 +9,26 @@ class SunSensorModel
 
 public:
 	SunSensorModel();	
-	const cVector& Plane() const { return plane; }
 
-	void setPlane(double, double, double);
+	/* Each satellite face returns the parameters
+	We only need azimuth and elevation */
+
+	const sVector& FaceX() const { return sensorX; }
+	const sVector& FaceY() const { return sensorY; }
+	const sVector& FaceZ() const { return sensorZ; }
+	const sVector& nFaceX() const { return nSensorX; }
+	const sVector& nFaceY() const { return nSensorY; }
+	const sVector& nFaceZ() const { return nSensorZ; }
+	const sVector& Plane() const { return plane; }
+
 	void computeSensorVector(EciSun e);
 
 protected:
-	cVector plane;
+	sVector sensorX;
+	sVector sensorY;
+	sVector sensorZ;
+	sVector nSensorX;
+	sVector nSensorY;
+	sVector nSensorZ;
+	sVector plane;
 };

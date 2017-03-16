@@ -1,8 +1,6 @@
 #pragma once
 
-#include "cVector.h"
-#include "EciSun.h"
-#include "globals.h"
+#include "stdafx.h"
 
 using namespace std;
 
@@ -46,9 +44,9 @@ void EciSun::calculateSunVec()
 	sun_Position.z *= sunDistInKm;
 
 	// Computes the azimuth and elevation of Sun
-	sun_Position.azi = (atan(sun_Position.y / sun_Position.x)) * 180 / PI;
-	sun_Position.ele = (atan(sun_Position.z / sqrt(powl(sun_Position.x, 2) +
-		powl(sun_Position.y, 2)))) * 180 / PI;
+	//sun_Position.azi = rad2deg((atan(sun_Position.y / sun_Position.x)));
+	//sun_Position.ele = rad2deg((atan(sun_Position.z / sqrt(powl(sun_Position.x, 2) +
+		//powl(sun_Position.y, 2)))));
 }
 
 void EciSun::computeBodyFrame(double eciX, double eciY, double eciZ)

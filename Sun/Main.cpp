@@ -3,7 +3,8 @@
 
 using namespace std;
 
-void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos, vector<SunSensorModel>& getGroundTruth, double eciX, double eciY, double eciZ, EciSun e, SunSensorModel s);
+//void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos, vector<SunSensorModel>& getGroundTruth, double eciX, double eciY, double eciZ, EciSun e, SunSensorModel s);
+void ExecuteSunPosition(const double JD, vector<EciSun>& getPos, vector<SunSensorModel>& getGroundTruth, double eciX, double eciY, double eciZ, EciSun e, SunSensorModel s);
 void PrintSunParameters(const vector <EciSun>& sunPos, const vector <SunSensorModel>& getGroundTruth);
 
 int main()
@@ -41,20 +42,24 @@ void PrintSunParameters(const vector <EciSun>& getPos, const vector <SunSensorMo
 
 	// Save Satellite ECI position, Radius file
 	myfile.open("SunPos_ECI.csv", ios::trunc);
-	myfile << "No.of Days,Sun_X,Sun_Y,Sun_Z,Azimuth,Elevation,Body_X,Body_Y,Body_Z,Body_Mag,Azimuth,Elevation" << endl;
+	myfile << "No.of Days,Sun_X,Sun_Y,Sun_Z,Body_X,Body_Y,Body_Z,Body_Mag,X_azi,X_ele,Y_azi,Y_ele," << endl;
 		for (unsigned int i = 0; i < getPos.size(); i++)
 		{
 			myfile << i << ',' << getPos[i].SunPosition().x << ',' 
 				<< getPos[i].SunPosition().y << ','
 				<< getPos[i].SunPosition().z << ',' 
-				<< getPos[i].SunPosition().azi << ','
-				<< getPos[i].SunPosition().ele << ','
 				<< getPos[i].BodyPosition().x << ','
 				<< getPos[i].BodyPosition().y << ','
 				<< getPos[i].BodyPosition().z << ','
 				<< getPos[i].BodyPosition().m << ','
-				<< getGroundTruth[i].Plane().azi << ','
-				<< getGroundTruth[i].Plane().ele << endl;
+				<< getGroundTruth[i].FaceX().azi << ',' 
+				<< getGroundTruth[i].FaceX().ele << ','
+				<< getGroundTruth[i].FaceY().azi << ','
+				<< getGroundTruth[i].FaceY().ele << ','
+				<< getGroundTruth[i].nFaceX().azi << ','
+				<< getGroundTruth[i].nFaceX().ele << ','
+				<< getGroundTruth[i].nFaceY().azi << ','
+				<< getGroundTruth[i].nFaceY().ele << endl;
 		}
 	myfile.close();
 }
@@ -62,19 +67,33 @@ void PrintSunParameters(const vector <EciSun>& getPos, const vector <SunSensorMo
 //////////////////////////////////////////////////////////////////////
 // Call this method when you want the position of the sun
 //////////////////////////////////////////////////////////////////////
-void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos,
+void ExecuteSunPosition(const double JD, vector<EciSun>& getPos,
 	vector<SunSensorModel>& getGroundTruth, double eciX, double eciY, 
 	double eciZ, EciSun e, SunSensorModel s)
 {
 	// Calculates sun position and body position of satellite
-	e.setJulianDate(date.ToDate());
+	e.setJulianDate(JD);
 	e.calculateSunVec();
 	e.computeBodyFrame(eciX, eciY, eciZ);
 	getPos.push_back(e);
 	
 	// Set the plane of the sensor coordinates based on body frame.
-	s.setPlane(0, 1, 0);
 	s.computeSensorVector(e);
 	getGroundTruth.push_back(s);
 }
 
+void Execute_Sgp4(const cSatellite& sat, int mpe,
+	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos) {
+
+	// Calculate the position and velocity of the satellite for various times.
+
+	// Get the position of the satellite at time "mpe"
+	cEciTime eci = sat.PositionEci(mpe);
+	cEcefTime ecef = sat.PositionEcef(mpe);
+	cGeoTime geo = sat.PositionEcef(mpe);
+
+	// Push the coordinates object onto the end of the vector.
+	vecPos.push_back(eci);
+	geoPos.push_back(geo);
+	ecefPos.push_back(ecef);
+}

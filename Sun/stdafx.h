@@ -8,8 +8,11 @@
 
 #include "globals.h"
 #include "EciSun.h"
-#include "cVector.h"
+#include "sVector.h"
 #include "SunSensorModel.h"
+#include "coreLib.h"
+#include "orbitLib.h"
+#include "math.h"
 
 #include <string>
 #include <map>

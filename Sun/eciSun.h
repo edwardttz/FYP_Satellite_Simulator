@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cVector.h"
+#include "sVector.h"
 
 using namespace std;
 
@@ -12,8 +12,8 @@ class EciSun
 {
 	public:
 		EciSun();
-		const cVector& SunPosition() const { return sun_Position; }
-		const cVector& BodyPosition() const { return body_Position; }
+		const sVector& SunPosition() const { return sun_Position; }
+		const sVector& BodyPosition() const { return body_Position; }
 
 		double julianDate;
 		
@@ -24,6 +24,6 @@ class EciSun
 		double getJulianDate();
 
 	protected:
-		cVector sun_Position;
-		cVector body_Position;
+		sVector sun_Position;
+		sVector body_Position;
 };

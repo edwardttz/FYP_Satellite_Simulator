@@ -9,43 +9,56 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="doc">
+      <UniqueIdentifier>{3fba0924-ead0-4674-a5c1-38dcfc060679}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="cNoradBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EciSun.cpp">
+    <ClCompile Include="cNoradSDP4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cNoradSGP4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cOrbit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SunSensorModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sVector.cpp">
+    <ClCompile Include="cSatellite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EciSun.h">
+    <ClInclude Include="cNoradBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cNoradSDP4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cNoradSGP4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cOrbit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SunSensorModel.h">
+    <ClInclude Include="cSatellite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="testCase.h">
+    <ClInclude Include="orbitLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sVector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="revHistory.txt">
+      <Filter>doc</Filter>
+    </None>
   </ItemGroup>
 </Project>
