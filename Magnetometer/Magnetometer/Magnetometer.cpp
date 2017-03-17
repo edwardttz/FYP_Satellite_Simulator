@@ -21,9 +21,9 @@ int main() {
 	//ECEF lat, long, alt, julian Date
 	double lat = 40.7077778, lon = -73.90527777, alt = 403.7934671, jDate = 2457814.5;
 
-	//calculateMagField(lat, lon, alt, jDate, magFieldValues);
+	calculateMagField(lat, lon, alt, jDate, magFieldValues);
 
-	testNoiseFloor();
+	//testNoiseFloor();
 
 	for (int i = 0; i < magFieldValues.size(); i++) {
 		cout << magFieldValues[i] << endl;
@@ -76,7 +76,7 @@ void calculateMagField(const double lat, const double lon, const double h, const
 
 	// Linearity 0.1% Full-Scale
 	F *= (100.1 / 100); 
-
+	
 	// Analog values
 	magFieldValues.push_back(Bx);
 	magFieldValues.push_back(By);
