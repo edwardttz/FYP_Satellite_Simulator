@@ -29,7 +29,7 @@
 
 #define LOOKAT_X            0.0     // Look-at point x coordinate.
 #define LOOKAT_Y            0.0     // Look-at point y coordinate.
-#define LOOKAT_Z            1.0     // Look-at point z coordinate.
+#define LOOKAT_Z            0.0     // Look-at point z coordinate.
 
 #define EYE_INIT_DIST       5.0     // Initial distance of eye from look-at point.
 #define EYE_DIST_INCR       0.2     // Distance increment when changing eye's distance.
@@ -169,7 +169,7 @@ void SatelliteDrawing(void)
 	glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
 
 	// Draw axes.
-	if (drawAxes) DrawAxes(1);
+	if (drawAxes) DrawAxes(2);
 
 	// Draw scene.
 	DrawSatellite();
@@ -177,14 +177,11 @@ void SatelliteDrawing(void)
 	glutSwapBuffers();
 }
 
-
-
-
 /////////////////////////////////////////////////////////////////////////////
 // The keyboard callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void MyKeyboard( unsigned char key, int x, int y )
+void EarthKeyboard( unsigned char key, int x, int y )
 {
     switch ( key )
     {
@@ -231,13 +228,57 @@ void MyKeyboard( unsigned char key, int x, int y )
 }
 
 
+void SatelliteKeyboard(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+		// Quit program.
+	case 'q':
+	case 'Q':
+		exit(0);
+		break;
 
+		// Toggle between wireframe and filled polygons.
+	case 'w':
+	case 'W':
+		drawWireframe = !drawWireframe;
+		if (drawWireframe)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glutPostRedisplay();
+		break;
+
+		// Toggle axes.
+	case 'x':
+	case 'X':
+		drawAxes = !drawAxes;
+		glutPostRedisplay();
+		break;
+
+		// Toggle texture mapping.
+	case 't':
+	case 'T':
+		hasTexture = !hasTexture;
+		glutPostRedisplay();
+		break;
+
+		// Reset to initial view.
+	case 'r':
+	case 'R':
+		eyeLatitude = 0.0;
+		eyeLongitude = 0.0;
+		eyeDistance = EYE_INIT_DIST;
+		glutPostRedisplay();
+		break;
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // The special key callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void MySpecialKey( int key, int x, int y )
+void EarthSpecialKey( int key, int x, int y )
 {
     int modi = glutGetModifiers();
 
@@ -284,8 +325,52 @@ void MySpecialKey( int key, int x, int y )
     }
 }
 
+void SatelliteSpecialKey(int key, int x, int y)
+{
+	int modi = glutGetModifiers();
 
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		eyeLongitude -= EYE_LONGITUDE_INCR;
+		if (eyeLongitude < -360.0) eyeLongitude += 360.0;
+		glutPostRedisplay();
+		break;
 
+	case GLUT_KEY_RIGHT:
+		eyeLongitude += EYE_LONGITUDE_INCR;
+		if (eyeLongitude > 360.0) eyeLongitude -= 360.0;
+		glutPostRedisplay();
+		break;
+
+	case GLUT_KEY_UP:
+		if (modi != GLUT_ACTIVE_SHIFT)
+		{
+			eyeLatitude += EYE_LATITUDE_INCR;
+			if (eyeLatitude > EYE_MAX_LATITUDE) eyeLatitude = EYE_MAX_LATITUDE;
+		}
+		else
+		{
+			eyeDistance -= EYE_DIST_INCR;
+			if (eyeDistance < EYE_MIN_DIST) eyeDistance = EYE_MIN_DIST;
+		}
+		glutPostRedisplay();
+		break;
+
+	case GLUT_KEY_DOWN:
+		if (modi != GLUT_ACTIVE_SHIFT)
+		{
+			eyeLatitude -= EYE_LATITUDE_INCR;
+			if (eyeLatitude < EYE_MIN_LATITUDE) eyeLatitude = EYE_MIN_LATITUDE;
+		}
+		else
+		{
+			eyeDistance += EYE_DIST_INCR;
+		}
+		glutPostRedisplay();
+		break;
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // The reshape callback function.
@@ -297,9 +382,6 @@ void MyReshape( int w, int h )
     winHeight = h;
     glViewport( 0, 0, w, h );
 }
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Initialize some OpenGL states.
@@ -354,9 +436,6 @@ void GLInit( void )
     glEnable( GL_NORMALIZE ); 
 }
 
-
-
-
 /////////////////////////////////////////////////////////////////////////////
 // Set up texture maps.
 /////////////////////////////////////////////////////////////////////////////
@@ -391,9 +470,6 @@ void SetUpTextureMaps( void )
 	DeallocateImageData(&imageData);
 }
 
-
-
-
 /////////////////////////////////////////////////////////////////////////////
 // The main function.
 /////////////////////////////////////////////////////////////////////////////
@@ -409,8 +485,8 @@ int main( int argc, char** argv )
 	glutCreateWindow("Satellite");
 	glutDisplayFunc(SatelliteDrawing);
 	glutReshapeFunc(MyReshape);
-	glutKeyboardFunc(MyKeyboard);
-	glutSpecialFunc(MySpecialKey);
+	glutKeyboardFunc(SatelliteKeyboard);
+	glutSpecialFunc(SatelliteSpecialKey);
 	// Setup the initial render context.
 	GLInit();
 	SetUpTextureMaps();
@@ -419,8 +495,8 @@ int main( int argc, char** argv )
 	glutCreateWindow("Main");
     glutDisplayFunc(EarthDrawing); 
     glutReshapeFunc(MyReshape);
-    glutKeyboardFunc(MyKeyboard);
-    glutSpecialFunc(MySpecialKey);
+    glutKeyboardFunc(EarthKeyboard);
+    glutSpecialFunc(EarthSpecialKey);
 	// Setup the initial render context.
 	GLInit();
 	SetUpTextureMaps();
@@ -470,16 +546,6 @@ int main( int argc, char** argv )
     return 0;
 }
 
-
-
-
-//============================================================================
-//============================================================================
-// Functions below are for modeling the 3D objects.
-//============================================================================
-//============================================================================
-
-
 /////////////////////////////////////////////////////////////////////////////
 // Draw the x, y, z axes. Each is drawn with the input length.
 // The x-axis is red, y-axis green, and z-axis blue.
@@ -507,9 +573,6 @@ void DrawAxes( double length )
     glEnd();
     glPopAttrib();
 }
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Subdivide input quad into uSteps x vSteps smaller quads, and draw them.
@@ -614,7 +677,6 @@ void DrawEarth(void)
 
 	glEnable(GL_CULL_FACE);	// Enable back-face culling.
 }
-
 
 void DrawSatellite(void)
 {
