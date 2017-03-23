@@ -76,10 +76,14 @@ void calculateGroundTruth(int counter)
 	//s1.setTorque(0.05, 0.05, 0.05); //UoSat12
 	s1.setTorque(0.01, 0.01, 0.01); //MOST
 
-	//s1.setStepSize(0.01); //10ms stepsize
 	s1.setStepSize(0.05); //50ms stepsize
 
 	s1.setQuaternionInitialValues(0, 0, 0, 1);
+
+	if (counter == 3601)
+	{
+		s1.setTorque(0, 0, 0);
+	}
 
 	//Find acceleration, next velocity and store all values in text file
 	s1.findAcc();
@@ -88,7 +92,7 @@ void calculateGroundTruth(int counter)
 	s1.getNextw();
 	s1.findNextQuaternion();
 	s1.findNextVector();
-	
+	/*
 	cout << "wX = " << s1.getVelocityX() << endl;
 	cout << "wY = " << s1.getVelocityY() << endl;
 	cout << "wZ = " << s1.getVelocityZ() << endl;
@@ -99,7 +103,7 @@ void calculateGroundTruth(int counter)
 	cout << "qX = " << s1.getQuaternionX() << endl;
 	cout << "qY = " << s1.getQuaternionY() << endl;
 	cout << "qZ = " << s1.getQuaternionZ() << endl;
-
+	*/
 	// Test SGP4 TLE data
 	string str1 = "SGP4 Test";
 	string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
@@ -116,9 +120,9 @@ void calculateGroundTruth(int counter)
 	// Time in minutes
 	// mpe = "minutes past epoch"
 	cout << "mpe = " << mpe << endl;
+	cout << "counter = " << counter << endl;
 	Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
 	storeSatelliteValues(vecPos[counter].Position().m_x, vecPos[counter].Position().m_y, vecPos[counter].Position().m_z);
-	cout << "test in loop = " << vecPos[counter].Position().m_y << endl;
 
 	//unlocking of mutex
 	groundTruthDone = true;
@@ -180,11 +184,9 @@ void transportData()
 }
 
 void Execute_Sgp4(const cSatellite& sat, double mpe,
-	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos) {
-
-	cout << "mpe in exe = " << mpe << endl;
+	vector<cEci>& vecPos, vector<cGeo>& geoPos, vector<cEcef>& ecefPos)
+{
 	// Calculate the position and velocity of the satellite for various times.
-
 	// Get the position of the satellite at time "mpe"
 	cEciTime eci = sat.PositionEci(mpe);
 	cEcefTime ecef = sat.PositionEcef(mpe);
