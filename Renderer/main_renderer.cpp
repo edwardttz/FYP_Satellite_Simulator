@@ -1,9 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "image_io.h"
+
+using namespace std;
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -93,11 +99,28 @@ bool drawAxes = true;           // Draw world coordinate frame axes iff true.
 bool drawWireframe = false;     // Draw polygons in wireframe if true, otherwise polygons are filled.
 bool hasTexture = true;         // Toggle texture mapping.
 
+//satellite position
+vector<double> satX;
+vector<double> satY;
+vector<double> satZ;
+
+//quaternion values
+vector<double> qX;
+vector<double> qY;
+vector<double> qZ;
+
+//window id
+int satelliteWindow;
+int mainWindow;
+
+ifstream infile;
+
 
 // Forward function declarations.
 void DrawAxes( double length );
 void DrawEarth(void);
 void DrawSatellite(void);
+void getData(string);
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -476,13 +499,21 @@ void SetUpTextureMaps( void )
 
 int main( int argc, char** argv )
 {
+	//populate satX, satY, satZ, qX, qY and qZ
+	getData("satX.txt");
+	getData("satY.txt");
+	getData("satZ.txt");
+	getData("qX.txt");
+	getData("qY.txt");
+	getData("qZ.txt");
+
 	// Initialize GLUT and create window.
     glutInit( &argc, argv );
     glutInitDisplayMode ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( winWidth, winHeight );
 
 	// satellite window
-	glutCreateWindow("Satellite");
+	satelliteWindow = glutCreateWindow("Satellite");
 	glutDisplayFunc(SatelliteDrawing);
 	glutReshapeFunc(MyReshape);
 	glutKeyboardFunc(SatelliteKeyboard);
@@ -492,7 +523,7 @@ int main( int argc, char** argv )
 	SetUpTextureMaps();
 
 	// main window
-	glutCreateWindow("Main");
+	mainWindow = glutCreateWindow("Main");
     glutDisplayFunc(EarthDrawing); 
     glutReshapeFunc(MyReshape);
     glutKeyboardFunc(EarthKeyboard);
@@ -521,10 +552,6 @@ int main( int argc, char** argv )
         exit( 1 );
     }
 
-
-
-
-
 // Display user instructions in console window.
 
     printf( "Press LEFT to move eye left.\n" );
@@ -538,6 +565,20 @@ int main( int argc, char** argv )
     printf( "Press 'X' to toggle axes.\n" );
     printf( "Press 'R' to reset to initial view.\n" );
     printf( "Press 'Q' to quit.\n\n" );
+	/*
+	cout << "qX.front = " << qX.front() << endl;
+	cout << "qX.back = " << qX.back() << endl;
+	cout << "qY.front = " << qY.front() << endl;
+	cout << "qY.back = " << qY.back() << endl;
+	cout << "qZ.front = " << qZ.front() << endl;
+	cout << "qZ.back = " << qZ.back() << endl;
+	cout << "satX.front = " << satX.front() << endl;
+	cout << "satX.back = " << satX.back() << endl;
+	cout << "satY.front = " << satY.front() << endl;
+	cout << "satY.back = " << satY.back() << endl;
+	cout << "satZ.front = " << satZ.front() << endl;
+	cout << "satZ.back = " << satZ.back() << endl;
+	*/
 
 
 // Enter GLUT event loop.
@@ -664,15 +705,17 @@ void DrawEarth(void)
 	
 	glDisable(GL_CULL_FACE);  // Disable back-face culling.
 
-	//create quadrics object for texture
-	quad = gluNewQuadric();
-	
+	//draw earth
 	glPushMatrix();
-	//generate quadric tex coords
+	quad = gluNewQuadric();
 	gluQuadricTexture(quad, GL_TRUE);
-	//draw sphere with texture
 	gluSphere(quad, radius, 32, 16);
+	glPopMatrix();
 
+	//draw satellite
+	glPushMatrix();
+	glTranslated(satX.back() / 6431, satY.back() / 6431, satZ.back() / 6431);
+	glutSolidSphere(0.05, 32, 16);
 	glPopMatrix();
 
 	glEnable(GL_CULL_FACE);	// Enable back-face culling.
@@ -742,4 +785,39 @@ void DrawSatellite(void)
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS);
 	
 	glPopMatrix();
+}
+
+void getData(string fileName)
+{
+	infile.open(fileName);
+	while (!infile.eof())
+	{
+		double temp;
+		infile >> temp;
+		if (fileName == "satX.txt")
+		{
+			satX.push_back(temp);
+		}
+		else if (fileName == "satY.txt")
+		{
+			satY.push_back(temp);
+		}
+		else if (fileName == "satZ.txt")
+		{
+			satZ.push_back(temp);
+		}
+		else if (fileName == "qX.txt")
+		{
+			qX.push_back(temp);
+		}
+		else if (fileName == "qY.txt")
+		{
+			qY.push_back(temp);
+		}
+		else if (fileName == "qZ.txt")
+		{
+			qZ.push_back(temp);
+		}
+	}
+	infile.close();
 }
