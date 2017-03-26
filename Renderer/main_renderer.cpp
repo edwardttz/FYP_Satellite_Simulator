@@ -63,6 +63,9 @@ const GLfloat light1Position[] = { -2.0, 10.0, -2.0, 1.0 };
 // Texture image filenames.
 const char earthTexFile[] = "images/earth.jpg";
 
+//counter for displaying
+int counter = 0;
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -532,9 +535,6 @@ int main( int argc, char** argv )
 	GLInit();
 	SetUpTextureMaps();
 
-
-
-
 // Initialize GLEW.
 // The followings make sure OpenGL 1.4 is supported and set up the extensions.
 
@@ -580,6 +580,7 @@ int main( int argc, char** argv )
 	cout << "satZ.back = " << satZ.back() << endl;
 	*/
 
+	cout << "counter = " << counter << endl;
 
 // Enter GLUT event loop.
 
@@ -713,14 +714,18 @@ void DrawEarth(void)
 	glPopMatrix();
 
 	//draw satellite
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glPushMatrix();
 	glTranslated(satX.back() / 6431, satY.back() / 6431, satZ.back() / 6431);
-	glutSolidSphere(0.05, 32, 16);
+	//glutSolidSphere(0.05, 32, 16);
+	glScalef(0.05, 0.05, 0.05);
+	DrawSatellite();
 	glPopMatrix();
 
 	glEnable(GL_CULL_FACE);	// Enable back-face culling.
 }
 
+//draw satellite
 void DrawSatellite(void)
 {
 
@@ -787,6 +792,7 @@ void DrawSatellite(void)
 	glPopMatrix();
 }
 
+//reading from .txt files
 void getData(string fileName)
 {
 	infile.open(fileName);
