@@ -73,8 +73,8 @@ int counter = 0;
 /////////////////////////////////////////////////////////////////////////////
 
 // Window's size.
-int winWidth = 800;     // Window width in pixels.
-int winHeight = 600;    // Window height in pixels.
+int winWidth = 1024;     // Window width in pixels.
+int winHeight = 768;    // Window height in pixels.
 
 
 // Define (actual) eye position.
@@ -157,11 +157,11 @@ void EarthDrawing( void )
     glLightfv( GL_LIGHT0, GL_POSITION, light0Position );
     glLightfv( GL_LIGHT1, GL_POSITION, light1Position );
 
-    // Draw axes.
-    if ( drawAxes ) DrawAxes( 2 );
-
-    // Draw scene.
+	glViewport(0, winHeight / 2, winWidth / 2, winHeight / 2);
 	DrawEarth();
+
+	glViewport(winWidth / 2, winHeight / 2, winWidth / 2, winHeight / 2);
+	DrawSatellite();
 
     glutSwapBuffers();
 }
@@ -253,53 +253,6 @@ void EarthKeyboard( unsigned char key, int x, int y )
     }
 }
 
-
-void SatelliteKeyboard(unsigned char key, int x, int y)
-{
-	switch (key)
-	{
-		// Quit program.
-	case 'q':
-	case 'Q':
-		exit(0);
-		break;
-
-		// Toggle between wireframe and filled polygons.
-	case 'w':
-	case 'W':
-		drawWireframe = !drawWireframe;
-		if (drawWireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glutPostRedisplay();
-		break;
-
-		// Toggle axes.
-	case 'x':
-	case 'X':
-		drawAxes = !drawAxes;
-		glutPostRedisplay();
-		break;
-
-		// Toggle texture mapping.
-	case 't':
-	case 'T':
-		hasTexture = !hasTexture;
-		glutPostRedisplay();
-		break;
-
-		// Reset to initial view.
-	case 'r':
-	case 'R':
-		eyeLatitude = 0.0;
-		eyeLongitude = 0.0;
-		eyeDistance = EYE_INIT_DIST;
-		glutPostRedisplay();
-		break;
-	}
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // The special key callback function.
 /////////////////////////////////////////////////////////////////////////////
@@ -349,53 +302,6 @@ void EarthSpecialKey( int key, int x, int y )
             glutPostRedisplay();
             break;
     }
-}
-
-void SatelliteSpecialKey(int key, int x, int y)
-{
-	int modi = glutGetModifiers();
-
-	switch (key)
-	{
-	case GLUT_KEY_LEFT:
-		eyeLongitude -= EYE_LONGITUDE_INCR;
-		if (eyeLongitude < -360.0) eyeLongitude += 360.0;
-		glutPostRedisplay();
-		break;
-
-	case GLUT_KEY_RIGHT:
-		eyeLongitude += EYE_LONGITUDE_INCR;
-		if (eyeLongitude > 360.0) eyeLongitude -= 360.0;
-		glutPostRedisplay();
-		break;
-
-	case GLUT_KEY_UP:
-		if (modi != GLUT_ACTIVE_SHIFT)
-		{
-			eyeLatitude += EYE_LATITUDE_INCR;
-			if (eyeLatitude > EYE_MAX_LATITUDE) eyeLatitude = EYE_MAX_LATITUDE;
-		}
-		else
-		{
-			eyeDistance -= EYE_DIST_INCR;
-			if (eyeDistance < EYE_MIN_DIST) eyeDistance = EYE_MIN_DIST;
-		}
-		glutPostRedisplay();
-		break;
-
-	case GLUT_KEY_DOWN:
-		if (modi != GLUT_ACTIVE_SHIFT)
-		{
-			eyeLatitude -= EYE_LATITUDE_INCR;
-			if (eyeLatitude < EYE_MIN_LATITUDE) eyeLatitude = EYE_MIN_LATITUDE;
-		}
-		else
-		{
-			eyeDistance += EYE_DIST_INCR;
-		}
-		glutPostRedisplay();
-		break;
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -515,22 +421,13 @@ int main( int argc, char** argv )
     glutInitDisplayMode ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( winWidth, winHeight );
 
-	// satellite window
-	satelliteWindow = glutCreateWindow("Satellite");
-	glutDisplayFunc(SatelliteDrawing);
-	glutReshapeFunc(MyReshape);
-	glutKeyboardFunc(SatelliteKeyboard);
-	glutSpecialFunc(SatelliteSpecialKey);
-	// Setup the initial render context.
-	GLInit();
-	SetUpTextureMaps();
-
 	// main window
 	mainWindow = glutCreateWindow("Main");
     glutDisplayFunc(EarthDrawing); 
     glutReshapeFunc(MyReshape);
     glutKeyboardFunc(EarthKeyboard);
     glutSpecialFunc(EarthSpecialKey);
+
 	// Setup the initial render context.
 	GLInit();
 	SetUpTextureMaps();
@@ -579,7 +476,6 @@ int main( int argc, char** argv )
 	cout << "satZ.front = " << satZ.front() << endl;
 	cout << "satZ.back = " << satZ.back() << endl;
 	*/
-
 	cout << "counter = " << counter << endl;
 
 // Enter GLUT event loop.
@@ -723,6 +619,9 @@ void DrawEarth(void)
 	glPopMatrix();
 
 	glEnable(GL_CULL_FACE);	// Enable back-face culling.
+
+	// Draw axes.
+	if (drawAxes) DrawAxes(2);
 }
 
 //draw satellite
@@ -790,6 +689,9 @@ void DrawSatellite(void)
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS);
 	
 	glPopMatrix();
+
+	// Draw axes.
+	if (drawAxes) DrawAxes(2);
 }
 
 //reading from .txt files

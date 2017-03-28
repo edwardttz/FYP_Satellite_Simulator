@@ -33,6 +33,7 @@ void calculateMagField(const double, const double, const double, const double, v
 //void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos, vector<SunSensorModel>& getGroundTruth, double eciX, double eciY, double eciZ, EciSun e, SunSensorModel s);
 void runSunVector(cSatellite);
 void initSatelliteStorage(void);
+void initGroundTruth(void);
 void storeSatelliteValues(double, double, double);
 
 
@@ -40,6 +41,7 @@ int main(void)
 {
 	clock_t tStart = clock();
 	initSatelliteStorage();
+	initGroundTruth();
 
 	for (int count = 0; count < 111601; count++) {
 		thread groundTruth(calculateGroundTruth, count);
@@ -66,44 +68,57 @@ void calculateGroundTruth(int counter)
 {
 	unique_lock<mutex> groundLock(groundTruthLock);
 	groundTruthConVar.wait(groundLock, [] {return transportDone;});
-	printf("ground truth\n");
+	//printf("ground truth\n");
 
-	//s1.setMOIValues(3.03, 4.85, 2.98); //KR 1
-	//s1.setMOIValues(40.45, 42.09, 41.36); //UoSat12
-	s1.setMOIValues(3.4, 2.18, 1.68); //MOST
-
-	//s1.setTorque(0.0107, 0.0107, 0.0107); //KR 1
-	//s1.setTorque(0.05, 0.05, 0.05); //UoSat12
-	s1.setTorque(0.01, 0.01, 0.01); //MOST
-
-	s1.setStepSize(0.05); //50ms stepsize
-
-	s1.setQuaternionInitialValues(0, 0, 0, 1);
-
-	if (counter == 3601)
+	if (counter == 599)
 	{
-		s1.setTorque(0, 0, 0);
+		s1.setTorque(0.0, 0.0, 0.0);
+	}
+
+	if (counter == 1199)
+	{
+		s1.setTorque(-0.01, -0.01, -0.01);
+	}
+
+	if (counter == 1799)
+	{
+		s1.setTorque(0.0, 0.0, 0.0);
 	}
 
 	//Find acceleration, next velocity and store all values in text file
 	s1.findAcc();
 	s1.findThetaValues();
+	s1.findNextVector();
 	s1.storeValues();
 	s1.getNextw();
 	s1.findNextQuaternion();
-	s1.findNextVector();
+
+	
 	/*
 	cout << "wX = " << s1.getVelocityX() << endl;
 	cout << "wY = " << s1.getVelocityY() << endl;
 	cout << "wZ = " << s1.getVelocityZ() << endl;
+
 	cout << "aX = " << s1.getAccX() << endl;
 	cout << "aY = " << s1.getAccY() << endl;
 	cout << "aZ = " << s1.getAccZ() << endl;
+
 	cout << "q0 = " << s1.getQuaternion0() << endl;
 	cout << "qX = " << s1.getQuaternionX() << endl;
 	cout << "qY = " << s1.getQuaternionY() << endl;
 	cout << "qZ = " << s1.getQuaternionZ() << endl;
+
+	cout << "q0inv = " << s1.getQ0Inverse() << endl;
+	cout << "qXinv = " << s1.getQXInverse() << endl;
+	cout << "qYinv = " << s1.getQYInverse() << endl;
+	cout << "qZinv = " << s1.getQZInverse() << endl;
+
+	cout << "v0 = " << s1.getVector0() << endl;
+	cout << "vX = " << s1.getVectorX() << endl;
+	cout << "vY = " << s1.getVectorY() << endl;
+	cout << "vZ = " << s1.getVectorZ() << endl;
 	*/
+	
 	// Test SGP4 TLE data
 	string str1 = "SGP4 Test";
 	string str2 = "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992";
@@ -119,8 +134,8 @@ void calculateGroundTruth(int counter)
 	// Locate position and velocity information of the satellite
 	// Time in minutes
 	// mpe = "minutes past epoch"
-	cout << "mpe = " << mpe << endl;
-	cout << "counter = " << counter << endl;
+	//cout << "mpe = " << mpe << endl;
+	//cout << "counter = " << counter << endl;
 	Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
 	storeSatelliteValues(vecPos[counter].Position().m_x, vecPos[counter].Position().m_y, vecPos[counter].Position().m_z);
 
@@ -175,7 +190,7 @@ void calculateNoiseModels()
 	}
 	*/
 
-	printf("noise\n");
+	//printf("noise\n");
 }
 
 void transportData()
@@ -196,6 +211,25 @@ void Execute_Sgp4(const cSatellite& sat, double mpe,
 	vecPos.push_back(eci);
 	geoPos.push_back(geo);
 	ecefPos.push_back(ecef);
+}
+
+void initGroundTruth()
+{
+	//s1.setMOIValues(3.03, 4.85, 2.98); //KR 1
+	//s1.setMOIValues(40.45, 42.09, 41.36); //UoSat12
+	s1.setMOIValues(3.4, 2.18, 1.68); //MOST
+
+	//s1.setTorque(0.0107, 0.0107, 0.0107); //KR 1
+	//s1.setTorque(0.05, 0.05, 0.05); //UoSat12
+	s1.setTorque(0.01, 0.01, 0.01); //MOST
+
+	s1.setStepSize(0.05); //50ms stepsize
+
+	s1.setQuaternionInitialValues(0, 0, 0, 1);
+
+	s1.setQuaternionInverseInitialValues(0, 0, 0, -1);
+
+	s1.setVectorInitialValues(0, 0, 0, 1);
 }
 
 void initSatelliteStorage()
