@@ -30,7 +30,6 @@ void calculateMagField(const double, const double, const double, const double, v
 void calcMagFieldMain(const cGeo, const cJulian, vector<double>&);
 double calculateDecimalYear(double);
 void calculateMagField(const double, const double, const double, const double, vector<double>&);
-//void ExecuteSunPosition(cJulian date, vector<EciSun>& getPos, vector<SunSensorModel>& getGroundTruth, double eciX, double eciY, double eciZ, EciSun e, SunSensorModel s);
 void runSunVector(cSatellite);
 void initSatelliteStorage(void);
 void initGroundTruth(void);

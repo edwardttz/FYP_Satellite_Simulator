@@ -583,12 +583,12 @@ void SpacecraftDynamics::findThetaValues()
 	if (getQuaternionX() > 1)
 	{
 		qX_temp = getQuaternionX() - 1;
-		thetaX = (180 * (-2 * asin(qX_temp) + 1)) / PI;
+		thetaX = (180 * (-2 * asin(qX_temp) - PI)) / PI;
 	}
 	else if (getQuaternionX() < -1)
 	{
 	qX_temp = getQuaternionX() + 1;
-	thetaX = (180 * (-2 * asin(qX_temp) + 1)) / PI;
+	thetaX = (180 * (-2 * asin(qX_temp) + PI)) / PI;
 	}
 
 	else
@@ -600,12 +600,12 @@ void SpacecraftDynamics::findThetaValues()
 	if (getQuaternionY() > 1)
 	{
 		qY_temp = getQuaternionY() - 1;
-		thetaY = (180 * (-2 * asin(qY_temp) + 1)) / PI;
+		thetaY = (180 * (-2 * asin(qY_temp) - PI)) / PI;
 	}
 	else if (getQuaternionX() < -1)
 	{
 	qY_temp = getQuaternionY() + 1;
-	thetaY = (180 * (-2 * asin(qY_temp) + 1)) / PI;
+	thetaY = (180 * (-2 * asin(qY_temp) + PI)) / PI;
 	}
 	else
 	{
@@ -616,12 +616,12 @@ void SpacecraftDynamics::findThetaValues()
 	if (getQuaternionZ() > 1)
 	{
 		qZ_temp = getQuaternionZ() - 1;
-		thetaZ = (180 * (-2 * asin(qZ_temp) + 1)) / PI;
+		thetaZ = (180 * (-2 * asin(qZ_temp) - PI)) / PI;
 	}
 	else if (getQuaternionZ() < -1)
 	{
 	qZ_temp = getQuaternionZ() + 1;
-	thetaZ = (180 * (-2 * asin(qZ_temp) + 1)) / PI;
+	thetaZ = (180 * (-2 * asin(qZ_temp) + PI)) / PI;
 	}
 	else
 	{
