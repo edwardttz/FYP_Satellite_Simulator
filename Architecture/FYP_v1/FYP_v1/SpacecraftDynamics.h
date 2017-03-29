@@ -16,8 +16,8 @@ private:
 	double aX, aY, aZ;
 	double iX, iY, iZ;
 	double torqueX, torqueY, torqueZ;
-	double spaceTorqueX, spaceTorqueY, spaceTorqueZ;
-	double reactionTorqueX, reactionTorqueY, reactionTorqueZ;
+	double vector0Initial, vectorXInitial, vectorYInitial, vectorZInitial;
+	double temp_var, temp_var2;
 	double q0, qX, qY, qZ;
 	double vector0, vectorX, vectorY, vectorZ;
 	double q0Inverse, qXInverse, qYInverse, qZInverse;
@@ -55,8 +55,6 @@ public:
 	void findNextW();
 	void findAcc();
 	void storeValues();
-	//double vectorMultiplication(vector<double>, vector<double>);
-	//vector<double> assignQuaternionValue(double, vector<double>);
 	void findNextQuaternion();
 	void setQuaternionInitialValues(double, double, double, double);
 	void setQuaternionInverseInitialValues(double, double, double, double);
@@ -89,6 +87,10 @@ public:
 	double getQXInverse();
 	double getQYInverse();
 	double getQZInverse();
+	double getVector0Initial();
+	double getVectorXInitial();
+	double getVectorYInitial();
+	double getVectorZInitial();
 	double getVector0();
 	double getVectorX();
 	double getVectorY();

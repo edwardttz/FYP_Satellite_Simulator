@@ -3,9 +3,11 @@
 #include <vector>
 #include <cmath>
 
+#define PI                  3.1415926535897932384626433832795
+
 using namespace std;
 
-SpacecraftDynamics::SpacecraftDynamics() 
+SpacecraftDynamics::SpacecraftDynamics()
 {
 	wX_values.setFileName("wX.txt");
 	wY_values.setFileName("wY.txt");
@@ -43,14 +45,14 @@ SpacecraftDynamics::SpacecraftDynamics()
 	thetaZ_values.clearFile();
 }
 
-double SpacecraftDynamics::rungeKutta (double torque, double MOI, double w_initial, double w1, double w2, double constant) 
+double SpacecraftDynamics::rungeKutta(double torque, double MOI, double w_initial, double w1, double w2, double constant)
 {
-	double k1,k2,k3,k4;
-	k1 = (torque/MOI) - constant * w1 * w2;
-	k2 = (torque/MOI) - constant * (w1 + ((k1*stepSize)/2))*(w2 + ((k1*stepSize)/2));
-	k3 = (torque/MOI) - constant * (w1 + ((k2*stepSize)/2))*(w2 + ((k2*stepSize)/2));
-	k4 = (torque/MOI) - constant * (w1 + (k3*stepSize))*(w2 + (k3*stepSize)); 
-	return w_initial + (stepSize/6) * (k1 + 2 * k2 + 2 * k3 + k4);
+	double k1, k2, k3, k4;
+	k1 = (torque / MOI) - constant * w1 * w2;
+	k2 = (torque / MOI) - constant * (w1 + ((k1*stepSize) / 2))*(w2 + ((k1*stepSize) / 2));
+	k3 = (torque / MOI) - constant * (w1 + ((k2*stepSize) / 2))*(w2 + ((k2*stepSize) / 2));
+	k4 = (torque / MOI) - constant * (w1 + (k3*stepSize))*(w2 + (k3*stepSize));
+	return w_initial + (stepSize / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
 }
 
 double SpacecraftDynamics::tempRKwX()
@@ -65,9 +67,9 @@ double SpacecraftDynamics::tempRKwX()
 	double accY = getAccY();
 	double accZ = getAccZ();
 	double wX = getVelocityX();
-	k1 = stepSize * ((tX / iX) - ((iZ-iY)/iX) * ((tZ - accZ*iZ)/(iY-iX)*wX) * ((tY - accY*iY) / (iX - iZ)*wX));
-	k2 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k1/2)) * ((tY - accY*iY) / (iX - iZ)*(wX + k1/2)));
-	k3 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k2/2)) * ((tY - accY*iY) / (iX - iZ)*(wX + k2/2)));
+	k1 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*wX) * ((tY - accY*iY) / (iX - iZ)*wX));
+	k2 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k1 / 2)) * ((tY - accY*iY) / (iX - iZ)*(wX + k1 / 2)));
+	k3 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k2 / 2)) * ((tY - accY*iY) / (iX - iZ)*(wX + k2 / 2)));
 	k4 = stepSize * ((tX / iX) - ((iZ - iY) / iX) * ((tZ - accZ*iZ) / (iY - iX)*(wX + k3)) * ((tY - accY*iY) / (iX - iZ)*(wX + k3)));
 	return (wX + (k1 / 6) + (k2 / 3) + (k3 / 3) + (k4 / 6));
 }
@@ -85,8 +87,8 @@ double SpacecraftDynamics::tempRKwY()
 	double accZ = getAccZ();
 	double wY = getVelocityY();
 	k1 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*wY) * ((tX - accX*iX) / (iZ - iY)*wY));
-	k2 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k1/2)) * ((tX - accX*iX) / (iZ - iY)*(wY + k1/2)));
-	k3 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k2/2)) * ((tX - accX*iX) / (iZ - iY)*(wY + k2/2)));
+	k2 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k1 / 2)) * ((tX - accX*iX) / (iZ - iY)*(wY + k1 / 2)));
+	k3 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k2 / 2)) * ((tX - accX*iX) / (iZ - iY)*(wY + k2 / 2)));
 	k4 = stepSize * ((tY / iY) - ((iX - iZ) / iY) * ((tZ - accZ*iZ) / (iY - iX)*(wY + k3)) * ((tX - accX*iX) / (iZ - iY)*(wY + k3)));
 	return (wY + (k1 / 6) + (k2 / 3) + (k3 / 3) + (k4 / 6));
 }
@@ -104,7 +106,7 @@ double SpacecraftDynamics::tempRKwZ()
 	double accY = getAccY();
 	double wZ = getVelocityZ();
 	k1 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*wZ) * ((tX - accX*iX) / (iZ - iY)*wZ));
-	k2 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k1/2)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k1/2)));
+	k2 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k1 / 2)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k1 / 2)));
 	k3 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k2 / 2)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k2 / 2)));
 	k4 = stepSize * ((tZ / iZ) - ((iY - iX) / iZ) * ((tY - accY*iY) / (iX - iZ)*(wZ + k3)) * ((tX - accX*iX) / (iZ - iY)*(wZ + k3)));
 	return (wZ + (k1 / 6) + (k2 / 3) + (k3 / 3) + (k4 / 6));
@@ -124,19 +126,19 @@ void SpacecraftDynamics::getNextAcc()
 	aZ = (torqueZ / iZ) - ((iY - iX) / iZ) * ((torqueY - aY*iY) / (iX - iZ)*wZ) * ((torqueX - aX*iX) / (iZ - iY)*wZ);
 }
 
-double SpacecraftDynamics::rungeKuttaQuaternions (double row1, double row2, double row3, double row4, double q_initial)
+double SpacecraftDynamics::rungeKuttaQuaternions(double row1, double row2, double row3, double row4, double q_initial)
 {
 	double k1, k2, k3, k4;
 
 	k1 = 0.5 * ((row1 * getQuaternion0()) + (row2 * getQuaternionX()) + (row3 * getQuaternionY()) + (row4 * getQuaternionZ()));
 
-	k2 = 0.5 * ((row1 * (getQuaternion0() + (stepSize / 2) * k1)) + (row2 * (getQuaternionX() + (stepSize / 2) * k1)) 
+	k2 = 0.5 * ((row1 * (getQuaternion0() + (stepSize / 2) * k1)) + (row2 * (getQuaternionX() + (stepSize / 2) * k1))
 		+ (row3 * (getQuaternionY() + (stepSize / 2) * k1)) + (row4 * (getQuaternionZ() + (stepSize / 2) * k1)));
 
-	k3 = 0.5 * ((row1 * (getQuaternion0() + (stepSize / 2) * k2)) + (row2 * (getQuaternionX() + (stepSize / 2) * k2)) 
+	k3 = 0.5 * ((row1 * (getQuaternion0() + (stepSize / 2) * k2)) + (row2 * (getQuaternionX() + (stepSize / 2) * k2))
 		+ (row3 * (getQuaternionY() + (stepSize / 2) * k2)) + (row4 * (getQuaternionZ() + (stepSize / 2) * k2)));
 
-	k4 = 0.5 * ((row1 * (getQuaternion0() + (stepSize * k3))) + (row2 * (getQuaternionX() + (stepSize * k3))) 
+	k4 = 0.5 * ((row1 * (getQuaternion0() + (stepSize * k3))) + (row2 * (getQuaternionX() + (stepSize * k3)))
 		+ (row3 * (getQuaternionY() + (stepSize * k3))) + (row4 * (getQuaternionZ() + (stepSize * k3))));
 
 	return q_initial + (stepSize / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
@@ -147,14 +149,14 @@ double SpacecraftDynamics::eulerMethodQuaternions(double row1, double row2, doub
 	return q_initial + stepSize * ((row1 * getQuaternion0()) + (row2 * getQuaternionX()) + (row3 * getQuaternionY()) + (row4 * getQuaternionZ()));
 }
 
-void SpacecraftDynamics::printValues (double iteration, double a_X,double a_Y, double a_Z, double w_X,double w_Y, double w_Z) 
+void SpacecraftDynamics::printValues(double iteration, double a_X, double a_Y, double a_Z, double w_X, double w_Y, double w_Z)
 {
 	cout << "**** Iteration " << iteration << " ****" << endl;
 	cout << "Angular Velocity: X=" << w_X << " Y=" << w_Y << " Z=" << w_Z << endl;
 	cout << "Angular Acceleration: X=" << a_X << " Y=" << a_Y << " Z=" << a_Z << endl << endl;
 }
 
-void SpacecraftDynamics::findNextW() 
+void SpacecraftDynamics::findNextW()
 {
 	double wX_next = rungeKutta(torqueX, iX, wX, wY, wZ, constantX);
 	double wY_next = rungeKutta(torqueY, iY, wY, wX, wZ, constantY);
@@ -164,47 +166,47 @@ void SpacecraftDynamics::findNextW()
 	wZ = wZ_next;
 }
 
-void SpacecraftDynamics::findAcc() 
+void SpacecraftDynamics::findAcc()
 {
 	aX = (torqueX / iX) - constantX * wY * wZ;
 	aY = (torqueY / iY) - constantY * wX * wZ;
 	aZ = (torqueZ / iZ) - constantZ * wX * wY;
 }
 
-void SpacecraftDynamics::findConstants() 
+void SpacecraftDynamics::findConstants()
 {
 	constantX = (iZ - iY) / iX;
 	constantY = (iX - iZ) / iY;
 	constantZ = (iY - iX) / iZ;
 }
 
-void SpacecraftDynamics::setInitialW(double xValue, double yValue, double zValue) 
+void SpacecraftDynamics::setInitialW(double xValue, double yValue, double zValue)
 {
 	wX = xValue;
 	wY = yValue;
 	wZ = zValue;
 }
 
-void SpacecraftDynamics::setTorque(double xValue, double yValue, double zValue) 
+void SpacecraftDynamics::setTorque(double xValue, double yValue, double zValue)
 {
 	torqueX = xValue;
 	torqueY = yValue;
 	torqueZ = zValue;
 }
 
-void SpacecraftDynamics::setMOIValues(double xValue, double yValue, double zValue) 
+void SpacecraftDynamics::setMOIValues(double xValue, double yValue, double zValue)
 {
 	iX = xValue;
 	iY = yValue;
 	iZ = zValue;
 }
 
-void SpacecraftDynamics::setStepSize(double timeInMS) 
+void SpacecraftDynamics::setStepSize(double timeInMS)
 {
 	stepSize = timeInMS;
 }
 
-void SpacecraftDynamics::storeValues() 
+void SpacecraftDynamics::storeValues()
 {
 	wX_values.storeInFile(wX);
 	wY_values.storeInFile(wY);
@@ -228,23 +230,23 @@ void SpacecraftDynamics::storeValues()
 /**
 double SpacecraftDynamics::vectorMultiplication(vector<double> row, vector<double> column)
 {
-	double answer = 0.0;
+double answer = 0.0;
 
-	for (int i = 0; i < column.max_size; i++)
-	{
-		answer += row[i] * row[i];
-	}
+for (int i = 0; i < column.max_size; i++)
+{
+answer += row[i] * row[i];
+}
 
-	return answer;
+return answer;
 }
 **/
 
 /**
 vector<double> SpacecraftDynamics::assignQuaternionValue(double value, vector<double> quaternionTemp)
 {
-	quaternionTemp.push_back(value);
+quaternionTemp.push_back(value);
 
-	return quaternionTemp;
+return quaternionTemp;
 }
 **/
 
@@ -289,6 +291,10 @@ void SpacecraftDynamics::setVectorInitialValues(double v0, double vX, double vY,
 	vectorX = vX;
 	vectorY = vY;
 	vectorZ = vZ;
+	vector0Initial = v0;
+	vectorXInitial = vX;
+	vectorYInitial = vY;
+	vectorZInitial = vZ;
 }
 
 double SpacecraftDynamics::getVelocityX()
@@ -405,6 +411,27 @@ double SpacecraftDynamics::getQZInverse()
 {
 	return qZInverse;
 }
+
+double SpacecraftDynamics::getVector0Initial()
+{
+	return vector0Initial;
+}
+
+double SpacecraftDynamics::getVectorXInitial()
+{
+	return vectorXInitial;
+}
+
+double SpacecraftDynamics::getVectorYInitial()
+{
+	return vectorYInitial;
+}
+
+double SpacecraftDynamics::getVectorZInitial()
+{
+	return vectorZInitial;
+}
+
 double SpacecraftDynamics::getVector0()
 {
 	return vector0;
@@ -499,19 +526,33 @@ void SpacecraftDynamics::findNextVector()
 	qXInverse = quaternionXInverse_temp;
 	qYInverse = quaternionYInverse_temp;
 	qZInverse = quaternionZInverse_temp;
-
+	/*
 	//multiply between vector and inverse of quaternion
 	double quaternion0Value_temp = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	getVector0(), getVectorX(), getVectorY(), getVectorZ());
 
 	double quaternionXValue_temp = quaternionXMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	getVector0(), getVectorX(), getVectorY(), getVectorZ());
 
 	double quaternionYValue_temp = quaternionYMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	getVector0(), getVectorX(), getVectorY(), getVectorZ());
 
 	double quaternionZValue_temp = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	*/
+
+	//multiply between vector initial and inverse of quaternion
+	double quaternion0Value_temp = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
+
+	double quaternionXValue_temp = quaternionXMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
+
+	double quaternionYValue_temp = quaternionYMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
+
+	double quaternionZValue_temp = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
 
 	//multiply between quaternion and product of vector and inverse of quaternion
 	double vector0_next = quaternion0Mulitplication(quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp,
@@ -534,7 +575,57 @@ void SpacecraftDynamics::findNextVector()
 
 void SpacecraftDynamics::findThetaValues()
 {
-	thetaX = -2 * asin(getQuaternionX());
-	thetaY = -2 * asin(getQuaternionY());
-	thetaZ = -2 * asin(getQuaternionZ());
+	double qX_temp = getQuaternionX();
+	double qY_temp = getQuaternionY();
+	double qZ_temp = getQuaternionZ();
+
+	//qX
+	if (getQuaternionX() > 1)
+	{
+		qX_temp = getQuaternionX() - 1;
+		thetaX = (180 * (-2 * asin(qX_temp) + 1)) / PI;
+	}
+	else if (getQuaternionX() < -1)
+	{
+	qX_temp = getQuaternionX() + 1;
+	thetaX = (180 * (-2 * asin(qX_temp) + 1)) / PI;
+	}
+
+	else
+	{
+		thetaX = (180 * (-2 * asin(getQuaternionX()))) / PI;
+	}
+
+	//qY
+	if (getQuaternionY() > 1)
+	{
+		qY_temp = getQuaternionY() - 1;
+		thetaY = (180 * (-2 * asin(qY_temp) + 1)) / PI;
+	}
+	else if (getQuaternionX() < -1)
+	{
+	qY_temp = getQuaternionY() + 1;
+	thetaY = (180 * (-2 * asin(qY_temp) + 1)) / PI;
+	}
+	else
+	{
+		thetaY = (180 * (-2 * asin(getQuaternionY()))) / PI;
+	}
+
+	//qZ
+	if (getQuaternionZ() > 1)
+	{
+		qZ_temp = getQuaternionZ() - 1;
+		thetaZ = (180 * (-2 * asin(qZ_temp) + 1)) / PI;
+	}
+	else if (getQuaternionZ() < -1)
+	{
+	qZ_temp = getQuaternionZ() + 1;
+	thetaZ = (180 * (-2 * asin(qZ_temp) + 1)) / PI;
+	}
+	else
+	{
+		thetaZ = (180 * (-2 * asin(getQuaternionZ()))) / PI;
+	}
+
 }
