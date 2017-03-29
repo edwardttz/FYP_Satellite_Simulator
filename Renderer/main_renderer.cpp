@@ -46,6 +46,7 @@ using namespace std;
 #define EYE_LATITUDE_INCR   2.0     // Degree increment when changing eye's latitude.
 #define EYE_LONGITUDE_INCR  2.0     // Degree increment when changing eye's longitude.
 
+#define DESIRED_FPS 60
 
 // Light 0.
 const GLfloat light0Ambient[] = { 0.2, 0.2, 0.2, 1.0 };
@@ -66,6 +67,9 @@ const char earthTexFile[] = "images/earth.jpg";
 //counter for displaying
 int counter = 0;
 
+//other vars
+bool pauseAnimation = false;
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,10 +81,10 @@ int winWidth = 1024;     // Window width in pixels.
 int winHeight = 768;    // Window height in pixels.
 
 
-// Define (actual) eye position.
-// Initial eye position is at [EYE_INIT_DIST, 0, 0] + [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]
-// in the world space, looking at [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]. 
-// The up-vector is always [0, 0, 1].
+						// Define (actual) eye position.
+						// Initial eye position is at [EYE_INIT_DIST, 0, 0] + [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]
+						// in the world space, looking at [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]. 
+						// The up-vector is always [0, 0, 1].
 
 double eyeLatitude = 0.0;
 double eyeLongitude = 0.0;
@@ -102,7 +106,7 @@ bool drawAxes = true;           // Draw world coordinate frame axes iff true.
 bool drawWireframe = false;     // Draw polygons in wireframe if true, otherwise polygons are filled.
 bool hasTexture = true;         // Toggle texture mapping.
 
-//satellite position
+								//satellite position
 vector<double> satX;
 vector<double> satY;
 vector<double> satZ;
@@ -112,6 +116,12 @@ vector<double> qX;
 vector<double> qY;
 vector<double> qZ;
 
+
+//theta values
+vector<double> thetaX;
+vector<double> thetaY;
+vector<double> thetaZ;
+
 //window id
 int satelliteWindow;
 int mainWindow;
@@ -120,42 +130,43 @@ ifstream infile;
 
 
 // Forward function declarations.
-void DrawAxes( double length );
+void DrawAxes(double length);
 void DrawEarth(void);
 void DrawSatellite(void);
 void getData(string);
+void updateScene(void);
 
 
 /////////////////////////////////////////////////////////////////////////////
 // The display callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void EarthDrawing( void )
+void EarthDrawing(void)
 {
-    if ( hasTexture )
-        glEnable( GL_TEXTURE_2D );
-    else
-        glDisable( GL_TEXTURE_2D );
+	if (hasTexture)
+		glEnable(GL_TEXTURE_2D);
+	else
+		glDisable(GL_TEXTURE_2D);
 
-    // Compute world-space eye position from eyeLatitude, eyeLongitude, eyeDistance, and look-at point.
-    eyePos[2] = eyeDistance * sin( eyeLatitude * PI / 180.0 ) + LOOKAT_Z;
-    double xy = eyeDistance * cos( eyeLatitude * PI / 180.0 );
-    eyePos[0] = xy * cos( eyeLongitude * PI / 180.0 ) + LOOKAT_X;
-    eyePos[1] = xy * sin( eyeLongitude * PI / 180.0 ) + LOOKAT_Y;
+	// Compute world-space eye position from eyeLatitude, eyeLongitude, eyeDistance, and look-at point.
+	eyePos[2] = eyeDistance * sin(eyeLatitude * PI / 180.0) + LOOKAT_Z;
+	double xy = eyeDistance * cos(eyeLatitude * PI / 180.0);
+	eyePos[0] = xy * cos(eyeLongitude * PI / 180.0) + LOOKAT_X;
+	eyePos[1] = xy * sin(eyeLongitude * PI / 180.0) + LOOKAT_Y;
 
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    gluPerspective( 45.0, (double)winWidth/winHeight, EYE_MIN_DIST, eyeDistance + SCENE_RADIUS );
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (double)winWidth / winHeight, EYE_MIN_DIST, eyeDistance + SCENE_RADIUS);
 
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-    gluLookAt( eyePos[0], eyePos[1], eyePos[2], LOOKAT_X, LOOKAT_Y, LOOKAT_Z, 0.0, 0.0, 1.0 );
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(eyePos[0], eyePos[1], eyePos[2], LOOKAT_X, LOOKAT_Y, LOOKAT_Z, 0.0, 0.0, 1.0);
 
-    // Set world-space positions of the two lights.
-    glLightfv( GL_LIGHT0, GL_POSITION, light0Position );
-    glLightfv( GL_LIGHT1, GL_POSITION, light1Position );
+	// Set world-space positions of the two lights.
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Position);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
 
 	glViewport(0, winHeight / 2, winWidth / 2, winHeight / 2);
 	DrawEarth();
@@ -163,7 +174,7 @@ void EarthDrawing( void )
 	glViewport(winWidth / 2, winHeight / 2, winWidth / 2, winHeight / 2);
 	DrawSatellite();
 
-    glutSwapBuffers();
+	glutSwapBuffers();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -203,181 +214,197 @@ void SatelliteDrawing(void)
 	glutSwapBuffers();
 }
 
+//timer function for animation
+void MyTimer(int v)
+{
+	if (!pauseAnimation)
+	{
+		updateScene();
+		glutTimerFunc(1000 / DESIRED_FPS, MyTimer, v);
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // The keyboard callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void EarthKeyboard( unsigned char key, int x, int y )
+void EarthKeyboard(unsigned char key, int x, int y)
 {
-    switch ( key )
-    {
-        // Quit program.
-        case 'q':
-        case 'Q': 
-            exit(0);
-            break;
+	switch (key)
+	{
+		// Quit program.
+	case 'q':
+	case 'Q':
+		exit(0);
+		break;
 
-        // Toggle between wireframe and filled polygons.
-        case 'w':
-        case 'W': 
-            drawWireframe = !drawWireframe;
-            if ( drawWireframe ) 
-                glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-            else
-                glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-            glutPostRedisplay();
-            break;
+		// Toggle between wireframe and filled polygons.
+	case 'w':
+	case 'W':
+		drawWireframe = !drawWireframe;
+		if (drawWireframe)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glutPostRedisplay();
+		break;
 
-        // Toggle axes.
-        case 'x':
-        case 'X': 
-            drawAxes = !drawAxes;
-            glutPostRedisplay();
-            break;
+		// Toggle axes.
+	case 'x':
+	case 'X':
+		drawAxes = !drawAxes;
+		glutPostRedisplay();
+		break;
+		// Pause or resume animation.
+	case 'p':
+	case 'P':
+		pauseAnimation = !pauseAnimation;
+		if (!pauseAnimation) glutTimerFunc(0, MyTimer, 0);
+		break;
 
-        // Toggle texture mapping.
-        case 't':
-        case 'T': 
-            hasTexture = !hasTexture;
-            glutPostRedisplay();
-            break;
+		// Toggle texture mapping.
+	case 't':
+	case 'T':
+		hasTexture = !hasTexture;
+		glutPostRedisplay();
+		break;
 
-       // Reset to initial view.
-        case 'r':
-        case 'R': 
-            eyeLatitude = 0.0;
-            eyeLongitude = 0.0;
-            eyeDistance = EYE_INIT_DIST;
-            glutPostRedisplay();
-            break;
-    }
+		// Reset to initial view.
+	case 'r':
+	case 'R':
+		eyeLatitude = 0.0;
+		eyeLongitude = 0.0;
+		eyeDistance = EYE_INIT_DIST;
+		glutPostRedisplay();
+		break;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // The special key callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void EarthSpecialKey( int key, int x, int y )
+void EarthSpecialKey(int key, int x, int y)
 {
-    int modi = glutGetModifiers();
+	int modi = glutGetModifiers();
 
-    switch ( key )
-    {
-        case GLUT_KEY_LEFT:
-            eyeLongitude -= EYE_LONGITUDE_INCR;
-            if ( eyeLongitude < -360.0 ) eyeLongitude += 360.0 ;
-            glutPostRedisplay();
-            break;
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		eyeLongitude -= EYE_LONGITUDE_INCR;
+		if (eyeLongitude < -360.0) eyeLongitude += 360.0;
+		glutPostRedisplay();
+		break;
 
-        case GLUT_KEY_RIGHT: 
-            eyeLongitude += EYE_LONGITUDE_INCR;
-            if ( eyeLongitude > 360.0 ) eyeLongitude -= 360.0 ;
-            glutPostRedisplay();
-            break;
+	case GLUT_KEY_RIGHT:
+		eyeLongitude += EYE_LONGITUDE_INCR;
+		if (eyeLongitude > 360.0) eyeLongitude -= 360.0;
+		glutPostRedisplay();
+		break;
 
-        case GLUT_KEY_UP:
-            if ( modi != GLUT_ACTIVE_SHIFT )
-            {
-                eyeLatitude += EYE_LATITUDE_INCR;
-                if ( eyeLatitude > EYE_MAX_LATITUDE ) eyeLatitude = EYE_MAX_LATITUDE;
-            }
-            else
-            {
-                eyeDistance -= EYE_DIST_INCR;
-                if ( eyeDistance < EYE_MIN_DIST ) eyeDistance = EYE_MIN_DIST;
-            }
-            glutPostRedisplay();
-            break;  
-        
-        case GLUT_KEY_DOWN:
-            if ( modi != GLUT_ACTIVE_SHIFT )
-            {
-                eyeLatitude -= EYE_LATITUDE_INCR;
-                if ( eyeLatitude < EYE_MIN_LATITUDE ) eyeLatitude = EYE_MIN_LATITUDE;
-            }
-            else
-            {
-                eyeDistance += EYE_DIST_INCR;
-            }
-            glutPostRedisplay();
-            break;
-    }
+	case GLUT_KEY_UP:
+		if (modi != GLUT_ACTIVE_SHIFT)
+		{
+			eyeLatitude += EYE_LATITUDE_INCR;
+			if (eyeLatitude > EYE_MAX_LATITUDE) eyeLatitude = EYE_MAX_LATITUDE;
+		}
+		else
+		{
+			eyeDistance -= EYE_DIST_INCR;
+			if (eyeDistance < EYE_MIN_DIST) eyeDistance = EYE_MIN_DIST;
+		}
+		glutPostRedisplay();
+		break;
+
+	case GLUT_KEY_DOWN:
+		if (modi != GLUT_ACTIVE_SHIFT)
+		{
+			eyeLatitude -= EYE_LATITUDE_INCR;
+			if (eyeLatitude < EYE_MIN_LATITUDE) eyeLatitude = EYE_MIN_LATITUDE;
+		}
+		else
+		{
+			eyeDistance += EYE_DIST_INCR;
+		}
+		glutPostRedisplay();
+		break;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // The reshape callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void MyReshape( int w, int h )
+void MyReshape(int w, int h)
 {
-    winWidth = w;
-    winHeight = h;
-    glViewport( 0, 0, w, h );
+	winWidth = w;
+	winHeight = h;
+	glViewport(0, 0, w, h);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Initialize some OpenGL states.
 /////////////////////////////////////////////////////////////////////////////
 
-void GLInit( void )
+void GLInit(void)
 {
-    glClearColor( 0.0, 0.0, 0.0, 1.0 ); // Set black background color.
+	glClearColor(0.0, 0.0, 0.0, 1.0); // Set black background color.
 
-    glShadeModel( GL_SMOOTH ); // Enable Gouraud shading.
-    glEnable( GL_DEPTH_TEST ); // Use depth-buffer for hidden surface removal.
-    glEnable( GL_CULL_FACE );  // Enable back-face culling.
+	glShadeModel(GL_SMOOTH); // Enable Gouraud shading.
+	glEnable(GL_DEPTH_TEST); // Use depth-buffer for hidden surface removal.
+	glEnable(GL_CULL_FACE);  // Enable back-face culling.
 
-    glDisable( GL_DITHER );
-    glDisable( GL_BLEND );
+	glDisable(GL_DITHER);
+	glDisable(GL_BLEND);
 
-    // Set Light 0.
-    glLightfv( GL_LIGHT0, GL_AMBIENT, light0Ambient );
-    glLightfv( GL_LIGHT0, GL_DIFFUSE, light0Diffuse );
-    glLightfv( GL_LIGHT0, GL_SPECULAR, light0Specular );
-    glEnable( GL_LIGHT0 );
+	// Set Light 0.
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Specular);
+	glEnable(GL_LIGHT0);
 
-    // Set Light 1.
-    glLightfv( GL_LIGHT1, GL_AMBIENT, light1Ambient );
-    glLightfv( GL_LIGHT1, GL_DIFFUSE, light1Diffuse );
-    glLightfv( GL_LIGHT1, GL_SPECULAR, light1Specular );
-    glEnable( GL_LIGHT1 );
+	// Set Light 1.
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light1Ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1Diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light1Specular);
+	glEnable(GL_LIGHT1);
 
-    glEnable( GL_LIGHTING );
+	glEnable(GL_LIGHTING);
 
-    // Set some global light properties.
-    GLfloat globalAmbient[] = { 0.2, 0.2, 0.2, 1.0 };
-    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, globalAmbient );
-    glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
-    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
-    glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR );
+	// Set some global light properties.
+	GLfloat globalAmbient[] = { 0.2, 0.2, 0.2, 1.0 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
-    // Set initial material properties.
-    GLfloat initMaterialAmbient[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat initMaterialDiffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat initMaterialSpecular[] = { 0.5, 0.5, 0.5, 1.0 };
-    GLfloat initMaterialShininess[] = { 16.0 };
-    GLfloat initMaterialEmission[] = { 0.0, 0.0, 0.0, 1.0 };
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, initMaterialAmbient );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, initMaterialDiffuse );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, initMaterialSpecular );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, initMaterialShininess );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, initMaterialEmission );
+	// Set initial material properties.
+	GLfloat initMaterialAmbient[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat initMaterialDiffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat initMaterialSpecular[] = { 0.5, 0.5, 0.5, 1.0 };
+	GLfloat initMaterialShininess[] = { 16.0 };
+	GLfloat initMaterialEmission[] = { 0.0, 0.0, 0.0, 1.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, initMaterialAmbient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, initMaterialDiffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, initMaterialSpecular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, initMaterialShininess);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, initMaterialEmission);
 
-    // Let OpenGL automatically renomarlize all normal vectors.
-    // This is important if objects are to be scaled.
-    glEnable( GL_NORMALIZE ); 
+	// Let OpenGL automatically renomarlize all normal vectors.
+	// This is important if objects are to be scaled.
+	glEnable(GL_NORMALIZE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Set up texture maps.
 /////////////////////////////////////////////////////////////////////////////
 
-void SetUpTextureMaps( void )
+void SetUpTextureMaps(void)
 {
-    unsigned char *imageData = NULL;
-    int imageWidth, imageHeight, numComponents;
+	unsigned char *imageData = NULL;
+	int imageWidth, imageHeight, numComponents;
 
-    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// This texture object is for the earth texture map (task 2)
 
@@ -406,62 +433,72 @@ void SetUpTextureMaps( void )
 // The main function.
 /////////////////////////////////////////////////////////////////////////////
 
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
 	//populate satX, satY, satZ, qX, qY and qZ
 	getData("satX.txt");
 	getData("satY.txt");
 	getData("satZ.txt");
+	cout << "sat done" << endl;
+
 	getData("qX.txt");
 	getData("qY.txt");
 	getData("qZ.txt");
+	cout << "q done" << endl;
+
+	getData("thetaX.txt");
+	getData("thetaY.txt");
+	getData("thetaZ.txt");
+	cout << "theta done" << endl;
 
 	// Initialize GLUT and create window.
-    glutInit( &argc, argv );
-    glutInitDisplayMode ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
-    glutInitWindowSize( winWidth, winHeight );
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowSize(winWidth, winHeight);
 
 	// main window
 	mainWindow = glutCreateWindow("Main");
-    glutDisplayFunc(EarthDrawing); 
-    glutReshapeFunc(MyReshape);
-    glutKeyboardFunc(EarthKeyboard);
-    glutSpecialFunc(EarthSpecialKey);
+	glutDisplayFunc(EarthDrawing);
+	glutReshapeFunc(MyReshape);
+	glutKeyboardFunc(EarthKeyboard);
+	glutSpecialFunc(EarthSpecialKey);
+	glutTimerFunc(50, MyTimer, 0);
 
 	// Setup the initial render context.
 	GLInit();
 	SetUpTextureMaps();
 
-// Initialize GLEW.
-// The followings make sure OpenGL 1.4 is supported and set up the extensions.
+	// Initialize GLEW.
+	// The followings make sure OpenGL 1.4 is supported and set up the extensions.
 
-    GLenum err = glewInit();
-    if ( err != GLEW_OK )
-    {
-        fprintf( stderr, "Error: %s.\n", glewGetErrorString( err ) );
-        exit( 1 );
-    }
-    printf( "Status: Using GLEW %s.\n\n", glewGetString( GLEW_VERSION ) );
+	GLenum err = glewInit();
+	if (err != GLEW_OK)
+	{
+		fprintf(stderr, "Error: %s.\n", glewGetErrorString(err));
+		exit(1);
+	}
+	printf("Status: Using GLEW %s.\n\n", glewGetString(GLEW_VERSION));
 
-    if ( !GLEW_VERSION_1_4 )
-    {
-        fprintf( stderr, "Error: OpenGL 1.4 is not supported.\n" );
-        exit( 1 );
-    }
+	if (!GLEW_VERSION_1_4)
+	{
+		fprintf(stderr, "Error: OpenGL 1.4 is not supported.\n");
+		exit(1);
+	}
 
-// Display user instructions in console window.
+	// Display user instructions in console window.
 
-    printf( "Press LEFT to move eye left.\n" );
-    printf( "Press RIGHT to move eye right.\n" );
-    printf( "Press UP to move eye up.\n" );
-    printf( "Press DOWN to move eye down.\n" );
-    printf( "Press SHIFT+UP to move closer.\n" );
-    printf( "Press SHIFT+DOWN to move further.\n" );
-    printf( "Press 'W' to toggle wireframe.\n" );
-    printf( "Press 'T' to toggle texture mapping.\n" );
-    printf( "Press 'X' to toggle axes.\n" );
-    printf( "Press 'R' to reset to initial view.\n" );
-    printf( "Press 'Q' to quit.\n\n" );
+	printf("Press LEFT to move eye left.\n");
+	printf("Press RIGHT to move eye right.\n");
+	printf("Press UP to move eye up.\n");
+	printf("Press DOWN to move eye down.\n");
+	printf("Press SHIFT+UP to move closer.\n");
+	printf("Press SHIFT+DOWN to move further.\n");
+	printf("Press 'W' to toggle wireframe.\n");
+	printf("Press 'T' to toggle texture mapping.\n");
+	printf("Press 'X' to toggle axes.\n");
+	printf("Press 'P' to toggle animation.\n");
+	printf("Press 'R' to reset to initial view.\n");
+	printf("Press 'Q' to quit.\n\n");
 	/*
 	cout << "qX.front = " << qX.front() << endl;
 	cout << "qX.back = " << qX.back() << endl;
@@ -476,12 +513,11 @@ int main( int argc, char** argv )
 	cout << "satZ.front = " << satZ.front() << endl;
 	cout << "satZ.back = " << satZ.back() << endl;
 	*/
-	cout << "counter = " << counter << endl;
 
-// Enter GLUT event loop.
+	// Enter GLUT event loop.
 
-    glutMainLoop();
-    return 0;
+	glutMainLoop();
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -489,27 +525,27 @@ int main( int argc, char** argv )
 // The x-axis is red, y-axis green, and z-axis blue.
 /////////////////////////////////////////////////////////////////////////////
 
-void DrawAxes( double length )
+void DrawAxes(double length)
 {
-    glPushAttrib( GL_ALL_ATTRIB_BITS );
-    glDisable( GL_LIGHTING );
-    glDisable( GL_TEXTURE_2D );
-    glLineWidth( 3.0 );
-    glBegin( GL_LINES );
-        // x-axis.
-        glColor3f( 1.0, 0.0, 0.0 );
-        glVertex3d( 0.0, 0.0, 0.0 );
-        glVertex3d( length, 0.0, 0.0 );
-        // y-axis.
-        glColor3f( 0.0, 1.0, 0.0 );
-        glVertex3d( 0.0, 0.0, 0.0 );
-        glVertex3d( 0.0, length, 0.0 );
-        // z-axis.
-        glColor3f( 0.0, 0.0, 1.0 );
-        glVertex3d( 0.0, 0.0, 0.0 );
-        glVertex3d( 0.0, 0.0, length );
-    glEnd();
-    glPopAttrib();
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glLineWidth(3.0);
+	glBegin(GL_LINES);
+	// x-axis.
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3d(0.0, 0.0, 0.0);
+	glVertex3d(length, 0.0, 0.0);
+	// y-axis.
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex3d(0.0, 0.0, 0.0);
+	glVertex3d(0.0, length, 0.0);
+	// z-axis.
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3d(0.0, 0.0, 0.0);
+	glVertex3d(0.0, 0.0, length);
+	glEnd();
+	glPopAttrib();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -523,65 +559,65 @@ void DrawAxes( double length )
 // interpolated to the newly created vertices.
 /////////////////////////////////////////////////////////////////////////////
 
-void SubdivideAndDrawQuad( int uSteps, int vSteps,
-                           float s0, float t0, float x0, float y0, float z0,
-                           float s1, float t1, float x1, float y1, float z1,
-                           float s2, float t2, float x2, float y2, float z2,
-                           float s3, float t3, float x3, float y3, float z3 )
+void SubdivideAndDrawQuad(int uSteps, int vSteps,
+	float s0, float t0, float x0, float y0, float z0,
+	float s1, float t1, float x1, float y1, float z1,
+	float s2, float t2, float x2, float y2, float z2,
+	float s3, float t3, float x3, float y3, float z3)
 {
-    float tc0[3] = { s0, t0, 0.0 };  float v0[3] = { x0, y0, z0 };
-    float tc1[3] = { s1, t1, 0.0 };  float v1[3] = { x1, y1, z1 };
-    float tc2[3] = { s2, t2, 0.0 };  float v2[3] = { x2, y2, z2 };
-    float tc3[3] = { s3, t3, 0.0 };  float v3[3] = { x3, y3, z3 };
+	float tc0[3] = { s0, t0, 0.0 };  float v0[3] = { x0, y0, z0 };
+	float tc1[3] = { s1, t1, 0.0 };  float v1[3] = { x1, y1, z1 };
+	float tc2[3] = { s2, t2, 0.0 };  float v2[3] = { x2, y2, z2 };
+	float tc3[3] = { s3, t3, 0.0 };  float v3[3] = { x3, y3, z3 };
 
-    glBegin( GL_QUADS );
+	glBegin(GL_QUADS);
 
-    for ( int u = 0; u < uSteps; u++ )
-    {
-        float uu = (float) u / uSteps;
-        float uu1 = (float) (u + 1) / uSteps;
-        float Atc[3], Btc[3], Ctc[3], Dtc[3];
-        float Av[3], Bv[3], Cv[3], Dv[3];
+	for (int u = 0; u < uSteps; u++)
+	{
+		float uu = (float)u / uSteps;
+		float uu1 = (float)(u + 1) / uSteps;
+		float Atc[3], Btc[3], Ctc[3], Dtc[3];
+		float Av[3], Bv[3], Cv[3], Dv[3];
 
-        for ( int i = 0; i < 3; i++ )
-        {
-            Atc[i] = tc0[i] + uu  * ( tc1[i] - tc0[i] );
-            Btc[i] = tc3[i] + uu  * ( tc2[i] - tc3[i] );
-            Ctc[i] = tc0[i] + uu1 * ( tc1[i] - tc0[i] );
-            Dtc[i] = tc3[i] + uu1 * ( tc2[i] - tc3[i] );
-            Av[i] = v0[i] + uu  * ( v1[i] - v0[i] );
-            Bv[i] = v3[i] + uu  * ( v2[i] - v3[i] );
-            Cv[i] = v0[i] + uu1 * ( v1[i] - v0[i] );
-            Dv[i] = v3[i] + uu1 * ( v2[i] - v3[i] );
-        }
+		for (int i = 0; i < 3; i++)
+		{
+			Atc[i] = tc0[i] + uu  * (tc1[i] - tc0[i]);
+			Btc[i] = tc3[i] + uu  * (tc2[i] - tc3[i]);
+			Ctc[i] = tc0[i] + uu1 * (tc1[i] - tc0[i]);
+			Dtc[i] = tc3[i] + uu1 * (tc2[i] - tc3[i]);
+			Av[i] = v0[i] + uu  * (v1[i] - v0[i]);
+			Bv[i] = v3[i] + uu  * (v2[i] - v3[i]);
+			Cv[i] = v0[i] + uu1 * (v1[i] - v0[i]);
+			Dv[i] = v3[i] + uu1 * (v2[i] - v3[i]);
+		}
 
-        for ( int v = 0; v < vSteps; v++ )
-        {
-            float vv = (float) v / vSteps;
-            float vv1 = (float) (v + 1) / vSteps;
-            float Etc[3], Ftc[3], Gtc[3], Htc[3];
-            float Ev[3], Fv[3], Gv[3], Hv[3];
+		for (int v = 0; v < vSteps; v++)
+		{
+			float vv = (float)v / vSteps;
+			float vv1 = (float)(v + 1) / vSteps;
+			float Etc[3], Ftc[3], Gtc[3], Htc[3];
+			float Ev[3], Fv[3], Gv[3], Hv[3];
 
-            for ( int i = 0; i < 3; i++ )
-            {
-                Etc[i] = Atc[i] + vv  * ( Btc[i] - Atc[i] );
-                Ftc[i] = Ctc[i] + vv  * ( Dtc[i] - Ctc[i] );
-                Gtc[i] = Atc[i] + vv1 * ( Btc[i] - Atc[i] );
-                Htc[i] = Ctc[i] + vv1 * ( Dtc[i] - Ctc[i] );
-                Ev[i] = Av[i] + vv  * ( Bv[i] - Av[i] );
-                Fv[i] = Cv[i] + vv  * ( Dv[i] - Cv[i] );
-                Gv[i] = Av[i] + vv1 * ( Bv[i] - Av[i] );
-                Hv[i] = Cv[i] + vv1 * ( Dv[i] - Cv[i] );
-            }
+			for (int i = 0; i < 3; i++)
+			{
+				Etc[i] = Atc[i] + vv  * (Btc[i] - Atc[i]);
+				Ftc[i] = Ctc[i] + vv  * (Dtc[i] - Ctc[i]);
+				Gtc[i] = Atc[i] + vv1 * (Btc[i] - Atc[i]);
+				Htc[i] = Ctc[i] + vv1 * (Dtc[i] - Ctc[i]);
+				Ev[i] = Av[i] + vv  * (Bv[i] - Av[i]);
+				Fv[i] = Cv[i] + vv  * (Dv[i] - Cv[i]);
+				Gv[i] = Av[i] + vv1 * (Bv[i] - Av[i]);
+				Hv[i] = Cv[i] + vv1 * (Dv[i] - Cv[i]);
+			}
 
-            glTexCoord2fv( Etc );  glVertex3fv( Ev );
-            glTexCoord2fv( Ftc );  glVertex3fv( Fv );
-            glTexCoord2fv( Htc );  glVertex3fv( Hv );
-            glTexCoord2fv( Gtc );  glVertex3fv( Gv );
-        }
-    }
+			glTexCoord2fv(Etc);  glVertex3fv(Ev);
+			glTexCoord2fv(Ftc);  glVertex3fv(Fv);
+			glTexCoord2fv(Htc);  glVertex3fv(Hv);
+			glTexCoord2fv(Gtc);  glVertex3fv(Gv);
+		}
+	}
 
-    glEnd();
+	glEnd();
 }
 
 void DrawEarth(void)
@@ -599,10 +635,10 @@ void DrawEarth(void)
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D, earthTexObj);
-	
+
 	glDisable(GL_CULL_FACE);  // Disable back-face culling.
 
-	//draw earth
+							  //draw earth
 	glPushMatrix();
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, GL_TRUE);
@@ -612,7 +648,7 @@ void DrawEarth(void)
 	//draw satellite
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glPushMatrix();
-	glTranslated(satX.back() / 6431, satY.back() / 6431, satZ.back() / 6431);
+	glTranslated(satX.at(counter) / 6431, satY.at(counter) / 6431, satZ.at(counter) / 6431);
 	//glutSolidSphere(0.05, 32, 16);
 	glScalef(0.05, 0.05, 0.05);
 	DrawSatellite();
@@ -620,13 +656,21 @@ void DrawEarth(void)
 
 	glEnable(GL_CULL_FACE);	// Enable back-face culling.
 
-	// Draw axes.
+							// Draw axes.
 	if (drawAxes) DrawAxes(2);
 }
 
 //draw satellite
 void DrawSatellite(void)
 {
+
+	if (counter > 0)
+	{
+		glRotated(thetaX.at(counter) - thetaX.at(counter - 1), 1, 0, 0);
+		glRotated(thetaY.at(counter) - thetaY.at(counter - 1), 0, 1, 0);
+		glRotated(thetaZ.at(counter) - thetaZ.at(counter - 1), 0, 0, 1);
+		cout << "rotating" << endl;
+	}
 
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
 	GLfloat matDiffuse1[] = { 1.0, 0.0, 0.0, 0.0 };
@@ -687,7 +731,7 @@ void DrawSatellite(void)
 		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS);
-	
+
 	glPopMatrix();
 
 	// Draw axes.
@@ -697,11 +741,13 @@ void DrawSatellite(void)
 //reading from .txt files
 void getData(string fileName)
 {
+	double temp;
 	infile.open(fileName);
-	while (!infile.eof())
+	//while (!infile.eof())
+	while (infile >> temp)
 	{
-		double temp;
-		infile >> temp;
+		//double temp;
+		//infile >> temp;
 		if (fileName == "satX.txt")
 		{
 			satX.push_back(temp);
@@ -726,6 +772,31 @@ void getData(string fileName)
 		{
 			qZ.push_back(temp);
 		}
+		else if (fileName == "thetaX.txt")
+		{
+			thetaX.push_back(temp);
+		}
+		else if (fileName == "thetaY.txt")
+		{
+			thetaY.push_back(temp);
+		}
+		else if (fileName == "thetaZ.txt")
+		{
+			thetaZ.push_back(temp);
+		}
 	}
 	infile.close();
+}
+
+void updateScene(void)
+{
+	//translate satellite in main window
+	//rotate satellite in satellite window
+	//update display of data
+	if (counter != satX.max_size() - 1)
+	{
+		counter++;
+	}
+	cout << "counter = " << counter << endl;
+	glutPostRedisplay();
 }
