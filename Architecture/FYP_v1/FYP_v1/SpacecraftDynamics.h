@@ -19,7 +19,6 @@ private:
 	double spaceTorqueX, spaceTorqueY, spaceTorqueZ;
 	double reactionTorqueX, reactionTorqueY, reactionTorqueZ;
 	double q0, qX, qY, qZ;
-	double vector0Initial, vectorXInitial, vectorYInitial, vectorZInitial;
 	double vector0, vectorX, vectorY, vectorZ;
 	double q0Inverse, qXInverse, qYInverse, qZInverse;
 	double thetaX, thetaY, thetaZ;
@@ -90,10 +89,6 @@ public:
 	double getQXInverse();
 	double getQYInverse();
 	double getQZInverse();
-	double getVector0Initial();
-	double getVectorXInitial();
-	double getVectorYInitial();
-	double getVectorZInitial();
 	double getVector0();
 	double getVectorX();
 	double getVectorY();
