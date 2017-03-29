@@ -116,12 +116,6 @@ vector<double> qX;
 vector<double> qY;
 vector<double> qZ;
 
-
-//theta values
-vector<double> thetaX;
-vector<double> thetaY;
-vector<double> thetaZ;
-
 //window id
 int satelliteWindow;
 int mainWindow;
@@ -439,17 +433,9 @@ int main( int argc, char** argv )
 	getData("satX.txt");
 	getData("satY.txt");
 	getData("satZ.txt");
-	cout << "sat done" << endl;
-
 	getData("qX.txt");
 	getData("qY.txt");
 	getData("qZ.txt");
-	cout << "q done" << endl;
-	
-	getData("thetaX.txt");
-	getData("thetaY.txt");
-	getData("thetaZ.txt");
-	cout << "theta done" << endl;
 
 	// Initialize GLUT and create window.
     glutInit( &argc, argv );
@@ -663,14 +649,6 @@ void DrawEarth(void)
 //draw satellite
 void DrawSatellite(void)
 {
-	
-	if (counter > 0)
-	{
-		glRotated(thetaX.at(counter) - thetaX.at(counter - 1), 1, 0, 0);
-		glRotated(thetaY.at(counter) - thetaY.at(counter - 1), 0, 1, 0);
-		glRotated(thetaZ.at(counter) - thetaZ.at(counter - 1), 0, 0, 1);
-		cout << "rotating" << endl;
-	}
 
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
 	GLfloat matDiffuse1[] = { 1.0, 0.0, 0.0, 0.0 };
@@ -741,13 +719,11 @@ void DrawSatellite(void)
 //reading from .txt files
 void getData(string fileName)
 {
-	double temp;
 	infile.open(fileName);
-	//while (!infile.eof())
-	while (infile >> temp)
+	while (!infile.eof())
 	{
-		//double temp;
-		//infile >> temp;
+		double temp;
+		infile >> temp;
 		if (fileName == "satX.txt")
 		{
 			satX.push_back(temp);
@@ -771,18 +747,6 @@ void getData(string fileName)
 		else if (fileName == "qZ.txt")
 		{
 			qZ.push_back(temp);
-		}
-		else if (fileName == "thetaX.txt")
-		{
-			thetaX.push_back(temp);
-		}
-		else if (fileName == "thetaY.txt")
-		{
-			thetaY.push_back(temp);
-		}
-		else if (fileName == "thetaZ.txt")
-		{
-			thetaZ.push_back(temp);
 		}
 	}
 	infile.close();
