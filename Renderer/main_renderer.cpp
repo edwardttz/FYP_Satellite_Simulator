@@ -65,7 +65,7 @@ const GLfloat light1Position[] = { -2.0, 10.0, -2.0, 1.0 };
 const char earthTexFile[] = "images/earth.jpg";
 
 //counter for displaying
-int counter = 0;
+int counter = 111590;
 
 //other vars
 bool pauseAnimation = false;
@@ -478,6 +478,7 @@ int main(int argc, char** argv)
 	printf("Press 'P' to toggle animation.\n");
 	printf("Press 'R' to reset to initial view.\n");
 	printf("Press 'Q' to quit.\n\n");
+
 	/*
 	cout << "qX.front = " << qX.front() << endl;
 	cout << "qX.back = " << qX.back() << endl;
@@ -645,9 +646,11 @@ void DrawSatellite(void)
 		glRotated(thetaX.at(counter) - thetaX.at(counter - 1), 1, 0, 0);
 		glRotated(thetaY.at(counter) - thetaY.at(counter - 1), 0, 1, 0);
 		glRotated(thetaZ.at(counter) - thetaZ.at(counter - 1), 0, 0, 1);
+		/*
 		cout << "rotating by (" << thetaX.at(counter) - thetaX.at(counter - 1)
 			<< "," << thetaY.at(counter) - thetaY.at(counter - 1)
 			<< "," << thetaZ.at(counter) - thetaZ.at(counter - 1) << ")" << endl;
+			*/
 	}
 
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
@@ -771,10 +774,14 @@ void updateScene(void)
 	//translate satellite in main window
 	//rotate satellite in satellite window
 	//update display of data
-	if (counter != satX.max_size() - 1)
+	if (counter < satX.size() - 1)
 	{
 		counter++;
 	}
-	//cout << "counter = " << counter << endl;
+
+	else
+	{
+		pauseAnimation = true;
+	}
 	glutPostRedisplay();
 }
