@@ -3,8 +3,6 @@
 #include <vector>
 #include <cmath>
 
-#define PI                  3.1415926535897932384626433832795
-
 using namespace std;
 
 SpacecraftDynamics::SpacecraftDynamics() 
@@ -291,10 +289,6 @@ void SpacecraftDynamics::setVectorInitialValues(double v0, double vX, double vY,
 	vectorX = vX;
 	vectorY = vY;
 	vectorZ = vZ;
-	vector0Initial = v0;
-	vectorXInitial = vX;
-	vectorYInitial = vY;
-	vectorZInitial = vZ;
 }
 
 double SpacecraftDynamics::getVelocityX()
@@ -411,27 +405,6 @@ double SpacecraftDynamics::getQZInverse()
 {
 	return qZInverse;
 }
-
-double SpacecraftDynamics::getVector0Initial()
-{
-	return vector0Initial;
-}
-
-double SpacecraftDynamics::getVectorXInitial()
-{
-	return vectorXInitial;
-}
-
-double SpacecraftDynamics::getVectorYInitial()
-{
-	return vectorYInitial;
-}
-
-double SpacecraftDynamics::getVectorZInitial()
-{
-	return vectorZInitial;
-}
-
 double SpacecraftDynamics::getVector0()
 {
 	return vector0;
@@ -526,7 +499,7 @@ void SpacecraftDynamics::findNextVector()
 	qXInverse = quaternionXInverse_temp;
 	qYInverse = quaternionYInverse_temp;
 	qZInverse = quaternionZInverse_temp;
-	/*
+
 	//multiply between vector and inverse of quaternion
 	double quaternion0Value_temp = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
 		getVector0(), getVectorX(), getVectorY(), getVectorZ());
@@ -539,20 +512,6 @@ void SpacecraftDynamics::findNextVector()
 
 	double quaternionZValue_temp = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
 		getVector0(), getVectorX(), getVectorY(), getVectorZ());
-		*/
-
-	//multiply between vector initial and inverse of quaternion
-	double quaternion0Value_temp = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
-
-	double quaternionXValue_temp = quaternionXMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
-
-	double quaternionYValue_temp = quaternionYMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
-
-	double quaternionZValue_temp = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
 
 	//multiply between quaternion and product of vector and inverse of quaternion
 	double vector0_next = quaternion0Mulitplication(quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp,
@@ -575,62 +534,7 @@ void SpacecraftDynamics::findNextVector()
 
 void SpacecraftDynamics::findThetaValues()
 {
-	double qX_temp = getQuaternionX();
-	double qY_temp = getQuaternionY();
-	double qZ_temp = getQuaternionZ();
-
-	//qX
-	if (getQuaternionX() > 1)
-	{
-		qX_temp = getQuaternionX() - 1;
-		thetaX = (180 *  (-2 * asin(qX_temp) + 1)) / PI;
-	}
-	/*
-	else if (getQuaternionX() < -1)
-	{
-		qX_temp = getQuaternionX() + 1;
-		thetaX = (180 * (-2 * asin(qX_temp) + 1)) / PI;
-	}
-	*/
-	else
-	{
-		thetaX = ( 180 * (-2 * asin(getQuaternionX()))) / PI;
-	}
-
-	//qY
-	if (getQuaternionY() > 1)
-	{
-		qY_temp = getQuaternionY() - 1;
-		thetaY = (180 * (-2 * asin(qY_temp) + 1)) / PI;
-	}
-	/*
-	else if (getQuaternionX() < -1)
-	{
-		qY_temp = getQuaternionY() + 1;
-		thetaY = (180 * (-2 * asin(qY_temp) + 1)) / PI;
-	}
-	*/
-	else
-	{
-		thetaY = (180 * (-2 * asin(getQuaternionY()))) / PI;
-	}
-
-	//qZ
-	if (getQuaternionZ() > 1)
-	{
-		qZ_temp = getQuaternionZ() - 1;
-		thetaZ = (180 * (-2 * asin(qZ_temp) + 1)) / PI;
-	}
-	/*
-	else if (getQuaternionZ() < -1)
-	{
-		qZ_temp = getQuaternionZ() + 1;
-		thetaZ = (180 * (-2 * asin(qZ_temp) + 1)) / PI;
-	}
-	*/
-	else
-	{
-		thetaZ = (180 * (-2 * asin(getQuaternionZ()))) / PI;
-	}
-
+	thetaX = -2 * asin(getQuaternionX());
+	thetaY = -2 * asin(getQuaternionY());
+	thetaZ = -2 * asin(getQuaternionZ());
 }
