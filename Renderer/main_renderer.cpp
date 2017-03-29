@@ -729,10 +729,3 @@ void getData(string fileName)
 	}
 	infile.close();
 }
-
-void updateScene(int counter)
-{
-	//translate satellite in main window
-	//rotate satellite in satellite window
-	//update display of data
-}
