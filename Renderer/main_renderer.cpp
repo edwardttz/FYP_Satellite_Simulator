@@ -4,7 +4,9 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <cstring>
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "image_io.h"
@@ -37,7 +39,7 @@ using namespace std;
 #define LOOKAT_Y            0.0     // Look-at point y coordinate.
 #define LOOKAT_Z            0.0     // Look-at point z coordinate.
 
-#define EYE_INIT_DIST       5.0     // Initial distance of eye from look-at point.
+#define EYE_INIT_DIST       4.0     // Initial distance of eye from look-at point.
 #define EYE_DIST_INCR       0.2     // Distance increment when changing eye's distance.
 #define EYE_MIN_DIST        0.1     // Min eye's distance from look-at point.
 
@@ -65,7 +67,7 @@ const GLfloat light1Position[] = { -2.0, 10.0, -2.0, 1.0 };
 const char earthTexFile[] = "images/earth.jpg";
 
 //counter for displaying
-int counter = 111590;
+int counter = 111000;
 
 //other vars
 bool pauseAnimation = false;
@@ -135,7 +137,19 @@ void DrawEarth(void);
 void DrawSatellite(void);
 void getData(string);
 void updateScene(void);
+string convertToString(double);
+void printData(void);
 
+
+void renderBitmapString(float x,float y,float z,void *font,char *string)
+{
+	char *c;
+	glRasterPos3f(x, y, z);
+	for (c = string; *c != '\0'; c++)
+	{
+		glutBitmapCharacter(font, *c);
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // The display callback function.
@@ -185,6 +199,9 @@ void EarthDrawing(void)
 		DrawAxes(2);
 	}
 	DrawSatellite();
+
+	glViewport(0, 0, winWidth, winHeight / 2);
+	printData();
 
 	glutSwapBuffers();
 }
@@ -408,6 +425,7 @@ void SetUpTextureMaps(void)
 	DeallocateImageData(&imageData);
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // The main function.
 /////////////////////////////////////////////////////////////////////////////
@@ -420,10 +438,12 @@ int main(int argc, char** argv)
 	getData("satZ.txt");
 	cout << "sat done" << endl;
 
+	/*
 	getData("qX.txt");
 	getData("qY.txt");
 	getData("qZ.txt");
 	cout << "q done" << endl;
+	*/
 
 	getData("thetaX.txt");
 	getData("thetaY.txt");
@@ -784,4 +804,38 @@ void updateScene(void)
 		pauseAnimation = true;
 	}
 	glutPostRedisplay();
+}
+
+string convertToString(double value)
+{
+	ostringstream ss;
+	ss << value;
+	return ss.str();
+}
+
+void printData(void)
+{
+	string satXToPrint = convertToString(satX.at(counter));
+	char *satXBuf = new char[strlen(satXToPrint.c_str())];
+	strcpy(satXBuf, satXToPrint.c_str());
+
+	string satYToPrint = convertToString(satY.at(counter));
+	char *satYBuf = new char[strlen(satYToPrint.c_str())];
+	strcpy(satYBuf, satYToPrint.c_str());
+
+	string satZToPrint = convertToString(satZ.at(counter));
+	char *satZBuf = new char[strlen(satZToPrint.c_str())];
+	strcpy(satZBuf, satZToPrint.c_str());
+
+	void *font = GLUT_BITMAP_TIMES_ROMAN_24;
+	renderBitmapString(0, -2, 1.2, font, "TLE");
+	renderBitmapString(0, -2, 1, font, "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992");
+	renderBitmapString(0, -2, 0.8, font, "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954");
+	renderBitmapString(0, -2, 0.6, font, "Singapore UTC+8: 17/10/2016  10:50:42 AM");
+	renderBitmapString(0, -2, 0, font, "satX = ");
+	renderBitmapString(0, -1.7, 0, font, (char *)satXBuf);
+	renderBitmapString(0, -2, -0.5, font, "satY = ");
+	renderBitmapString(0, -1.7, -0.5, font, (char *)satYBuf);
+	renderBitmapString(0, -2, -1, font, "satZ = ");
+	renderBitmapString(0, -1.7, -1, font, (char *)satZBuf);
 }
