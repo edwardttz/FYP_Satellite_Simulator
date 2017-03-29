@@ -46,7 +46,6 @@ using namespace std;
 #define EYE_LATITUDE_INCR   2.0     // Degree increment when changing eye's latitude.
 #define EYE_LONGITUDE_INCR  2.0     // Degree increment when changing eye's longitude.
 
-#define DESIRED_FPS 60
 
 // Light 0.
 const GLfloat light0Ambient[] = { 0.2, 0.2, 0.2, 1.0 };
@@ -66,9 +65,6 @@ const char earthTexFile[] = "images/earth.jpg";
 
 //counter for displaying
 int counter = 0;
-
-//other vars
-bool pauseAnimation = false;
 
 
 
@@ -128,7 +124,6 @@ void DrawAxes( double length );
 void DrawEarth(void);
 void DrawSatellite(void);
 void getData(string);
-void updateScene(void);
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -208,16 +203,6 @@ void SatelliteDrawing(void)
 	glutSwapBuffers();
 }
 
-//timer function for animation
-void MyTimer(int v)
-{
-	if (!pauseAnimation)
-	{
-		updateScene();
-		glutTimerFunc(1000 / DESIRED_FPS, MyTimer, v);
-	}
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // The keyboard callback function.
 /////////////////////////////////////////////////////////////////////////////
@@ -249,12 +234,6 @@ void EarthKeyboard( unsigned char key, int x, int y )
             drawAxes = !drawAxes;
             glutPostRedisplay();
             break;
-		// Pause or resume animation.
-		case 'p':
-		case 'P':
-			pauseAnimation = !pauseAnimation;
-			if (!pauseAnimation) glutTimerFunc(0, MyTimer, 0);
-			break;
 
         // Toggle texture mapping.
         case 't':
@@ -448,7 +427,6 @@ int main( int argc, char** argv )
     glutReshapeFunc(MyReshape);
     glutKeyboardFunc(EarthKeyboard);
     glutSpecialFunc(EarthSpecialKey);
-	glutTimerFunc(50, MyTimer, 0);
 
 	// Setup the initial render context.
 	GLInit();
@@ -482,7 +460,6 @@ int main( int argc, char** argv )
     printf( "Press 'W' to toggle wireframe.\n" );
     printf( "Press 'T' to toggle texture mapping.\n" );
     printf( "Press 'X' to toggle axes.\n" );
-	printf("Press 'P' to toggle animation.\n");
     printf( "Press 'R' to reset to initial view.\n" );
     printf( "Press 'Q' to quit.\n\n" );
 	/*
@@ -499,6 +476,7 @@ int main( int argc, char** argv )
 	cout << "satZ.front = " << satZ.front() << endl;
 	cout << "satZ.back = " << satZ.back() << endl;
 	*/
+	cout << "counter = " << counter << endl;
 
 // Enter GLUT event loop.
 
@@ -621,7 +599,7 @@ void DrawEarth(void)
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D, earthTexObj);
-
+	
 	glDisable(GL_CULL_FACE);  // Disable back-face culling.
 
 	//draw earth
@@ -634,7 +612,7 @@ void DrawEarth(void)
 	//draw satellite
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glPushMatrix();
-	glTranslated(satX.at(counter) / 6431, satY.at(counter) / 6431, satZ.at(counter) / 6431);
+	glTranslated(satX.back() / 6431, satY.back() / 6431, satZ.back() / 6431);
 	//glutSolidSphere(0.05, 32, 16);
 	glScalef(0.05, 0.05, 0.05);
 	DrawSatellite();
@@ -752,15 +730,9 @@ void getData(string fileName)
 	infile.close();
 }
 
-void updateScene(void)
+void updateScene(int counter)
 {
 	//translate satellite in main window
 	//rotate satellite in satellite window
 	//update display of data
-	if (counter != satX.max_size() - 1)
-	{
-		counter++;
-	}
-	cout << "counter = " << counter << endl;
-	glutPostRedisplay();
 }
