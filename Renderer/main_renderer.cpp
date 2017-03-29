@@ -168,10 +168,22 @@ void EarthDrawing(void)
 	glLightfv(GL_LIGHT0, GL_POSITION, light0Position);
 	glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
 
+	//switch viewport to earth
 	glViewport(0, winHeight / 2, winWidth / 2, winHeight / 2);
+	// Draw axes.
+	if (drawAxes)
+	{
+		DrawAxes(2);
+	}
 	DrawEarth();
 
+	//switch viewport to satellite
 	glViewport(winWidth / 2, winHeight / 2, winWidth / 2, winHeight / 2);
+	// Draw axes.
+	if (drawAxes)
+	{
+		DrawAxes(2);
+	}
 	DrawSatellite();
 
 	glutSwapBuffers();
@@ -180,39 +192,6 @@ void EarthDrawing(void)
 /////////////////////////////////////////////////////////////////////////////
 // The display callback function.
 /////////////////////////////////////////////////////////////////////////////
-
-void SatelliteDrawing(void)
-{
-	glDisable(GL_TEXTURE_2D);
-
-	// Compute world-space eye position from eyeLatitude, eyeLongitude, eyeDistance, and look-at point.
-	eyePos[2] = eyeDistance * sin(eyeLatitude * PI / 180.0) + LOOKAT_Z;
-	double xy = eyeDistance * cos(eyeLatitude * PI / 180.0);
-	eyePos[0] = xy * cos(eyeLongitude * PI / 180.0) + LOOKAT_X;
-	eyePos[1] = xy * sin(eyeLongitude * PI / 180.0) + LOOKAT_Y;
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0, (double)winWidth / winHeight, EYE_MIN_DIST, eyeDistance + SCENE_RADIUS);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(eyePos[0], eyePos[1], eyePos[2], LOOKAT_X, LOOKAT_Y, LOOKAT_Z, 0.0, 0.0, 1.0);
-
-	// Set world-space positions of the two lights.
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Position);
-	glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
-
-	// Draw axes.
-	if (drawAxes) DrawAxes(2);
-
-	// Draw scene.
-	DrawSatellite();
-
-	glutSwapBuffers();
-}
 
 //timer function for animation
 void MyTimer(int v)
@@ -655,9 +634,6 @@ void DrawEarth(void)
 	glPopMatrix();
 
 	glEnable(GL_CULL_FACE);	// Enable back-face culling.
-
-							// Draw axes.
-	if (drawAxes) DrawAxes(2);
 }
 
 //draw satellite
@@ -669,7 +645,9 @@ void DrawSatellite(void)
 		glRotated(thetaX.at(counter) - thetaX.at(counter - 1), 1, 0, 0);
 		glRotated(thetaY.at(counter) - thetaY.at(counter - 1), 0, 1, 0);
 		glRotated(thetaZ.at(counter) - thetaZ.at(counter - 1), 0, 0, 1);
-		cout << "rotating" << endl;
+		cout << "rotating by (" << thetaX.at(counter) - thetaX.at(counter - 1)
+			<< "," << thetaY.at(counter) - thetaY.at(counter - 1)
+			<< "," << thetaZ.at(counter) - thetaZ.at(counter - 1) << ")" << endl;
 	}
 
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
@@ -735,7 +713,7 @@ void DrawSatellite(void)
 	glPopMatrix();
 
 	// Draw axes.
-	if (drawAxes) DrawAxes(2);
+	//if (drawAxes) DrawAxes(2);
 }
 
 //reading from .txt files
@@ -797,6 +775,6 @@ void updateScene(void)
 	{
 		counter++;
 	}
-	cout << "counter = " << counter << endl;
+	//cout << "counter = " << counter << endl;
 	glutPostRedisplay();
 }
