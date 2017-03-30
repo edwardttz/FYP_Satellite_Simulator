@@ -110,15 +110,20 @@ bool drawAxes = true;           // Draw world coordinate frame axes iff true.
 bool drawWireframe = false;     // Draw polygons in wireframe if true, otherwise polygons are filled.
 bool hasTexture = true;         // Toggle texture mapping.
 
-								//satellite position
+//satellite position
 vector<double> satX;
 vector<double> satY;
 vector<double> satZ;
 
-//quaternion values
-vector<double> qX;
-vector<double> qY;
-vector<double> qZ;
+//angular velocity values
+vector<double> wX;
+vector<double> wY;
+vector<double> wZ;
+
+//angular acceleration values
+vector<double> aX;
+vector<double> aY;
+vector<double> aZ;
 
 
 //theta values
@@ -145,6 +150,7 @@ void updateScene(void);
 string convertToString(double);
 void printData(void);
 double getAngleOfRotation(int);
+double getAngleOfRotation(char);
 
 
 void renderBitmapString(float x,float y,float z,void *font,char *string)
@@ -281,6 +287,16 @@ void EarthKeyboard(unsigned char key, int x, int y)
 		eyeLatitude = 0.0;
 		eyeLongitude = 0.0;
 		eyeDistance = EYE_INIT_DIST;
+		glutPostRedisplay();
+		break;
+
+		//restart animation
+	case 'e':
+	case 'E':
+		counter = 0;
+		thetaXCumulative = thetaX.at(counter);
+		thetaYCumulative = thetaY.at(counter);
+		thetaZCumulative = thetaZ.at(counter);
 		glutPostRedisplay();
 		break;
 	}
@@ -453,6 +469,17 @@ int main(int argc, char** argv)
 	getData("thetaZ.txt");
 	cout << "theta done" << endl;
 
+	getData("wX.txt");
+	getData("wY.txt");
+	getData("wZ.txt");
+	cout << "velocity done" << endl;
+
+	getData("aX.txt");
+	getData("aY.txt");
+	getData("aZ.txt");
+	cout << "acceleration done" << endl;
+
+	//set initial theta
 	thetaXCumulative = thetaX.at(counter);
 	thetaYCumulative = thetaY.at(counter);
 	thetaZCumulative = thetaZ.at(counter);
@@ -503,22 +530,8 @@ int main(int argc, char** argv)
 	printf("Press 'X' to toggle axes.\n");
 	printf("Press 'P' to toggle animation.\n");
 	printf("Press 'R' to reset to initial view.\n");
+	printf("Press 'E' to restart simulation.\n");
 	printf("Press 'Q' to quit.\n\n");
-
-	/*
-	cout << "qX.front = " << qX.front() << endl;
-	cout << "qX.back = " << qX.back() << endl;
-	cout << "qY.front = " << qY.front() << endl;
-	cout << "qY.back = " << qY.back() << endl;
-	cout << "qZ.front = " << qZ.front() << endl;
-	cout << "qZ.back = " << qZ.back() << endl;
-	cout << "satX.front = " << satX.front() << endl;
-	cout << "satX.back = " << satX.back() << endl;
-	cout << "satY.front = " << satY.front() << endl;
-	cout << "satY.back = " << satY.back() << endl;
-	cout << "satZ.front = " << satZ.front() << endl;
-	cout << "satZ.back = " << satZ.back() << endl;
-	*/
 
 	// Enter GLUT event loop.
 
@@ -673,19 +686,9 @@ void DrawSatellite(void)
 		glRotated(getAngleOfRotation(0), 1, 0, 0);
 		glRotated(getAngleOfRotation(1), 0, 1, 0);
 		glRotated(getAngleOfRotation(2), 0, 0, 1);
-		cout << thetaXCumulative << endl;
-		cout << thetaYCumulative << endl;
-		cout << thetaZCumulative << endl;
-
-		cout << counter << endl;
-
-
-		/*
-		cout << "rotating by (" << getAngleOfRotation(0)
-			<< "," << getAngleOfRotation(1)
-			<< "," << getAngleOfRotation(2)
-			<< ")" << endl;
-		*/
+		//glRotated(getAngleOfRotation('x'), 1, 0, 0);
+		//glRotated(getAngleOfRotation('y'), 0, 1, 0);
+		//glRotated(getAngleOfRotation('z'), 0, 0, 1);
 	}
 
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
@@ -776,17 +779,17 @@ void getData(string fileName)
 		{
 			satZ.push_back(temp);
 		}
-		else if (fileName == "qX.txt")
+		else if (fileName == "wX.txt")
 		{
-			qX.push_back(temp);
+			wX.push_back(temp);
 		}
-		else if (fileName == "qY.txt")
+		else if (fileName == "wY.txt")
 		{
-			qY.push_back(temp);
+			wY.push_back(temp);
 		}
-		else if (fileName == "qZ.txt")
+		else if (fileName == "wZ.txt")
 		{
-			qZ.push_back(temp);
+			wZ.push_back(temp);
 		}
 		else if (fileName == "thetaX.txt")
 		{
@@ -799,6 +802,18 @@ void getData(string fileName)
 		else if (fileName == "thetaZ.txt")
 		{
 			thetaZ.push_back(temp);
+		}
+		else if (fileName == "aX.txt")
+		{
+			aX.push_back(temp);
+		}
+		else if (fileName == "aY.txt")
+		{
+			aY.push_back(temp);
+		}
+		else if (fileName == "aZ.txt")
+		{
+			aZ.push_back(temp);
 		}
 	}
 	infile.close();
@@ -830,6 +845,7 @@ string convertToString(double value)
 
 void printData(void)
 {
+	//satellite position
 	string satXToPrint = convertToString(satX.at(counter));
 	char *satXBuf = new char[strlen(satXToPrint.c_str())];
 	strcpy(satXBuf, satXToPrint.c_str());
@@ -842,7 +858,7 @@ void printData(void)
 	char *satZBuf = new char[strlen(satZToPrint.c_str())];
 	strcpy(satZBuf, satZToPrint.c_str());
 
-	
+	//euler angle
 	string eulerXToPrint = convertToString(thetaX.at(counter));
 	char *eulerXBuf = new char[strlen(eulerXToPrint.c_str())];
 	strcpy(eulerXBuf, eulerXToPrint.c_str());
@@ -855,28 +871,79 @@ void printData(void)
 	char *eulerZBuf = new char[strlen(eulerZToPrint.c_str())];
 	strcpy(eulerZBuf, eulerZToPrint.c_str());
 
+	//angular velocity
+	string wXToPrint = convertToString(wX.at(counter));
+	char *wXBuf = new char[strlen(wXToPrint.c_str())];
+	strcpy(wXBuf, wXToPrint.c_str());
+
+	string wYToPrint = convertToString(wY.at(counter));
+	char *wYBuf = new char[strlen(wYToPrint.c_str())];
+	strcpy(wYBuf, wYToPrint.c_str());
+
+	string wZToPrint = convertToString(wZ.at(counter));
+	char *wZBuf = new char[strlen(wZToPrint.c_str())];
+	strcpy(wZBuf, wZToPrint.c_str());
+
+	//angular acceleration
+	string aXToPrint = convertToString(aX.at(counter));
+	char *aXBuf = new char[strlen(aXToPrint.c_str())];
+	strcpy(aXBuf, aXToPrint.c_str());
+
+	string aYToPrint = convertToString(aY.at(counter));
+	char *aYBuf = new char[strlen(aYToPrint.c_str())];
+	strcpy(aYBuf, aYToPrint.c_str());
+
+	string aZToPrint = convertToString(aZ.at(counter));
+	char *aZBuf = new char[strlen(aZToPrint.c_str())];
+	strcpy(aZBuf, aZToPrint.c_str());
+
+	//simulation time
+	string timerToPrint = convertToString(counter * 0.05);
+	char *timerBuf = new char[strlen(timerToPrint.c_str())];
+	strcpy(timerBuf, timerToPrint.c_str());
+
 	void *font = GLUT_BITMAP_TIMES_ROMAN_24;
 	//TLE
 	renderBitmapString(0, -2, 1.2, font, "TLE");
 	renderBitmapString(0, -2, 1, font, "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992");
 	renderBitmapString(0, -2, 0.8, font, "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954");
 	renderBitmapString(0, -2, 0.6, font, "Singapore UTC+8: 17/10/2016  10:50:42 AM");
+
+	//simulation time
+	renderBitmapString(0, -2, 0.3, font, "time (in s) = ");
+	renderBitmapString(0, -1.3, 0.3, font, (char *)timerBuf);
 	
 	//satpos
-	renderBitmapString(0, -2, 0, font, "satX = ");
-	renderBitmapString(0, -1.7, 0, font, (char *)satXBuf);
-	renderBitmapString(0, -2, -0.5, font, "satY = ");
-	renderBitmapString(0, -1.7, -0.5, font, (char *)satYBuf);
-	renderBitmapString(0, -2, -1, font, "satZ = ");
-	renderBitmapString(0, -1.7, -1, font, (char *)satZBuf);
+	renderBitmapString(0, -2, -0.1, font, "satX = ");
+	renderBitmapString(0, -1.7, -0.1, font, (char *)satXBuf);
+	renderBitmapString(0, -2, -0.6, font, "satY = ");
+	renderBitmapString(0, -1.7, -0.6, font, (char *)satYBuf);
+	renderBitmapString(0, -2, -1.1, font, "satZ = ");
+	renderBitmapString(0, -1.7, -1.1, font, (char *)satZBuf);
 
 	//euler
-	renderBitmapString(0, -1, 0, font, "eulerX = ");
-	renderBitmapString(0, -0.6, 0, font, (char *)eulerXBuf);
-	renderBitmapString(0, -1, -0.5, font, "eulerY = ");
-	renderBitmapString(0, -0.6, -0.5, font, (char *)eulerYBuf);
-	renderBitmapString(0, -1, -1, font, "eulerZ = ");
-	renderBitmapString(0, -0.6, -1, font, (char *)eulerZBuf);
+	renderBitmapString(0, -1, -0.1, font, "eulerX = ");
+	renderBitmapString(0, -0.6, -0.1, font, (char *)eulerXBuf);
+	renderBitmapString(0, -1, -0.6, font, "eulerY = ");
+	renderBitmapString(0, -0.6, -0.6, font, (char *)eulerYBuf);
+	renderBitmapString(0, -1, -1.1, font, "eulerZ = ");
+	renderBitmapString(0, -0.6, -1.1, font, (char *)eulerZBuf);
+
+	//velocity
+	renderBitmapString(0, 0, -0.1, font, "wX = ");
+	renderBitmapString(0, 0.25, -0.1, font, (char *)wXBuf);
+	renderBitmapString(0, 0, -0.6, font, "wY = ");
+	renderBitmapString(0, 0.25, -0.6, font, (char *)wYBuf);
+	renderBitmapString(0, 0, -1.1, font, "wZ = ");
+	renderBitmapString(0, 0.25, -1.1, font, (char *)wZBuf);
+
+	//acceleration
+	renderBitmapString(0, 1.0, -0.1, font, "aX = ");
+	renderBitmapString(0, 1.25, -0.1, font, (char *)aXBuf);
+	renderBitmapString(0, 1.0, -0.6, font, "aY = ");
+	renderBitmapString(0, 1.25, -0.6, font, (char *)aYBuf);
+	renderBitmapString(0, 1.0, -1.1, font, "aZ = ");
+	renderBitmapString(0, 1.25, -1.1, font, (char *)aZBuf);
 }
 
 double getAngleOfRotation(int axis)
@@ -917,5 +984,44 @@ double getAngleOfRotation(int axis)
 			return thetaZCumulative;
 		}
 	}
+}
 
+double getAngleOfRotation(char axis)
+{
+	if (counter > 0)
+	{
+		if (axis = 'x')
+		{
+			thetaXCumulative += (thetaX.at(counter) - thetaX.at(counter - 1));
+			return thetaXCumulative;
+		}
+		else if (axis = 'y')
+		{
+			thetaYCumulative += (thetaY.at(counter) - thetaY.at(counter - 1));
+			return thetaYCumulative;
+		}
+		else if (axis = 'z')
+		{
+			thetaZCumulative += (thetaZ.at(counter) - thetaZ.at(counter - 1));
+			return thetaZCumulative;
+		}
+	}
+	else
+	{
+		if (axis = 'x')
+		{
+			thetaXCumulative = thetaX.at(counter);
+			return thetaXCumulative;
+		}
+		else if (axis = 'y')
+		{
+			thetaYCumulative = thetaY.at(counter);
+			return thetaYCumulative;
+		}
+		else if (axis = 'z')
+		{
+			thetaZCumulative = thetaZ.at(counter);
+			return thetaZCumulative;
+		}
+	}
 }
