@@ -67,7 +67,7 @@ const GLfloat light1Position[] = { -2.0, 10.0, -2.0, 1.0 };
 const char earthTexFile[] = "images/earth.jpg";
 
 //counter for displaying
-int counter = 111000;
+int counter = 0;
 
 //other vars
 bool pauseAnimation = false;
@@ -123,6 +123,9 @@ vector<double> qZ;
 vector<double> thetaX;
 vector<double> thetaY;
 vector<double> thetaZ;
+double thetaXCumulative;
+double thetaYCumulative;
+double thetaZCumulative;
 
 //window id
 int satelliteWindow;
@@ -139,6 +142,7 @@ void getData(string);
 void updateScene(void);
 string convertToString(double);
 void printData(void);
+double getAngleOfRotation(int);
 
 
 void renderBitmapString(float x,float y,float z,void *font,char *string)
@@ -189,6 +193,7 @@ void EarthDrawing(void)
 	{
 		DrawAxes(2);
 	}
+	glEnable(GL_LIGHTING);
 	DrawEarth();
 
 	//switch viewport to satellite
@@ -198,9 +203,23 @@ void EarthDrawing(void)
 	{
 		DrawAxes(2);
 	}
+	glEnable(GL_LIGHTING);
 	DrawSatellite();
 
 	glViewport(0, 0, winWidth, winHeight / 2);
+	glDisable(GL_LIGHTING);
+	double eyePosZ = EYE_INIT_DIST * sin(0 * PI / 180.0) + LOOKAT_Z;
+	double newXY = EYE_INIT_DIST * cos(0 * PI / 180.0);
+	double eyePosX = newXY * cos(0 * PI / 180.0) + LOOKAT_X;
+	double eyePosY = newXY * sin(0 * PI / 180.0) + LOOKAT_Y;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (double)winWidth / winHeight, EYE_MIN_DIST, eyeDistance + SCENE_RADIUS);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(eyePosX, eyePosY, eyePosZ, LOOKAT_X, LOOKAT_Y, LOOKAT_Z, 0.0, 0.0, 1.0);
 	printData();
 
 	glutSwapBuffers();
@@ -232,17 +251,6 @@ void EarthKeyboard(unsigned char key, int x, int y)
 	case 'q':
 	case 'Q':
 		exit(0);
-		break;
-
-		// Toggle between wireframe and filled polygons.
-	case 'w':
-	case 'W':
-		drawWireframe = !drawWireframe;
-		if (drawWireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glutPostRedisplay();
 		break;
 
 		// Toggle axes.
@@ -432,23 +440,20 @@ void SetUpTextureMaps(void)
 
 int main(int argc, char** argv)
 {
-	//populate satX, satY, satZ, qX, qY and qZ
+	//populate satX, satY, satZ, thetaX, thetaY and thetaZ
 	getData("satX.txt");
 	getData("satY.txt");
 	getData("satZ.txt");
 	cout << "sat done" << endl;
 
-	/*
-	getData("qX.txt");
-	getData("qY.txt");
-	getData("qZ.txt");
-	cout << "q done" << endl;
-	*/
-
 	getData("thetaX.txt");
 	getData("thetaY.txt");
 	getData("thetaZ.txt");
 	cout << "theta done" << endl;
+
+	thetaXCumulative = thetaX.at(counter);
+	thetaYCumulative = thetaY.at(counter);
+	thetaZCumulative = thetaZ.at(counter);
 
 	// Initialize GLUT and create window.
 	glutInit(&argc, argv);
@@ -492,7 +497,6 @@ int main(int argc, char** argv)
 	printf("Press DOWN to move eye down.\n");
 	printf("Press SHIFT+UP to move closer.\n");
 	printf("Press SHIFT+DOWN to move further.\n");
-	printf("Press 'W' to toggle wireframe.\n");
 	printf("Press 'T' to toggle texture mapping.\n");
 	printf("Press 'X' to toggle axes.\n");
 	printf("Press 'P' to toggle animation.\n");
@@ -663,14 +667,22 @@ void DrawSatellite(void)
 
 	if (counter > 0)
 	{
-		glRotated(thetaX.at(counter) - thetaX.at(counter - 1), 1, 0, 0);
-		glRotated(thetaY.at(counter) - thetaY.at(counter - 1), 0, 1, 0);
-		glRotated(thetaZ.at(counter) - thetaZ.at(counter - 1), 0, 0, 1);
+		glRotated(getAngleOfRotation(0), 1, 0, 0);
+		glRotated(getAngleOfRotation(1), 0, 1, 0);
+		glRotated(getAngleOfRotation(2), 0, 0, 1);
+		cout << thetaXCumulative << endl;
+		cout << thetaYCumulative << endl;
+		cout << thetaZCumulative << endl;
+
+		cout << counter << endl;
+
+
 		/*
-		cout << "rotating by (" << thetaX.at(counter) - thetaX.at(counter - 1)
-			<< "," << thetaY.at(counter) - thetaY.at(counter - 1)
-			<< "," << thetaZ.at(counter) - thetaZ.at(counter - 1) << ")" << endl;
-			*/
+		cout << "rotating by (" << getAngleOfRotation(0)
+			<< "," << getAngleOfRotation(1)
+			<< "," << getAngleOfRotation(2)
+			<< ")" << endl;
+		*/
 	}
 
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
@@ -827,15 +839,80 @@ void printData(void)
 	char *satZBuf = new char[strlen(satZToPrint.c_str())];
 	strcpy(satZBuf, satZToPrint.c_str());
 
+	
+	string eulerXToPrint = convertToString(thetaX.at(counter));
+	char *eulerXBuf = new char[strlen(eulerXToPrint.c_str())];
+	strcpy(eulerXBuf, eulerXToPrint.c_str());
+	
+	string eulerYToPrint = convertToString(thetaY.at(counter));
+	char *eulerYBuf = new char[strlen(eulerYToPrint.c_str())];
+	strcpy(eulerYBuf, eulerYToPrint.c_str());
+
+	string eulerZToPrint = convertToString(thetaZ.at(counter));
+	char *eulerZBuf = new char[strlen(eulerZToPrint.c_str())];
+	strcpy(eulerZBuf, eulerZToPrint.c_str());
+
 	void *font = GLUT_BITMAP_TIMES_ROMAN_24;
+	//TLE
 	renderBitmapString(0, -2, 1.2, font, "TLE");
 	renderBitmapString(0, -2, 1, font, "1 25544U 98067A   16291.11854479  .00010689  00000-0  16758-3 0  9992");
 	renderBitmapString(0, -2, 0.8, font, "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954");
 	renderBitmapString(0, -2, 0.6, font, "Singapore UTC+8: 17/10/2016  10:50:42 AM");
+	
+	//satpos
 	renderBitmapString(0, -2, 0, font, "satX = ");
 	renderBitmapString(0, -1.7, 0, font, (char *)satXBuf);
 	renderBitmapString(0, -2, -0.5, font, "satY = ");
 	renderBitmapString(0, -1.7, -0.5, font, (char *)satYBuf);
 	renderBitmapString(0, -2, -1, font, "satZ = ");
 	renderBitmapString(0, -1.7, -1, font, (char *)satZBuf);
+
+	//euler
+	renderBitmapString(0, -1, 0, font, "eulerX = ");
+	renderBitmapString(0, -0.6, 0, font, (char *)eulerXBuf);
+	renderBitmapString(0, -1, -0.5, font, "eulerY = ");
+	renderBitmapString(0, -0.6, -0.5, font, (char *)eulerYBuf);
+	renderBitmapString(0, -1, -1, font, "eulerZ = ");
+	renderBitmapString(0, -0.6, -1, font, (char *)eulerZBuf);
+}
+
+double getAngleOfRotation(int axis)
+{
+	if (counter > 0)
+	{
+		if (axis = 0)
+		{
+			thetaXCumulative += (thetaX.at(counter) - thetaX.at(counter - 1));
+			return thetaXCumulative;
+		}
+		else if (axis = 1)
+		{
+			thetaYCumulative += (thetaY.at(counter) - thetaY.at(counter - 1));
+			return thetaYCumulative;
+		}
+		else if (axis = 2)
+		{
+			thetaZCumulative += (thetaZ.at(counter) - thetaZ.at(counter - 1));
+			return thetaZCumulative;
+		}
+	}
+	else
+	{
+		if (axis = 0)
+		{
+			thetaXCumulative = thetaX.at(counter);
+			return thetaXCumulative;
+		}
+		else if (axis = 1)
+		{
+			thetaYCumulative = thetaY.at(counter);
+			return thetaYCumulative;
+		}
+		else if (axis = 2)
+		{
+			thetaZCumulative = thetaZ.at(counter);
+			return thetaZCumulative;
+		}
+	}
+
 }
