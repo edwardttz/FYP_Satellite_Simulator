@@ -227,38 +227,8 @@ void SpacecraftDynamics::storeValues()
 	thetaZ_values.storeInFile(thetaZ);
 }
 
-/**
-double SpacecraftDynamics::vectorMultiplication(vector<double> row, vector<double> column)
-{
-double answer = 0.0;
-
-for (int i = 0; i < column.max_size; i++)
-{
-answer += row[i] * row[i];
-}
-
-return answer;
-}
-**/
-
-/**
-vector<double> SpacecraftDynamics::assignQuaternionValue(double value, vector<double> quaternionTemp)
-{
-quaternionTemp.push_back(value);
-
-return quaternionTemp;
-}
-**/
-
 void SpacecraftDynamics::findNextQuaternion()
 {
-	/**
-	double q0_next = eulerMethodQuaternions(0, -getVelocityX(), -getVelocityY(), -getVelocityZ(), getQuaternion0());
-	double qX_next = eulerMethodQuaternions(getVelocityX(), 0, getVelocityZ(), -getVelocityY(), getQuaternionX());
-	double qY_next = eulerMethodQuaternions(getVelocityY(), -getVelocityZ(), 0, getVelocityX(), getQuaternionY());
-	double qZ_next = eulerMethodQuaternions(getVelocityZ(), getVelocityY(), -getVelocityX(), 0, getQuaternionZ());
-	**/
-
 	double q0_next = rungeKuttaQuaternions(0, -getVelocityX(), -getVelocityY(), -getVelocityZ(), getQuaternion0());
 	double qX_next = rungeKuttaQuaternions(getVelocityX(), 0, getVelocityZ(), -getVelocityY(), getQuaternionX());
 	double qY_next = rungeKuttaQuaternions(getVelocityY(), -getVelocityZ(), 0, getVelocityX(), getQuaternionY());
@@ -476,33 +446,6 @@ double SpacecraftDynamics::quaternionZMulitplication(double w1, double x1, doubl
 	return ((w1 * z2) + (x1 * y2) - (y1 * x2) + (z1 * w2));
 }
 
-/*
-//original
-//a x b
-double SpacecraftDynamics::quaternion0Mulitplication(double a0, double a1, double a2, double a3, double b0, double b1, double b2, double b3)
-{
-return ((b0 * a0) - (b1 * a1) - (b2 * a2) - (b3 * a3));
-}
-
-//a x b
-double SpacecraftDynamics::quaternionXMulitplication(double a0, double a1, double a2, double a3, double b0, double b1, double b2, double b3)
-{
-return ((b0 * a1) + (b1 * a0) - (b2 * a3) + (b3 * a2));
-}
-
-//a x b
-double SpacecraftDynamics::quaternionYMulitplication(double a0, double a1, double a2, double a3, double b0, double b1, double b2, double b3)
-{
-return ((b0 * a2) + (b1 * a3) + (b2 * a0) - (b3 * a1));
-}
-
-//a x b
-double SpacecraftDynamics::quaternionZMulitplication(double a0, double a1, double a2, double a3, double b0, double b1, double b2, double b3)
-{
-return ((b0 * a3) - (b1 * a2) + (b2 * a1) + (b3 * a0));
-}
-*/
-
 double SpacecraftDynamics::inverseQuaternionVal(double qVal)
 {
 	return (qVal / findMagnitude(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ()));
@@ -526,46 +469,32 @@ void SpacecraftDynamics::findNextVector()
 	qXInverse = quaternionXInverse_temp;
 	qYInverse = quaternionYInverse_temp;
 	qZInverse = quaternionZInverse_temp;
-	/*
+
 	//multiply between vector and inverse of quaternion
-	double quaternion0Value_temp = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-	getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	double quaternion0Value_temp = quaternion0Mulitplication(getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial(),
+		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
 
-	double quaternionXValue_temp = quaternionXMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-	getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	double quaternionXValue_temp = quaternionXMulitplication(getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial(),
+		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
 
-	double quaternionYValue_temp = quaternionYMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-	getVector0(), getVectorX(), getVectorY(), getVectorZ());
+	double quaternionYValue_temp = quaternionYMulitplication(getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial(),
+		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
 
-	double quaternionZValue_temp = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-	getVector0(), getVectorX(), getVectorY(), getVectorZ());
-	*/
-
-	//multiply between vector initial and inverse of quaternion
-	double quaternion0Value_temp = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
-
-	double quaternionXValue_temp = quaternionXMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
-
-	double quaternionYValue_temp = quaternionYMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
-
-	double quaternionZValue_temp = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
-		getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial());
+	double quaternionZValue_temp = quaternionZMulitplication(getVector0Initial(), getVectorXInitial(), getVectorYInitial(), getVectorZInitial(),
+		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
 
 	//multiply between quaternion and product of vector and inverse of quaternion
-	double vector0_next = quaternion0Mulitplication(quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp,
-		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
+	double vector0_next = quaternion0Mulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp);
 
-	double vectorX_next = quaternionXMulitplication(quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp,
-		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
+	double vectorX_next = quaternionXMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp);
 
-	double vectorY_next = quaternionYMulitplication(quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp,
-		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
+	double vectorY_next = quaternionYMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp);
 
-	double vectorZ_next = quaternionZMulitplication(quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp,
-		getQ0Inverse(), getQXInverse(), getQYInverse(), getQZInverse());
+	double vectorZ_next = quaternionZMulitplication(getQuaternion0(), getQuaternionX(), getQuaternionY(), getQuaternionZ(),
+		quaternion0Value_temp, quaternionXValue_temp, quaternionYValue_temp, quaternionZValue_temp);
 
 	vector0 = vector0_next;
 	vectorX = vectorX_next;

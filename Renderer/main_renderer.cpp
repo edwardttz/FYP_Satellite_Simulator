@@ -135,10 +135,13 @@ double thetaYCumulative;
 double thetaZCumulative;
 
 //window id
-int satelliteWindow;
 int mainWindow;
 
+//for reading data
 ifstream infile;
+
+//simulation display time interval (default is 50ms)
+double displayInterval = 50;
 
 
 // Forward function declarations.
@@ -150,23 +153,14 @@ void updateScene(void);
 string convertToString(double);
 void printData(void);
 double getAngleOfRotation(char);
+void renderBitmapString(float, float, float, void *, char *);
 
-
-void renderBitmapString(float x,float y,float z,void *font,char *string)
-{
-	char *c;
-	glRasterPos3f(x, y, z);
-	for (c = string; *c != '\0'; c++)
-	{
-		glutBitmapCharacter(font, *c);
-	}
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // The display callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void EarthDrawing(void)
+void MyDisplay(void)
 {
 	if (hasTexture)
 		glEnable(GL_TEXTURE_2D);
@@ -242,7 +236,7 @@ void MyTimer(int v)
 	if (!pauseAnimation)
 	{
 		updateScene();
-		glutTimerFunc(1000 / DESIRED_FPS, MyTimer, v);
+		glutTimerFunc(displayInterval, MyTimer, v);
 	}
 }
 
@@ -250,7 +244,7 @@ void MyTimer(int v)
 // The keyboard callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void EarthKeyboard(unsigned char key, int x, int y)
+void MyKeyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
@@ -296,6 +290,29 @@ void EarthKeyboard(unsigned char key, int x, int y)
 		thetaXCumulative = thetaX.at(counter);
 		thetaYCumulative = thetaY.at(counter);
 		thetaZCumulative = thetaZ.at(counter);
+		displayInterval = 50;
+		glutPostRedisplay();
+		break;
+
+		//increase simulation interval by 5ms
+	case '+':
+		displayInterval -= 5;
+		if (displayInterval < 1)
+		{
+			displayInterval = 1;
+		}
+		glutPostRedisplay();
+		break;
+
+		//decrease simulation interval by 5ms
+	case '-':
+		displayInterval += 5;
+		glutPostRedisplay();
+		break;
+
+		//reset simulation interval to 50ms
+	case '*':
+		displayInterval = 50;
 		glutPostRedisplay();
 		break;
 	}
@@ -305,7 +322,7 @@ void EarthKeyboard(unsigned char key, int x, int y)
 // The special key callback function.
 /////////////////////////////////////////////////////////////////////////////
 
-void EarthSpecialKey(int key, int x, int y)
+void MySpecialKey(int key, int x, int y)
 {
 	int modi = glutGetModifiers();
 
@@ -457,26 +474,26 @@ void SetUpTextureMaps(void)
 
 int main(int argc, char** argv)
 {
-	//populate satX, satY, satZ, thetaX, thetaY and thetaZ
+	//populate satX, satY, satZ, thetaX, thetaY, thetaZ, wX, wY, wZ, aX, aY, aZ
 	getData("satX.txt");
 	getData("satY.txt");
 	getData("satZ.txt");
-	cout << "sat done" << endl;
+	cout << "Finished reading satellite position data!" << endl;
 
 	getData("thetaX.txt");
 	getData("thetaY.txt");
 	getData("thetaZ.txt");
-	cout << "theta done" << endl;
+	cout << "Finished reading euler angle data!" << endl;
 
 	getData("wX.txt");
 	getData("wY.txt");
 	getData("wZ.txt");
-	cout << "velocity done" << endl;
+	cout << "Finished reading angular velocity data!" << endl;
 
 	getData("aX.txt");
 	getData("aY.txt");
 	getData("aZ.txt");
-	cout << "acceleration done" << endl;
+	cout << "Finished reading angular acceleration data!" << endl;
 
 	//set initial theta
 	thetaXCumulative = thetaX.at(counter);
@@ -490,11 +507,11 @@ int main(int argc, char** argv)
 
 	// main window
 	mainWindow = glutCreateWindow("Main");
-	glutDisplayFunc(EarthDrawing);
+	glutDisplayFunc(MyDisplay);
 	glutReshapeFunc(MyReshape);
-	glutKeyboardFunc(EarthKeyboard);
-	glutSpecialFunc(EarthSpecialKey);
-	glutTimerFunc(50, MyTimer, 0);
+	glutKeyboardFunc(MyKeyboard);
+	glutSpecialFunc(MySpecialKey);
+	glutTimerFunc(displayInterval, MyTimer, 0);
 
 	// Setup the initial render context.
 	GLInit();
@@ -530,6 +547,8 @@ int main(int argc, char** argv)
 	printf("Press 'P' to toggle animation.\n");
 	printf("Press 'R' to reset to initial view.\n");
 	printf("Press 'E' to restart simulation.\n");
+	printf("Press '+' to decrease simulation time interval by 10x.\n");
+	printf("Press '-' to increase simulation time interval by 10x.\n");
 	printf("Press 'Q' to quit.\n\n");
 
 	// Enter GLUT event loop.
@@ -638,6 +657,7 @@ void SubdivideAndDrawQuad(int uSteps, int vSteps,
 	glEnd();
 }
 
+//draw earth
 void DrawEarth(void)
 {
 	double radius = 1;
@@ -762,11 +782,8 @@ void getData(string fileName)
 {
 	double temp;
 	infile.open(fileName);
-	//while (!infile.eof())
 	while (infile >> temp)
 	{
-		//double temp;
-		//infile >> temp;
 		if (fileName == "satX.txt")
 		{
 			satX.push_back(temp);
@@ -819,6 +836,7 @@ void getData(string fileName)
 	infile.close();
 }
 
+//function to update counter
 void updateScene(void)
 {
 	//translate satellite in main window
@@ -836,6 +854,7 @@ void updateScene(void)
 	glutPostRedisplay();
 }
 
+//convert from double to string
 string convertToString(double value)
 {
 	ostringstream ss;
@@ -843,6 +862,7 @@ string convertToString(double value)
 	return ss.str();
 }
 
+//printing words and data
 void printData(void)
 {
 	//satellite position
@@ -902,6 +922,11 @@ void printData(void)
 	char *timerBuf = new char[strlen(timerToPrint.c_str())];
 	strcpy(timerBuf, timerToPrint.c_str());
 
+	//display interval
+	string intervalToPrint = convertToString(displayInterval);
+	char *intervalBuf = new char[strlen(intervalToPrint.c_str())];
+	strcpy(intervalBuf, intervalToPrint.c_str());
+
 	void *font = GLUT_BITMAP_TIMES_ROMAN_24;
 	//TLE
 	renderBitmapString(0, -2, 1.2, font, "TLE");
@@ -909,9 +934,13 @@ void printData(void)
 	renderBitmapString(0, -2, 0.8, font, "2 25544  51.6446 169.8664 0007102  80.6091  76.5051 15.54264543 23954");
 	renderBitmapString(0, -2, 0.6, font, "Singapore UTC+8: 17/10/2016  10:50:42 AM");
 
-	//simulation time
+	//display interval
 	renderBitmapString(0, -2, 0.3, font, "time (in s) = ");
 	renderBitmapString(0, -1.3, 0.3, font, (char *)timerBuf);
+
+	//simulation time
+	renderBitmapString(0, -0.5, 0.3, font, "display interval (in ms) = ");
+	renderBitmapString(0, 0.6, 0.3, font, (char *)intervalBuf);
 	
 	//satpos
 	renderBitmapString(0, -2, -0.1, font, "satX = ");
@@ -946,6 +975,7 @@ void printData(void)
 	renderBitmapString(0, 1.25, -1.1, font, (char *)aZBuf);
 }
 
+//finding angle of rotation
 double getAngleOfRotation(char axis)
 {
 	if (counter > 0)
@@ -983,5 +1013,16 @@ double getAngleOfRotation(char axis)
 			thetaZCumulative = thetaZ.at(counter);
 			return thetaZCumulative;
 		}
+	}
+}
+
+//function to render strings into printable characters
+void renderBitmapString(float x, float y, float z, void *font, char *string)
+{
+	char *c;
+	glRasterPos3f(x, y, z);
+	for (c = string; *c != '\0'; c++)
+	{
+		glutBitmapCharacter(font, *c);
 	}
 }

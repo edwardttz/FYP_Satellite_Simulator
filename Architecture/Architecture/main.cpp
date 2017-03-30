@@ -39,22 +39,29 @@ void storeSatelliteValues(double, double, double);
 int main(void)
 {
 	clock_t tStart = clock();
+	
+	//initialize storage of satellite position values
 	initSatelliteStorage();
+
+	//initialize ground truth values
 	initGroundTruth();
 
 	for (int count = 0; count < 111601; count++) {
 		thread groundTruth(calculateGroundTruth, count);
-		thread noiseModels(calculateNoiseModels);
+		//thread noiseModels(calculateNoiseModels);
 
+		//join back groundtruth thread once it has completed calculations
 		if (groundTruth.joinable())
 		{
 			groundTruth.join();
 		}
 
+		/*
 		if (noiseModels.joinable())
 		{
 			noiseModels.join();
 		}
+		*/
 
 		mpe += 0.05/60;
 	}
@@ -67,56 +74,33 @@ void calculateGroundTruth(int counter)
 {
 	unique_lock<mutex> groundLock(groundTruthLock);
 	groundTruthConVar.wait(groundLock, [] {return transportDone;});
-	//printf("ground truth\n");
 
+	//switch off torque at 30s
 	if (counter == 599)
 	{
 		s1.setTorque(0.0, 0.0, 0.0);
 	}
 
+	//switch on negative torque at 1min
 	if (counter == 1199)
 	{
 		s1.setTorque(-0.01, -0.01, -0.01);
 	}
 
+	//switch off torque at 1min 30s
 	if (counter == 1799)
 	{
 		s1.setTorque(0.0, 0.0, 0.0);
 	}
 
-	//Find acceleration, next velocity and store all values in text file
+	//Find acceleration, euler angles and next vector and store all values in text files
+	//Find next velocity and quaternion values after that
 	s1.findAcc();
 	s1.findThetaValues();
 	s1.findNextVector();
 	s1.storeValues();
 	s1.getNextw();
 	s1.findNextQuaternion();
-
-	
-	/*
-	cout << "wX = " << s1.getVelocityX() << endl;
-	cout << "wY = " << s1.getVelocityY() << endl;
-	cout << "wZ = " << s1.getVelocityZ() << endl;
-
-	cout << "aX = " << s1.getAccX() << endl;
-	cout << "aY = " << s1.getAccY() << endl;
-	cout << "aZ = " << s1.getAccZ() << endl;
-
-	cout << "q0 = " << s1.getQuaternion0() << endl;
-	cout << "qX = " << s1.getQuaternionX() << endl;
-	cout << "qY = " << s1.getQuaternionY() << endl;
-	cout << "qZ = " << s1.getQuaternionZ() << endl;
-
-	cout << "q0inv = " << s1.getQ0Inverse() << endl;
-	cout << "qXinv = " << s1.getQXInverse() << endl;
-	cout << "qYinv = " << s1.getQYInverse() << endl;
-	cout << "qZinv = " << s1.getQZInverse() << endl;
-
-	cout << "v0 = " << s1.getVector0() << endl;
-	cout << "vX = " << s1.getVectorX() << endl;
-	cout << "vY = " << s1.getVectorY() << endl;
-	cout << "vZ = " << s1.getVectorZ() << endl;
-	*/
 	
 	// Test SGP4 TLE data
 	string str1 = "SGP4 Test";
@@ -133,9 +117,9 @@ void calculateGroundTruth(int counter)
 	// Locate position and velocity information of the satellite
 	// Time in minutes
 	// mpe = "minutes past epoch"
-	//cout << "mpe = " << mpe << endl;
-	//cout << "counter = " << counter << endl;
 	Execute_Sgp4(satSGP4, mpe, vecPos, geoPos, ecefPos);
+	
+	//store values in vecPos for writing into text file
 	storeSatelliteValues(vecPos[counter].Position().m_x, vecPos[counter].Position().m_y, vecPos[counter].Position().m_z);
 
 	//unlocking of mutex
@@ -188,8 +172,6 @@ void calculateNoiseModels()
 		JD += 1;
 	}
 	*/
-
-	//printf("noise\n");
 }
 
 void transportData()
