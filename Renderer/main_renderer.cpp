@@ -149,7 +149,6 @@ void getData(string);
 void updateScene(void);
 string convertToString(double);
 void printData(void);
-double getAngleOfRotation(int);
 double getAngleOfRotation(char);
 
 
@@ -683,33 +682,31 @@ void DrawSatellite(void)
 
 	if (counter > 0)
 	{
-		glRotated(getAngleOfRotation(0), 1, 0, 0);
-		glRotated(getAngleOfRotation(1), 0, 1, 0);
-		glRotated(getAngleOfRotation(2), 0, 0, 1);
-		//glRotated(getAngleOfRotation('x'), 1, 0, 0);
-		//glRotated(getAngleOfRotation('y'), 0, 1, 0);
-		//glRotated(getAngleOfRotation('z'), 0, 0, 1);
+		glRotated(getAngleOfRotation('x'), 1, 0, 0);
+		glRotated(getAngleOfRotation('y'), 0, 1, 0);
+		glRotated(getAngleOfRotation('z'), 0, 0, 1);
 	}
 
+	//set side to red (z)
 	GLfloat matAmbient1[] = { 1.0, 0.0, 0.0, 0.0 };
 	GLfloat matDiffuse1[] = { 1.0, 0.0, 0.0, 0.0 };
-	GLfloat matSpecular1[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat matSpecular1[] = { 1.0, 1.0, 0.0, 1.0 };
 	GLfloat matShininess1[] = { 128.0 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient1);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse1);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular1);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess1);
 
-	//in +ve z-direction (normal vector)
-	glNormal3f(0.0, 0.0, 1.0);
-	//draw counter-clockwise from (0, 0)
+	//in +ve z-direction 
+	glNormal3f(0.0, 0.0, 1.0); // Normal vector
 	SubdivideAndDrawQuad(24, 2,
 		0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z,
 		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z);
 
-	GLfloat matAmbient2[] = { 0.5, 0.5, 0.5, 0.5 };
+	//other sides all white
+	GLfloat matAmbient2[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat matDiffuse2[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat matSpecular2[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat matShininess2[] = { 128.0 };
@@ -717,26 +714,29 @@ void DrawSatellite(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse2);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular2);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess2);
-
-	// Sides.
+	
 	// In +y direction.
 	glNormal3f(0.0, 1.0, 0.0); // Normal vector.
 	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z);
+
+
 	// In -y direction.
 	glNormal3f(0.0, -1.0, 0.0); // Normal vector.
 	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X1, SATELLITE_Y1, SATELLITE_Z);
+
 	// In +x direction.
 	glNormal3f(1.0, 0.0, 0.0); // Normal vector.
 	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 0.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
 		1.0, 1.0, SATELLITE_X2, SATELLITE_Y2, SATELLITE_Z,
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z);
+
 	// In -x direction.
 	glNormal3f(-1.0, 0.0, 0.0); // Normal vector.
 	SubdivideAndDrawQuad(24, 2, 0.0, 0.0, SATELLITE_X1, SATELLITE_Y2, SATELLITE_Z - SATELLITE_THICKNESS,
@@ -944,46 +944,6 @@ void printData(void)
 	renderBitmapString(0, 1.25, -0.6, font, (char *)aYBuf);
 	renderBitmapString(0, 1.0, -1.1, font, "aZ = ");
 	renderBitmapString(0, 1.25, -1.1, font, (char *)aZBuf);
-}
-
-double getAngleOfRotation(int axis)
-{
-	if (counter > 0)
-	{
-		if (axis = 0)
-		{
-			thetaXCumulative += (thetaX.at(counter) - thetaX.at(counter - 1));
-			return thetaXCumulative;
-		}
-		else if (axis = 1)
-		{
-			thetaYCumulative += (thetaY.at(counter) - thetaY.at(counter - 1));
-			return thetaYCumulative;
-		}
-		else if (axis = 2)
-		{
-			thetaZCumulative += (thetaZ.at(counter) - thetaZ.at(counter - 1));
-			return thetaZCumulative;
-		}
-	}
-	else
-	{
-		if (axis = 0)
-		{
-			thetaXCumulative = thetaX.at(counter);
-			return thetaXCumulative;
-		}
-		else if (axis = 1)
-		{
-			thetaYCumulative = thetaY.at(counter);
-			return thetaYCumulative;
-		}
-		else if (axis = 2)
-		{
-			thetaZCumulative = thetaZ.at(counter);
-			return thetaZCumulative;
-		}
-	}
 }
 
 double getAngleOfRotation(char axis)
