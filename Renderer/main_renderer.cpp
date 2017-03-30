@@ -50,6 +50,8 @@ using namespace std;
 
 #define DESIRED_FPS 60
 
+#define EARTH_ROTATION_ANGLE 0.00002089
+
 // Light 0.
 const GLfloat light0Ambient[] = { 0.2, 0.2, 0.2, 1.0 };
 const GLfloat light0Diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -644,6 +646,7 @@ void DrawEarth(void)
 
 							  //draw earth
 	glPushMatrix();
+	glRotated((EARTH_ROTATION_ANGLE * counter), 0, 0, 1);
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, GL_TRUE);
 	gluSphere(quad, radius, 32, 16);
