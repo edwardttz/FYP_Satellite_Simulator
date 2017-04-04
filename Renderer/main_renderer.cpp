@@ -85,10 +85,10 @@ int winWidth = 1024;     // Window width in pixels.
 int winHeight = 768;    // Window height in pixels.
 
 
-						// Define (actual) eye position.
-						// Initial eye position is at [EYE_INIT_DIST, 0, 0] + [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]
-						// in the world space, looking at [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]. 
-						// The up-vector is always [0, 0, 1].
+// Define (actual) eye position.
+// Initial eye position is at [EYE_INIT_DIST, 0, 0] + [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]
+// in the world space, looking at [LOOKAT_X, LOOKAT_Y, LOOKAT_Z]. 
+// The up-vector is always [0, 0, 1].
 
 double eyeLatitude = 0.0;
 double eyeLongitude = 0.0;
@@ -96,7 +96,6 @@ double eyeDistance = EYE_INIT_DIST;
 
 // The actual eye position in world space.
 // This is computed from eyeLatitude, eyeLongitude, eyeDistance, and the look-at point.
-
 double eyePos[3];
 
 // Texture objects.
@@ -207,6 +206,7 @@ void MyDisplay(void)
 	glEnable(GL_LIGHTING);
 	DrawSatellite();
 
+	//switch viewport to data display
 	glViewport(0, 0, winWidth, winHeight / 2);
 	glDisable(GL_LIGHTING);
 	double eyePosZ = EYE_INIT_DIST * sin(0 * PI / 180.0) + LOOKAT_Z;
@@ -676,7 +676,7 @@ void DrawEarth(void)
 
 	glDisable(GL_CULL_FACE);  // Disable back-face culling.
 
-							  //draw earth
+	//draw earth
 	glPushMatrix();
 	glRotated((EARTH_ROTATION_ANGLE * counter), 0, 0, 1);
 	quad = gluNewQuadric();
@@ -688,7 +688,6 @@ void DrawEarth(void)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glPushMatrix();
 	glTranslated(satX.at(counter) / 6431, satY.at(counter) / 6431, satZ.at(counter) / 6431);
-	//glutSolidSphere(0.05, 32, 16);
 	glScalef(0.05, 0.05, 0.05);
 	DrawSatellite();
 	glPopMatrix();
@@ -839,9 +838,6 @@ void getData(string fileName)
 //function to update counter
 void updateScene(void)
 {
-	//translate satellite in main window
-	//rotate satellite in satellite window
-	//update display of data
 	if (counter < satX.size() - 1)
 	{
 		counter++;
@@ -975,7 +971,8 @@ void printData(void)
 	renderBitmapString(0, 1.25, -1.1, font, (char *)aZBuf);
 }
 
-//finding angle of rotation
+//finding cumulative angle of rotation
+//rotation is from original position, so need to know how much total angle to rotate by
 double getAngleOfRotation(char axis)
 {
 	if (counter > 0)
