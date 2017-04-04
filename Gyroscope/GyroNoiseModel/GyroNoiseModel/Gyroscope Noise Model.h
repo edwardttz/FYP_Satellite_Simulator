@@ -9,7 +9,7 @@ using namespace std;
 class GyroNoiseModel
 {
 private:
-	static double pollingTime; //polling time of main program in seconds.
+	static double pollingTime; 
 	static int numberOfNoiseGenerations;
 	static int counterForNoise;
 	static vector <double> realWValues;

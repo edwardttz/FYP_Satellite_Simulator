@@ -306,8 +306,8 @@ vector <double> GyroNoiseModel::findRawGyro(string fileName) {
 	return gyroValues;
 }
 
-
-double GyroNoiseModel::noiseDensityValue(double timeStep) { //Calculates noise density between values found using allan variance method
+//Calculates noise density between values found using allan variance method
+double GyroNoiseModel::noiseDensityValue(double timeStep) { 
 	double noiseDValue;
 	noiseDValue = generateRandomNumber(minNoiseDensity, maxNoiseDensity);
 	return noiseDValue*timeStep;
@@ -370,7 +370,8 @@ void GyroNoiseModel::testGyroModel() {
 	s1.findConstants();
 	double totalNoise;
 
-	for (int i = 0; i < 9000; i++) //For 3 minutes at 20ms stepsize 
+	//For 3 minutes at 20ms stepsize 
+	for (int i = 0; i < 9000; i++) 
 		{
 		//switching torque off after 30s
 			if (i == 1499) 
@@ -490,6 +491,7 @@ void GyroNoiseModel::testReverseNoiseModel(string fileName) {
 	}
 }
 
+//Trial code for a simple Kalman Filter
 void GyroNoiseModel::kalmanFilter(string fileName) {
 	vector <double> data;
 	data = findRawGyro(fileName);
