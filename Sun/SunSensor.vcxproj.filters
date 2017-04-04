@@ -41,9 +41,6 @@
     <ClInclude Include="SunSensorModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="testCase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -42,25 +42,20 @@ void EciSun::calculateSunVec()
 	sun_Position.x *= sunDistInKm;
 	sun_Position.y *= sunDistInKm;
 	sun_Position.z *= sunDistInKm;
-
-	// Computes the azimuth and elevation of Sun
-	//sun_Position.azi = rad2deg((atan(sun_Position.y / sun_Position.x)));
-	//sun_Position.ele = rad2deg((atan(sun_Position.z / sqrt(powl(sun_Position.x, 2) +
-		//powl(sun_Position.y, 2)))));
 }
 
-void EciSun::computeBodyFrame(double eciX, double eciY, double eciZ)
+void EciSun::computeBodySunVec(double eciX, double eciY, double eciZ)
 {
-	// Gets the satellite body frame 
-	body_Position.x = (-eciX + sun_Position.x);
-	body_Position.y = (-eciY + sun_Position.y);
-	body_Position.z = (-eciZ + sun_Position.z);
+	// Get the sun vector
+	sun_Vector.x = (-eciX + sun_Position.x);
+	sun_Vector.y = (-eciY + sun_Position.y);
+	sun_Vector.z = (-eciZ + sun_Position.z);
 
 	// Normalize the vectors
-	body_Position.m = body_Position.Magnitude_2D();
-	body_Position.x /= body_Position.m;
-	body_Position.y /= body_Position.m;
-	body_Position.z /= body_Position.m;
+	sun_Vector.m = sun_Vector.Magnitude_2D();
+	sun_Vector.x /= sun_Vector.m;
+	sun_Vector.y /= sun_Vector.m;
+	sun_Vector.z /= sun_Vector.m;
 }
 
 void EciSun::setJulianDate(double JD)

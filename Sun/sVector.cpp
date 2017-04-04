@@ -30,6 +30,10 @@ void sVector::Sub(const sVector& vec)
 		
 double sVector::Angle_2D(const sVector& vec) const
 {
+	if (Dot_2D(vec) == 0 && Magnitude_2D() == 0)
+	{
+		return 0;
+	}
 	return acos(Dot_2D(vec) / (Magnitude_2D() * vec.Magnitude_2D()));
 }
 
@@ -82,7 +86,10 @@ double sVector::computeAzimuth(const sVector& vec) const
 {
 	double result;
 
-	result = rad2deg(Angle_2D(vec));
+	//if (z == 1 || z == -1) 
+		//result = rad2deg(Angle_3D(vec));
+	//else 
+		result = rad2deg(Angle_2D(vec));
 
 	//	+X face
 	if (vec.y < 0 && x == 1) {
@@ -113,12 +120,13 @@ double sVector::computeAzimuth(const sVector& vec) const
 double sVector::computeElevation(const sVector& vec) const
 {
 	double aX, aY, aZ, aDotB, magA, magB, result;
-	
-	// The cross product of X(1,0,0) and Y(0,1,0) yields us a Z component
+	                  
+	// Defined plane with respect to z
 	aX = 0;
 	aY = 0;
 	aZ = 1;
 
+	// Dot Product of the vectors
 	aDotB = abs(vec.x * aX + vec.y * aY + vec.z * aZ);
 	magA = sqrt(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2));
 	magB = sqrt(pow(aX, 2) + pow(aY, 2) + pow(aZ, 2));
