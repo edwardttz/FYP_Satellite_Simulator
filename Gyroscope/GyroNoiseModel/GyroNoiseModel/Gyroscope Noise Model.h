@@ -11,6 +11,7 @@ class GyroNoiseModel
 private:
 	static double pollingTime; //polling time of main program in seconds.
 	static int numberOfNoiseGenerations;
+	static int counterForNoise;
 	static vector <double> realWValues;
 	static double wXreal;
 	static double wYreal;
@@ -20,6 +21,7 @@ private:
 	static double wZideal;
 	static int fsValue;
 	static double samplePeriod;
+	static double timeGenerated;
 	static long int noOfSamples;
 	static double maxNonLinearity;
 	static double minNonLinearity;
@@ -34,6 +36,13 @@ private:
 	Storage wYRealValues;
 	Storage wZRealValues;
 	Storage allanDeviation;
+	Storage noiseValues;
+	Storage randomValues;
+	Storage angleVectorX;
+	Storage angleVectorY;
+	Storage angleVectorZ;
+	Storage reverseGyroModel;
+	Storage filter;
 
 public:
 	/*Setting enviroment*/
@@ -45,6 +54,8 @@ public:
 	int getFSValue();
 	void setSamplePeriod(double);
 	double getSamplePeriod();
+	void setDataGenTime(double);
+	double getDataGenTime();
 	/*General equations of getting and setting variables*/
 	vector <double> getRealWValues();
 	double getRealwX();
@@ -65,8 +76,8 @@ public:
 	/*Non Linearity*/
 	void setMaxNonLinearity();
 	void setMinNonLinearity();
-	double nonLinearityValue();
-	double accumNonLinearityValues();
+	double nonLinearityValue(double);
+	double accumNonLinearityValues(double);
 	/*Noise density*/
 	void setMaxNoiseDensity(double);
 	void setMinNoiseDensity(double);
@@ -77,13 +88,21 @@ public:
 	void findNoOfSamples();
 	void calculateAllanDeviation(int);
 	void findRawValues(string);
-	double noiseDensityValue();
-	double accumNoiseDensityValues();
+	vector <double> findRawGyro(string);
+	double noiseDensityValue(double);
+	double accumNoiseDensityValues(double);
+	void storeRandomValues();
 	/*Real W with all noise calculation*/
-	void findAccumNoise();
+	void findAccumNoise(double);
 	void findRealW();
 	void storeRealwValues();
 	void testGyroModel();
+	void testConstW();
+	double generateNextAngle(double, double, double);
+	void generateRawARW();
+	void generateARW(string, Storage);
+	void testReverseNoiseModel(string);
+	void kalmanFilter(string);
 };
 
 
