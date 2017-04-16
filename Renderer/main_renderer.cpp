@@ -260,18 +260,12 @@ void MyKeyboard(unsigned char key, int x, int y)
 		drawAxes = !drawAxes;
 		glutPostRedisplay();
 		break;
+
 		// Pause or resume animation.
 	case 'p':
 	case 'P':
 		pauseAnimation = !pauseAnimation;
 		if (!pauseAnimation) glutTimerFunc(0, MyTimer, 0);
-		break;
-
-		// Toggle texture mapping.
-	case 't':
-	case 'T':
-		hasTexture = !hasTexture;
-		glutPostRedisplay();
 		break;
 
 		// Reset to initial view.
@@ -536,19 +530,18 @@ int main(int argc, char** argv)
 
 	// Display user instructions in console window.
 
-	printf("Press LEFT to move eye left.\n");
-	printf("Press RIGHT to move eye right.\n");
-	printf("Press UP to move eye up.\n");
-	printf("Press DOWN to move eye down.\n");
-	printf("Press SHIFT+UP to move closer.\n");
-	printf("Press SHIFT+DOWN to move further.\n");
-	printf("Press 'T' to toggle texture mapping.\n");
+	printf("Press LEFT to move camera left.\n");
+	printf("Press RIGHT to move camera right.\n");
+	printf("Press UP to move camera up.\n");
+	printf("Press DOWN to move camera down.\n");
+	printf("Press SHIFT+UP to zoom in.\n");
+	printf("Press SHIFT+DOWN to zoom out.\n");
 	printf("Press 'X' to toggle axes.\n");
 	printf("Press 'P' to toggle animation.\n");
 	printf("Press 'R' to reset to initial view.\n");
 	printf("Press 'E' to restart simulation.\n");
-	printf("Press '+' to decrease simulation time interval by 10x.\n");
-	printf("Press '-' to increase simulation time interval by 10x.\n");
+	printf("Press '+' to decrease simulation time interval by 5ms.\n");
+	printf("Press '-' to increase simulation time interval by 5ms.\n");
 	printf("Press 'Q' to quit.\n\n");
 
 	// Enter GLUT event loop.
@@ -771,9 +764,6 @@ void DrawSatellite(void)
 		0.0, 1.0, SATELLITE_X2, SATELLITE_Y1, SATELLITE_Z - SATELLITE_THICKNESS);
 
 	glPopMatrix();
-
-	// Draw axes.
-	//if (drawAxes) DrawAxes(2);
 }
 
 //reading from .txt files
